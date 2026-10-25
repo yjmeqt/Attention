@@ -73,10 +73,29 @@ enum Unfurler {
     }
 
     private static func imageData(_ string: String?) async -> Data? {
-        guard let string, let url = URL(string: string),
-              let data = try? await fetch(url), let image = UIImage(data: data),
-              image.size.width >= 48, image.size.height >= 48 else { return nil }
-        return data
+        guard let string else { return nil }
+        for url in imageCandidates(string) {
+            if let data = try? await fetch(url), let image = UIImage(data: data),
+               image.size.width >= 48, image.size.height >= 48 { return data }
+        }
+        return nil
+    }
+
+    /// An image URL wrapped in a resizing proxy, like Xiaohongshu's
+    /// `https://ci.xiaohongshu.com/http://sns-webpic….xhscdn.com/…?imageMogr2/crop/450x300`, is tried unwrapped
+    /// first: the proxy often fails, and the original keeps its full size and aspect ratio.
+    nonisolated static func imageCandidates(_ string: String) -> [URL] {
+        var strings: [String] = []
+        if string.count > 8, let inner = string.dropFirst(8).range(of: "https?://", options: .regularExpression) {
+            let wrapped = String(string[inner.lowerBound...])
+            strings += [String(wrapped.prefix { $0 != "?" }), wrapped]
+        }
+        strings.append(string)
+        var seen = Set<URL>()
+        return strings
+            .map { $0.hasPrefix("http://") ? "https://" + $0.dropFirst(7) : $0 }
+            .compactMap(URL.init(string:))
+            .filter { seen.insert($0).inserted }
     }
 
     /// Downloads an icon and keeps it at most 192 px, preserving transparency.
@@ -207,7 +226,7 @@ enum Unfurler {
         let icon = OpenGraph.icon(in: page).flatMap { URL(string: $0, relativeTo: finalURL)?.absoluteURL.absoluteString }
         async let imageResult = imageData(image)
         async let iconResult = iconData(icon)
-        return LinkMeta(url: url, site: site, title: title,
+        return LinkMeta(url: url, site: site, title: OpenGraph.removingSiteSuffix(site, from: title),
                         imageData: await imageResult, iconData: await iconResult)
     }
 
@@ -272,6 +291,15 @@ enum OpenGraph {
             if score > (best?.score ?? -1) { best = (score, decodeEntities(href)) }
         }
         return best?.href
+    }
+
+    /// "原来苹果 CEO 也是法拉利车迷？ - 小红书" → "原来苹果 CEO 也是法拉利车迷？", since the site is shown separately.
+    static func removingSiteSuffix(_ site: String, from title: String) -> String {
+        for separator in [" - ", " | ", " – ", " — ", "_"] where title.hasSuffix(separator + site) {
+            let trimmed = title.dropLast(separator.count + site.count).trimmingCharacters(in: .whitespaces)
+            return trimmed.isEmpty ? title : trimmed
+        }
+        return title
     }
 
     static func title(in html: String) -> String? {

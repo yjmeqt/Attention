@@ -145,6 +145,24 @@ struct LibraryTests {
         }
     }
 
+    @Test func unwrapsProxiedImageURLs() {
+        let proxied = "https://ci.xiaohongshu.com/http://sns-webpic-qc.xhscdn.com/a/b!h5_1080jpg?imageMogr2/crop/450x300"
+        #expect(Unfurler.imageCandidates(proxied).map(\.absoluteString) == [
+            "https://sns-webpic-qc.xhscdn.com/a/b!h5_1080jpg",
+            "https://sns-webpic-qc.xhscdn.com/a/b!h5_1080jpg?imageMogr2/crop/450x300",
+            proxied,
+        ])
+        #expect(Unfurler.imageCandidates("http://example.com/a.jpg").map(\.absoluteString) == ["https://example.com/a.jpg"])
+        #expect(Unfurler.imageCandidates("https://example.com/a.jpg?w=1").map(\.absoluteString) == ["https://example.com/a.jpg?w=1"])
+    }
+
+    @Test func removesSiteSuffixFromTitles() {
+        #expect(OpenGraph.removingSiteSuffix("小红书", from: "原来苹果 CEO 也是法拉利车迷？ - 小红书") == "原来苹果 CEO 也是法拉利车迷？")
+        #expect(OpenGraph.removingSiteSuffix("GitHub", from: "Pull requests | GitHub") == "Pull requests")
+        #expect(OpenGraph.removingSiteSuffix("小红书", from: "小红书") == "小红书")
+        #expect(OpenGraph.removingSiteSuffix("小红书", from: "红书日记") == "红书日记")
+    }
+
     static func qrImage(_ text: String) -> Data? {
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(text.utf8)
