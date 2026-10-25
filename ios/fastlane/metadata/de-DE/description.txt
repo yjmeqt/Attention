@@ -1,0 +1,26 @@
+Links von YouTube, X und vielen anderen Websites erscheinen in WeChat nur als nackte Adresse – ohne Titel und ohne Vorschaubild. OpticShare macht aus jedem Link eine saubere Bildkarte, damit deine Kontakte auf einen Blick sehen, worum es geht.
+
+SO FUNKTIONIERT’S
+1. Kopiere einen Link oder tippe in Safari oder einer anderen App auf „Teilen“ und wähle OpticShare
+2. Du erhältst eine Karte mit Titel, Coverbild, Autor und QR-Code
+3. Sende das Bild in WeChat und füge dann den Link ein – er ist schon in der Zwischenablage
+
+FUNKTIONIERT MIT
+• YouTube-Videos: Vorschaubild, Titel und Kanal
+• X-Posts: Text, Autor und Medien
+• Bilibili-Videos: Cover, Titel und Uploader
+• Jeder Webseite: Titel, Vorschaubild und Website-Symbol
+
+KARTENSTILE
+• Die passende Vorlage wird für jeden Link automatisch gewählt: Bild, Beitrag, Text oder QR
+• Seitenverhältnisse 4:5, 1:1 und 9:16 für Chats, Momente und Storys
+• Den QR-Code auf der Karte scannen, um den Original-Link zu öffnen
+• Tracking-Parameter werden aus geteilten Links entfernt
+
+AUSSERDEM
+• QR-Codes mit der Kamera oder aus einem Foto scannen
+• Verlauf, um jede Karte erneut zu teilen
+• iPhone und iPad, heller und dunkler Modus
+
+DATENSCHUTZ
+Links werden auf deinem Gerät verarbeitet. Kein Konto, kein Tracking, keine Datenerhebung.

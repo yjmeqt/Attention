@@ -16,7 +16,13 @@ devices=(
   "OpticShare-Shots-iPhone|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max|iphone"
   "OpticShare-Shots-iPad|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad"
 )
-locales=("zh-Hans|zh_CN" "en-US|en_US")
+# fastlane locale|app language|region|App Store storefront. es-MX reuses the es-ES shots.
+locales=(
+  "zh-Hans|zh-Hans|zh_CN|cn" "en-US|en|en_US|us" "ko|ko|ko_KR|kr" "ja|ja|ja_JP|jp" "ru|ru|ru_RU|ru"
+  "vi|vi|vi_VN|vn" "ar-SA|ar|ar_SA|sa" "fr-FR|fr|fr_FR|fr" "de-DE|de|de_DE|de" "es-ES|es|es_ES|es"
+)
+# ONLY="ko ja" limits the run to those fastlane locales.
+ONLY=${ONLY:-}
 # label|url|extra launch flag ({cc} becomes the storefront: cn or us). Labels starting with _
 # are launched but not captured, so History has more to show. 2-extension is captured by hand
 # from Safari's share sheet. Demo launches hide the paste banner; 7-empty shows it with a link copied.
@@ -44,17 +50,17 @@ for device in $devices; do
   xcrun simctl ui "$udid" appearance light
   xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 \
     --wifiBars 3 --cellularMode active --cellularBars 4 --dataNetwork wifi
-  xcrun simctl uninstall "$udid" $BUNDLE 2>/dev/null || true
-  xcrun simctl install "$udid" "$APP"
 
   for locale in $locales; do
-    IFS='|' read -r lang region <<< "$locale"
-    language=${lang%-US}
+    IFS='|' read -r lang language region cc <<< "$locale"
+    [[ -n $ONLY && " $ONLY " != *" $lang "* ]] && continue
+    # A fresh install per locale keeps History in that locale's language.
+    xcrun simctl uninstall "$udid" $BUNDLE 2>/dev/null || true
+    xcrun simctl install "$udid" "$APP"
     mkdir -p "$OUT/$lang"
     for scene in $scenes; do
       IFS='|' read -r label url flag <<< "$scene"
       args=(-AppleLanguages "($language)" -AppleLocale "$region" -seenShareGuide YES -demoNoAutoShare YES)
-      cc=$([[ $language == zh-Hans ]] && echo cn || echo us)
       [[ -n $url ]] && args+=(-demoURL "${url//\{cc\}/$cc}")
       [[ -n $flag ]] && args+=(-$flag YES)
       xcrun simctl terminate "$udid" $BUNDLE 2>/dev/null || true

@@ -16,7 +16,7 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 
 ## Listing copy
 
-`ios/fastlane/metadata/` follows the [fastlane deliver](https://docs.fastlane.tools/actions/deliver/) layout, one folder per locale (`zh-Hans`, `en-US`):
+`ios/fastlane/metadata/` follows the [fastlane deliver](https://docs.fastlane.tools/actions/deliver/) layout, one folder per locale: Simplified Chinese (`zh-Hans`), English (`en-US`), Korean (`ko`), Japanese (`ja`), Russian (`ru`), Vietnamese (`vi`), Arabic (`ar-SA`), French (`fr-FR`), German (`de-DE`) and Spanish (`es-ES`, `es-MX`):
 
 | File | Limit |
 |---|---|
@@ -34,8 +34,9 @@ Upload with `fastlane deliver --skip_binary_upload --skip_screenshots` from `ios
 
 ## Screenshots
 
-1. `ios/Tools/capture-screenshots.sh` builds the Debug app, creates two simulators (iPhone 17 Pro Max, 6.9-inch, and iPad Pro 13-inch) and captures every scene in both locales into `ios/fastlane/raw/`. Scenes are driven by Debug-only launch arguments: `-demoURL <link>` generates a card on launch and `-demoStyle YES` opens the Style sheet.
-2. `ios/Tools/frame-screenshots.swift` adds the caption and background and writes the upload-ready images to `ios/fastlane/screenshots/<locale>/`. Captions are defined at the top of that script.
+1. `ios/Tools/capture-screenshots.sh` builds the Debug app, creates two simulators (iPhone 17 Pro Max, 6.9-inch, and iPad Pro 13-inch) and captures every scene in every locale into `ios/fastlane/raw/` (git-ignored). `ONLY="ko ja"` limits a run to some locales. Scenes are driven by Debug-only launch arguments: `-demoURL <link>` generates a card on launch, `-demoStyle YES` opens the Style sheet, `-demoHistory YES` opens History, and `-demoNoAutoShare YES` keeps the share extension's card on screen instead of opening the share sheet. Demo content is limited to Apple's own pages (App Store, Apple Music, Apple Maps).
+2. Two scenes are captured by hand, for Chinese and English only: `2-extension` (in Safari, tap Share and choose OpticShare; the simulator's system language must match) and the iPhone Duo set (`duo-*`, unfolded, rotated to landscape). Save them into `ios/fastlane/raw/<locale>/` with those names.
+3. `ios/Tools/frame-screenshots.swift` adds the caption and background and writes the upload-ready images to `ios/fastlane/screenshots/<locale>/`. Captions are defined at the top of that script. `es-MX` reuses the `es-ES` images. App Store Connect has no foldable size class, so the iPhone Duo images go to `ios/fastlane/extra/` for marketing use.
 
 Sizes: iPhone 1320 × 2868, iPad 2064 × 2752. Those are the only sizes App Store Connect requires; smaller devices are scaled from them.
 
@@ -46,7 +47,7 @@ The capture needs network access, because the demo links are unfurled live.
 - **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking, no collected data; UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
 - **App Privacy questionnaire**: answer **Data Not Collected**. Links are fetched from the device and never sent to the developer.
 - **Privacy policy**: `docs/privacy-policy.md` (Chinese and English). It must be published at a public URL and that URL put in `privacy_url.txt`. The repo is private, so use GitHub Pages from a public repo, a Gist, or any static host.
-- **Permission prompts**: camera (QR scanning) and adding to Photos, in English and Simplified Chinese (`InfoPlist.strings`).
+- **Permission prompts**: camera (QR scanning) and adding to Photos, in all listed languages (`InfoPlist.strings`).
 
 ## Age rating and export compliance
 

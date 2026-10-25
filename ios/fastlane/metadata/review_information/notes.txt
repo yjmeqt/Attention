@@ -1,7 +1,7 @@
 No account or login is required.
 
 To test:
-1. Open OpticShare, paste a link (for example https://www.youtube.com/watch?v=dQw4w9WgXcQ) and tap Generate. A card image is created on the device.
+1. Open OpticShare, paste a link (for example https://www.youtube.com/watch?v=0_DjDdfqtUE) and tap Generate. A card image is created on the device.
 2. Tap Share to send the card through the system share sheet. The cleaned link is copied to the clipboard at the same time.
 3. The share extension: in Safari, open any page, tap Share and choose OpticShare.
 

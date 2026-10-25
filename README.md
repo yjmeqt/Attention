@@ -55,7 +55,7 @@ xcodebuild -project OpticShare.xcodeproj -scheme OpticShare \
 
 - Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.com.yijiang.opticshare`.
 - Signing uses automatic provisioning with team `5AT3UN98GQ`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and the bundle ID prefix in `project.yml`.
-- UI strings are in `Shared/Localizable.xcstrings` (English source, Simplified Chinese). The app icon is an Icon Composer document (`App/OpticShare.icon`), so iOS derives the dark, tinted and clear appearances itself.
+- UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/OpticShare.icon`), so iOS derives the dark, tinted and clear appearances itself.
 
 Tests: the `UnfurlTests` suite fetches about 30 real Chinese and US sites, so it needs network access and is slow. Run everything else with:
 
