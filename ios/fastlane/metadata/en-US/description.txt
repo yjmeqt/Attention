@@ -1,7 +1,7 @@
 Links from YouTube, X and many other sites show up in WeChat as a bare URL, with no title and no thumbnail. OpticShare turns any link into a clean image card, so the people you share with can see what it is at a glance.
 
 HOW IT WORKS
-1. Copy a link, or tap Share in Safari, YouTube, X or any other app and choose OpticShare
+1. Copy a link, or tap Share in Safari or another app and choose OpticShare
 2. Get a card with the title, cover image, author and a QR code
 3. Send the image in WeChat, then paste the link — it's already on your clipboard
 

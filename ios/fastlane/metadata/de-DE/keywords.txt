@@ -1,0 +1,1 @@
+wechat,linkvorschau,teilen,karte,qr-code,youtube,twitter,vorschaubild,poster,url

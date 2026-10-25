@@ -1,0 +1,26 @@
+Liên kết từ YouTube, X và nhiều trang web khác chỉ hiện trên WeChat dưới dạng một địa chỉ trần, không có tiêu đề hay ảnh thu nhỏ. OpticShare biến mọi liên kết thành một thẻ ảnh gọn gàng để người nhận hiểu ngay bạn đang chia sẻ gì.
+
+CÁCH DÙNG
+1. Sao chép liên kết, hoặc chạm Chia sẻ trong Safari hay ứng dụng khác rồi chọn OpticShare
+2. Nhận thẻ có tiêu đề, ảnh bìa, tác giả và mã QR
+3. Gửi ảnh trong WeChat rồi dán liên kết — liên kết đã có sẵn trong bộ nhớ tạm
+
+HỖ TRỢ
+• Video YouTube: ảnh thu nhỏ, tiêu đề và kênh
+• Bài đăng X: nội dung, tác giả và ảnh/video
+• Video Bilibili: ảnh bìa, tiêu đề và người đăng
+• Mọi trang web: tiêu đề, ảnh xem trước và biểu tượng trang
+
+KIỂU THẺ
+• Tự chọn mẫu phù hợp nhất cho từng liên kết: ảnh lớn, bài đăng, văn bản hoặc QR
+• Tỷ lệ 4:5, 1:1 và 9:16 cho trò chuyện, Khoảnh khắc và tin
+• Quét mã QR trên thẻ để mở liên kết gốc
+• Loại bỏ tham số theo dõi khỏi liên kết được chia sẻ
+
+NGOÀI RA
+• Quét mã QR bằng camera hoặc từ ảnh
+• Lịch sử để chia sẻ lại bất kỳ thẻ nào
+• iPhone và iPad, chế độ sáng và tối
+
+QUYỀN RIÊNG TƯ
+Liên kết được xử lý trên thiết bị. Không cần tài khoản, không theo dõi, không thu thập dữ liệu.

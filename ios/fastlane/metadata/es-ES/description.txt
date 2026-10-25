@@ -1,0 +1,26 @@
+En WeChat, los enlaces de YouTube, X y muchos otros sitios aparecen como una simple dirección, sin título ni miniatura. OpticShare convierte cualquier enlace en una tarjeta de imagen limpia, para que quien la reciba vea de un vistazo qué le compartes.
+
+CÓMO FUNCIONA
+1. Copia un enlace, o toca Compartir en Safari u otra app y elige OpticShare
+2. Obtén una tarjeta con el título, la imagen de portada, el autor y un código QR
+3. Envía la imagen en WeChat y pega el enlace: ya está en el portapapeles
+
+FUNCIONA CON
+• Vídeos de YouTube: miniatura, título y canal
+• Publicaciones de X: texto, autor y contenido multimedia
+• Vídeos de Bilibili: portada, título y autor
+• Cualquier página web: título, imagen de vista previa e icono del sitio
+
+ESTILOS DE TARJETA
+• Elige automáticamente la mejor plantilla para cada enlace: imagen, publicación, texto o QR
+• Proporciones 4:5, 1:1 y 9:16 para chats, Momentos e historias
+• Escanea el código QR de la tarjeta para abrir el enlace original
+• Se eliminan los parámetros de seguimiento de los enlaces compartidos
+
+ADEMÁS
+• Escanea códigos QR con la cámara o desde una foto
+• Historial para volver a compartir cualquier tarjeta
+• iPhone y iPad, modo claro y oscuro
+
+PRIVACIDAD
+Los enlaces se procesan en tu dispositivo. Sin cuenta, sin seguimiento y sin recopilar datos.
