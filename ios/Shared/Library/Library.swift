@@ -18,6 +18,7 @@ final class Library {
     @ObservationIgnored private let context: ModelContext
     @ObservationIgnored let directory: URL
     @ObservationIgnored private let thumbnails = NSCache<NSString, UIImage>()
+    @ObservationIgnored private let tints = NSCache<NSString, Tint>()
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
 
@@ -189,10 +190,27 @@ final class Library {
         return image
     }
 
+    /// The band color under a tile's photo, taken from the photo's bottom edge.
+    func tint(_ item: LibraryItem) -> Tint? {
+        let key = item.id.uuidString as NSString
+        if let cached = tints.object(forKey: key) { return cached }
+        guard let image = thumbnail(item)?.cgImage, let rgb = ImageData.bottomEdgeColor(image) else { return nil }
+        let tint = Tint(color: UIColor(red: rgb.red, green: rgb.green, blue: rgb.blue, alpha: 1),
+                        isDark: 0.299 * rgb.red + 0.587 * rgb.green + 0.114 * rgb.blue < 0.6)
+        tints.setObject(tint, forKey: key)
+        return tint
+    }
+
+    final class Tint {
+        let color: UIColor
+        let isDark: Bool
+        init(color: UIColor, isDark: Bool) { self.color = color; self.isDark = isDark }
+    }
+
     func favicon(_ item: LibraryItem) -> UIImage? {
         let key = "icon-\(item.id.uuidString)" as NSString
         if let cached = thumbnails.object(forKey: key) { return cached }
-        guard let data = data(.icon, of: item), let cgImage = ImageData.downsample(data, maxPixel: 64) else { return nil }
+        guard let data = data(.icon, of: item), let cgImage = ImageData.downsample(data, maxPixel: 128) else { return nil }
         let image = UIImage(cgImage: cgImage)
         thumbnails.setObject(image, forKey: key)
         return image
@@ -216,6 +234,7 @@ final class Library {
         try? FileManager.default.removeItem(at: folder(item).appending(path: "thumbnail"))
         thumbnails.removeObject(forKey: item.id.uuidString as NSString)
         thumbnails.removeObject(forKey: "icon-\(item.id.uuidString)" as NSString)
+        tints.removeObject(forKey: item.id.uuidString as NSString)
         item.thumbnailAspect = aspect
         revision += 1
     }

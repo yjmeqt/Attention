@@ -42,41 +42,21 @@ struct FeedTile: View {
     let library: Library
     var isSelecting = false
     var isSelected = false
+    var onOpen: (() -> Void)?
 
     var body: some View {
         let _ = library.revision
-        let photo = library.thumbnail(item)
-        VStack(alignment: .leading, spacing: 0) {
-            if let photo {
-                Color.clear
-                    .aspectRatio(item.thumbnailAspect, contentMode: .fit)
-                    .overlay { Image(uiImage: photo).resizable().scaledToFill() }
-                    .clipped()
-                    .overlay(alignment: .topLeading) {
-                        SourceBadge(item: item, library: library, onPhoto: true).padding(8)
-                    }
+        Group {
+            if let photo = library.thumbnail(item) {
+                card(photo)
+            } else {
+                lockup
             }
-            VStack(alignment: .leading, spacing: 6) {
-                if photo == nil { SourceBadge(item: item, library: library, onPhoto: false) }
-                if !item.isImage || !item.title.isEmpty {
-                    Text(item.displayTitle)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(photo == nil ? 5 : 3)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                HStack(spacing: 4) {
-                    if item.isPrivate { Image(systemName: "lock.fill") }
-                    Text(item.updatedAt.formatted(.relative(presentation: .numeric, unitsStyle: .narrow)))
-                        .lineLimit(1)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            }
-            .padding(10)
         }
-        .background(Color(.secondarySystemBackground))
-        .clipShape(.rect(cornerRadius: 14))
+        .clipShape(.rect(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(.separator.opacity(0.4), lineWidth: 0.5)
+        }
         .overlay(alignment: .topTrailing) {
             if isSelecting {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
@@ -92,17 +72,99 @@ struct FeedTile: View {
             }
         }
         .opacity(isSelecting && !isSelected ? 0.85 : 1)
-        .contentShape(.rect)
+        .contentShape(.rect(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
+
+    /// A photo with a band below it in the photo's own color, like App Store Today cards.
+    private func card(_ photo: UIImage) -> some View {
+        let tint = library.tint(item)
+        return VStack(alignment: .leading, spacing: 0) {
+            Color.clear
+                .aspectRatio(item.thumbnailAspect, contentMode: .fit)
+                .overlay { Image(uiImage: photo).resizable().scaledToFill() }
+                .clipped()
+            VStack(alignment: .leading, spacing: 4) {
+                Eyebrow(item: item, library: library)
+                if !item.isImage || !item.title.isEmpty {
+                    Text(item.displayTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(3)
+                        .multilineTextAlignment(.leading)
+                }
+                footer
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(tint.map { Color(uiColor: $0.color) } ?? Color(.secondarySystemBackground))
+            .environment(\.colorScheme, tint.map { $0.isDark ? .dark : .light } ?? colorScheme)
+        }
+    }
+
+    /// Links without a photo look like an App Store app row: icon, name and an Open button.
+    private var lockup: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Group {
+                    if let icon = library.favicon(item) {
+                        Image(uiImage: icon).resizable().scaledToFill()
+                    } else {
+                        Image(systemName: item.isImage ? "photo" : "globe")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.fill.tertiary)
+                    }
+                }
+                .frame(width: 44, height: 44)
+                .clipShape(.rect(cornerRadius: 10, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.platformName)
+                        .font(.caption2.weight(.semibold))
+                        .textCase(.uppercase)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    Text(item.displayTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(4)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            HStack {
+                footer
+                Spacer(minLength: 4)
+                if let onOpen, !item.isImage {
+                    Button("Open", action: onOpen)
+                        .font(.caption.weight(.bold))
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.capsule)
+                        .controlSize(.small)
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+    }
+
+    private var footer: some View {
+        HStack(spacing: 4) {
+            if item.isPrivate { Image(systemName: "lock.fill") }
+            Text(min(item.updatedAt, .now).formatted(.relative(presentation: .named, unitsStyle: .narrow)))
+                .lineLimit(1)
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
+
+    @Environment(\.colorScheme) private var colorScheme
 }
 
-/// The platform an item came from: favicon and site name.
-private struct SourceBadge: View {
+/// The platform line above a title: favicon and site name.
+private struct Eyebrow: View {
     let item: LibraryItem
     let library: Library
-    let onPhoto: Bool
 
     var body: some View {
         HStack(spacing: 4) {
@@ -113,18 +175,22 @@ private struct SourceBadge: View {
                     .clipShape(.rect(cornerRadius: 3))
             } else {
                 Image(systemName: item.isImage ? "photo" : "globe")
-                    .font(.caption2)
             }
-            Text(item.site.isEmpty ? item.domainLabel : item.site)
-                .font(.caption2.weight(.semibold))
+            Text(item.platformName)
+                .textCase(.uppercase)
                 .lineLimit(1)
         }
-        .foregroundStyle(onPhoto ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
-        .padding(.horizontal, onPhoto ? 7 : 0)
-        .padding(.vertical, onPhoto ? 4 : 0)
-        .background {
-            if onPhoto { Capsule().fill(.regularMaterial) }
-        }
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(.secondary)
+    }
+}
+
+/// Shrinks a little while pressed, like App Store cards.
+struct PressableStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.25), value: configuration.isPressed)
     }
 }
 
