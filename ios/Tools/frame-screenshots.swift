@@ -6,18 +6,22 @@ import AppKit
 
 let captions: [String: [String: (title: String, subtitle: String)]] = [
     "zh-Hans": [
-        "1-youtube": ("微信里也能看到视频预览", "YouTube 链接一键变成封面卡片"),
-        "2-wikipedia": ("任何网页，都有标题和封面", "自动读取网页的标题、预览图和图标"),
-        "3-web": ("长按二维码，直接打开原链接", "链接已自动复制，发完图片就能粘贴"),
-        "4-style": ("多种模板，多种比例", "自动挑选最合适的样式，也可以自己换"),
-        "5-empty": ("从任意 App 分享过来", "复制链接，或在分享面板里选择 OpticShare"),
+        "1-appstore": ("微信里也能看到链接预览", "任何链接一键变成带封面和二维码的卡片"),
+        "2-extension": ("在任何 App 里直接分享", "在 Safari 里点分享，选择 OpticShare"),
+        "3-music": ("长按二维码，直接打开原链接", "链接已自动复制，发完图片就能粘贴"),
+        "4-maps": ("地点、文章、视频都可以", "自动读取标题、预览图和网站图标"),
+        "5-history": ("做过的卡片随时找回", "历史记录只保存在你的设备上"),
+        "6-style": ("多种模板，多种比例", "自动挑选最合适的样式，也可以自己换"),
+        "7-empty": ("复制链接就能开始", "粘贴链接，或从任意 App 分享到 OpticShare"),
     ],
     "en-US": [
-        "1-youtube": ("Video previews, right in WeChat", "Turn a YouTube link into a cover card"),
-        "2-wikipedia": ("Any page, with title and cover", "Title, preview image and site icon, read for you"),
-        "3-web": ("Scan the QR to open the link", "The link is copied, ready to paste after the image"),
-        "4-style": ("Templates and sizes", "The best style is picked for you, or choose your own"),
-        "5-empty": ("Share from any app", "Copy a link, or pick OpticShare in the share sheet"),
+        "1-appstore": ("Link previews, right in WeChat", "Turn any link into a card with a cover and QR code"),
+        "2-extension": ("Share from any app", "Tap Share in Safari and pick OpticShare"),
+        "3-music": ("Scan the QR to open the link", "The link is copied, ready to paste after the image"),
+        "4-maps": ("Places, articles, videos", "Title, preview image and site icon, read for you"),
+        "5-history": ("Every card, kept in History", "History stays on your device"),
+        "6-style": ("Templates and sizes", "The best style is picked for you, or choose your own"),
+        "7-empty": ("Copy a link to start", "Paste it, or share it to OpticShare from any app"),
     ],
 ]
 
@@ -35,7 +39,11 @@ let layouts: [String: Layout] = [
                      titleSize: 104, subtitleSize: 52, cornerRadius: 140),
     "ipad": Layout(canvas: CGSize(width: 2064, height: 2752), shotWidth: 1560, top: 540,
                    titleSize: 112, subtitleSize: 56, cornerRadius: 60),
+    "duo": Layout(canvas: CGSize(width: 2752, height: 2064), shotWidth: 2200, top: 440,
+                  titleSize: 104, subtitleSize: 52, cornerRadius: 70),
 ]
+// App Store Connect has no foldable size class, so these go to fastlane/extra instead of screenshots.
+let extraDevices: Set = ["duo"]
 
 let background = NSColor(srgbRed: 0.949, green: 0.929, blue: 0.894, alpha: 1)
 let ink = NSColor(srgbRed: 0.114, green: 0.114, blue: 0.122, alpha: 1)
@@ -124,12 +132,11 @@ func frame(_ raw: URL, layout: Layout, caption: (title: String, subtitle: String
 
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appending(path: "fastlane")
 let rawRoot = root.appending(path: "raw")
-let outRoot = root.appending(path: "screenshots")
 
 for (locale, scenes) in captions {
-    let outDir = outRoot.appending(path: locale)
-    try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
     for (device, layout) in layouts {
+        let outDir = root.appending(path: extraDevices.contains(device) ? "extra" : "screenshots").appending(path: locale)
+        try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
         for (scene, caption) in scenes {
             let name = "\(device)-\(scene).png"
             let raw = rawRoot.appending(path: locale).appending(path: name)

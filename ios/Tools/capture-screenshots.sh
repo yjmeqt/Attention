@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Captures raw App Store screenshots from dedicated simulators using the Debug-only
-# demo launch arguments (demoURL, demoStyle). Output: ios/fastlane/raw/<locale>/<device>-<scene>.png
+# demo launch arguments (demoURL, demoStyle, demoHistory, demoNoAutoShare). Output: ios/fastlane/raw/<locale>/<device>-<scene>.png
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -17,12 +17,22 @@ devices=(
   "OpticShare-Shots-iPad|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad"
 )
 locales=("zh-Hans|zh_CN" "en-US|en_US")
+# label|url|extra launch flag ({cc} becomes the storefront: cn or us). Labels starting with _
+# are launched but not captured, so History has more to show. 2-extension is captured by hand
+# from Safari's share sheet. Demo launches hide the paste banner; 7-empty shows it with a link copied.
+APPSTORE="https://apps.apple.com/{cc}/app/keynote/id361285480"
+MUSIC="https://music.apple.com/us/station/apple-music-1/ra.978194965"
+MAPS="https://maps.apple.com/place?address=Apple%20Park&coordinate=37.334922,-122.009033&name=Apple%20Park"
 scenes=(
-  "1-youtube|https://www.youtube.com/watch?v=29ixFQIGZaY|NO"
-  "2-wikipedia|WIKI|NO"
-  "3-web|https://science.nasa.gov/mission/webb/|NO"
-  "4-style|https://www.youtube.com/watch?v=29ixFQIGZaY|YES"
-  "5-empty||NO"
+  "_iphone|https://www.apple.com/iphone/|"
+  "_podcasts|https://podcasts.apple.com/us/browse|"
+  "_store|https://apps.apple.com/{cc}/app/apple-store/id375380948|"
+  "1-appstore|$APPSTORE|"
+  "3-music|$MUSIC|"
+  "4-maps|$MAPS|"
+  "5-history|$MAPS|demoHistory"
+  "6-style|$APPSTORE|demoStyle"
+  "7-empty||"
 )
 
 for device in $devices; do
@@ -42,13 +52,16 @@ for device in $devices; do
     language=${lang%-US}
     mkdir -p "$OUT/$lang"
     for scene in $scenes; do
-      IFS='|' read -r label url style <<< "$scene"
-      args=(-AppleLanguages "($language)" -AppleLocale "$region" -seenShareGuide YES -demoStyle "$style")
-      [[ $url == WIKI ]] && url=$([[ $language == zh-Hans ]] && echo "https://zh.wikipedia.org/wiki/%E6%97%A5%E9%A3%9F" || echo "https://en.wikipedia.org/wiki/Solar_eclipse")
-      [[ -n $url ]] && args+=(-demoURL "$url")
+      IFS='|' read -r label url flag <<< "$scene"
+      args=(-AppleLanguages "($language)" -AppleLocale "$region" -seenShareGuide YES -demoNoAutoShare YES)
+      cc=$([[ $language == zh-Hans ]] && echo cn || echo us)
+      [[ -n $url ]] && args+=(-demoURL "${url//\{cc\}/$cc}")
+      [[ -n $flag ]] && args+=(-$flag YES)
       xcrun simctl terminate "$udid" $BUNDLE 2>/dev/null || true
+      [[ $label == 7-empty ]] && printf '%s' "$MUSIC" | xcrun simctl pbcopy "$udid"
       xcrun simctl launch "$udid" $BUNDLE "${args[@]}" >/dev/null
       sleep 9
+      [[ $label == _* ]] && continue
       xcrun simctl io "$udid" screenshot --type=png "$OUT/$lang/$slug-$label.png" >/dev/null 2>&1
       echo "captured $lang/$slug-$label"
     done

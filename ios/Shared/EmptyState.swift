@@ -133,9 +133,9 @@ private struct StepRow: View {
 }
 
 struct SampleCard: View {
-    static let meta = LinkMeta(url: URL(string: "https://youtu.be/29ixFQIGZaY")!, site: "YouTube",
-                               title: "2026 Total Solar Eclipse (Official NASA Trailer)",
-                               authorName: "NASA")
+    static let meta = LinkMeta(url: URL(string: "https://youtu.be/0_DjDdfqtUE")!, site: "YouTube",
+                               title: "WWDC 2025 — June 9 | Apple",
+                               authorName: "Apple")
 
     var scale: CGFloat = 0.42
 

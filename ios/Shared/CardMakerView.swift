@@ -7,7 +7,6 @@ struct CardMakerView: View {
     var onDone: (() -> Void)?
 
     @State private var maker = CardMaker()
-    @State private var isWide = false
     @State private var cardPaneHeight: CGFloat = .infinity
     @State private var showHistory = false
     @State private var clipboardHasLink = false
@@ -15,8 +14,9 @@ struct CardMakerView: View {
 
     var body: some View {
         NavigationStack {
-            content
-                .onGeometryChange(for: Bool.self) { $0.size.width > $0.size.height } action: { isWide = $0 }
+            GeometryReader { proxy in
+                content(isWide: proxy.size.width > proxy.size.height)
+            }
                 .navigationTitle(Brand.name)
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
@@ -38,26 +38,36 @@ struct CardMakerView: View {
         }
         .task {
             #if DEBUG
+            if initialURL == nil {
+                AppGroup.defaults.set(UserDefaults.standard.bool(forKey: "demoNoAutoShare"), forKey: "demoNoAutoShare")
+            }
             if let demo = UserDefaults.standard.string(forKey: "demoURL") {
                 maker.input = demo
                 await maker.make()
+                if UserDefaults.standard.bool(forKey: "demoHistory") { showHistory = true }
                 return
             }
             #endif
             guard let initialURL else { return }
             maker.input = initialURL.absoluteString
             maker.autoSharePending = true
+            #if DEBUG
+            if AppGroup.defaults.bool(forKey: "demoNoAutoShare") { maker.autoSharePending = false }
+            #endif
             await maker.make()
         }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             maker.history.reload()
             if watchesClipboard { clipboardHasLink = await Clipboard.hasNewLink() }
+            #if DEBUG
+            if UserDefaults.standard.string(forKey: "demoURL") != nil { clipboardHasLink = false }
+            #endif
         }
     }
 
     @ViewBuilder
-    private var content: some View {
+    private func content(isWide: Bool) -> some View {
         if isWide {
             if #available(iOS 27.1, *) {
                 ArrangementView {
