@@ -163,6 +163,17 @@ struct LibraryTests {
         #expect(OpenGraph.removingSiteSuffix("小红书", from: "红书日记") == "红书日记")
     }
 
+    @Test func upgradesHTTPLinks() {
+        #expect(URL(string: "http://xhslink.com/o/3M8gnOFZeo1")!.upgradedToHTTPS.absoluteString == "https://xhslink.com/o/3M8gnOFZeo1")
+        #expect(URL(string: "https://example.com/a?b=1")!.upgradedToHTTPS.absoluteString == "https://example.com/a?b=1")
+    }
+
+    @Test func savesHTTPLinksAsHTTPS() {
+        let library = Library(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString), inMemory: true)
+        let item = library.save(.link(URL(string: "http://xhslink.com/o/3M8gnOFZeo1")!, image: nil))
+        #expect(item.urlString == "https://xhslink.com/o/3M8gnOFZeo1")
+    }
+
     static func qrImage(_ text: String) -> Data? {
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(text.utf8)
