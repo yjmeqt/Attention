@@ -27,7 +27,7 @@ struct Waterfall<Content: View>: View {
         for item in items {
             let lane = heights.indices.min { heights[$0] < heights[$1] } ?? 0
             lanes[lane].append(item)
-            heights[lane] += 1 / max(item.thumbnailAspect, 0.2) + 0.25
+            heights[lane] += (item.thumbnailAspect > 0 ? 1 / item.thumbnailAspect : 0.25) + 0.35
         }
         return lanes
     }
@@ -45,57 +45,86 @@ struct FeedTile: View {
 
     var body: some View {
         let _ = library.revision
-        VStack(alignment: .leading, spacing: 6) {
-            thumbnail
-                .overlay(alignment: .topTrailing) {
-                    if isSelecting {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                            .font(.title2)
-                            .symbolRenderingMode(.palette)
-                            .foregroundStyle(.white, isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.black.opacity(0.3)))
-                            .padding(8)
+        let photo = library.thumbnail(item)
+        VStack(alignment: .leading, spacing: 0) {
+            if let photo {
+                Color.clear
+                    .aspectRatio(item.thumbnailAspect, contentMode: .fit)
+                    .overlay { Image(uiImage: photo).resizable().scaledToFill() }
+                    .clipped()
+                    .overlay(alignment: .topLeading) {
+                        SourceBadge(item: item, library: library, onPhoto: true).padding(8)
                     }
-                }
-                .overlay {
-                    if library.enriching.contains(item.id) {
-                        ProgressView().padding(10).background(.regularMaterial, in: .circle)
-                    }
-                }
-            if item.isImage {
-                Text(item.displayTitle)
-                    .font(.footnote.weight(.medium))
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
             }
-            HStack(spacing: 4) {
-                if item.isPrivate { Image(systemName: "lock.fill") }
-                Text(item.domainLabel).lineLimit(1)
-                Spacer(minLength: 4)
-                Text(item.updatedAt.formatted(.relative(presentation: .numeric, unitsStyle: .narrow)))
-                    .lineLimit(1)
+            VStack(alignment: .leading, spacing: 6) {
+                if photo == nil { SourceBadge(item: item, library: library, onPhoto: false) }
+                if !item.isImage || !item.title.isEmpty {
+                    Text(item.displayTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(photo == nil ? 5 : 3)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                HStack(spacing: 4) {
+                    if item.isPrivate { Image(systemName: "lock.fill") }
+                    Text(item.updatedAt.formatted(.relative(presentation: .numeric, unitsStyle: .narrow)))
+                        .lineLimit(1)
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             }
-            .font(.caption2)
-            .foregroundStyle(.secondary)
+            .padding(10)
         }
+        .background(Color(.secondarySystemBackground))
+        .clipShape(.rect(cornerRadius: 14))
+        .overlay(alignment: .topTrailing) {
+            if isSelecting {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title2)
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.white, isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.black.opacity(0.3)))
+                    .padding(8)
+            }
+        }
+        .overlay {
+            if library.enriching.contains(item.id) {
+                ProgressView().padding(10).background(.regularMaterial, in: .circle)
+            }
+        }
+        .opacity(isSelecting && !isSelected ? 0.85 : 1)
         .contentShape(.rect)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
+}
 
-    private var thumbnail: some View {
-        Group {
-            if let image = library.thumbnail(item) {
-                Image(uiImage: image).resizable()
+/// The platform an item came from: favicon and site name.
+private struct SourceBadge: View {
+    let item: LibraryItem
+    let library: Library
+    let onPhoto: Bool
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let icon = library.favicon(item) {
+                Image(uiImage: icon)
+                    .resizable()
+                    .frame(width: 14, height: 14)
+                    .clipShape(.rect(cornerRadius: 3))
             } else {
-                Rectangle().fill(.fill.tertiary)
+                Image(systemName: item.isImage ? "photo" : "globe")
+                    .font(.caption2)
             }
+            Text(item.site.isEmpty ? item.domainLabel : item.site)
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
         }
-        .aspectRatio(item.thumbnailAspect, contentMode: .fit)
-        .clipShape(.rect(cornerRadius: 12))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.5), lineWidth: 0.5)
+        .foregroundStyle(onPhoto ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
+        .padding(.horizontal, onPhoto ? 7 : 0)
+        .padding(.vertical, onPhoto ? 4 : 0)
+        .background {
+            if onPhoto { Capsule().fill(.regularMaterial) }
         }
-        .opacity(isSelecting && !isSelected ? 0.85 : 1)
     }
 }
 

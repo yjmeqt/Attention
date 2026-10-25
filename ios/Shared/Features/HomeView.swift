@@ -11,6 +11,8 @@ struct HomeView: View {
     @State private var columns = 2
     @State private var selecting = false
     @State private var selection: Set<UUID> = []
+    @State private var showsGuide = false
+    @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
 
     init(library: Library) {
@@ -42,7 +44,8 @@ struct HomeView: View {
             }
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
             .scrollDismissesKeyboard(.interactively)
-            .searchable(text: $filter.search, placement: .navigationBarDrawer(displayMode: .automatic))
+            .searchable(text: $filter.search, placement: .toolbar)
+            .searchToolbarBehavior(.minimize)
             .navigationTitle(Brand.name)
             .navigationDestination(for: UUID.self) { id in
                 if let item = library.items.first(where: { $0.id == id }) {
@@ -72,7 +75,19 @@ struct HomeView: View {
         .onChange(of: filter.showsPrivate) { _, shows in
             if !shows { lockPrivate() }
         }
+        .sheet(isPresented: $showsGuide, onDismiss: { seenShareGuide = true }) {
+            NavigationStack {
+                ShareSheetGuide()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { showsGuide = false }
+                        }
+                    }
+            }
+            .presentationSizing(.page)
+        }
         .task {
+            if !seenShareGuide { showsGuide = true }
             HistoryImport.run(into: library)
             clipboardHasLink = await Clipboard.hasNewLink()
         }
@@ -116,12 +131,7 @@ struct HomeView: View {
                         selection = [item.id]
                     }
                 } preview: {
-                    if let image = library.thumbnail(item) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(item.thumbnailAspect, contentMode: .fit)
-                            .frame(width: 300)
-                    }
+                    FeedTile(item: item, library: library).frame(width: 280)
                 }
         }
     }
@@ -151,6 +161,9 @@ struct HomeView: View {
                     .disabled(selection.isEmpty)
             }
         } else {
+            if !library.items.isEmpty {
+                DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+            }
             ToolbarItem(placement: .primaryAction) {
                 Menu("More", systemImage: "ellipsis") {
                     if !library.items.isEmpty {

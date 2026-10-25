@@ -70,7 +70,7 @@ struct ItemDetailView: View {
                     .accessibilityLabel(item.displayTitle)
             } else {
                 RoundedRectangle(cornerRadius: 16).fill(.fill.tertiary)
-                    .aspectRatio(item.thumbnailAspect, contentMode: .fit)
+                    .aspectRatio(item.style.aspect.size.width / item.style.aspect.size.height, contentMode: .fit)
             }
             if isLoading {
                 ProgressView()

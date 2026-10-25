@@ -18,6 +18,8 @@ final class Library {
     @ObservationIgnored private let context: ModelContext
     @ObservationIgnored let directory: URL
     @ObservationIgnored private let thumbnails = NSCache<NSString, UIImage>()
+    /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
+    @ObservationIgnored private var checked: Set<UUID> = []
 
     init(directory: URL = AppGroup.container.appending(path: "Library", directoryHint: .isDirectory),
          inMemory: Bool = false) {
@@ -117,7 +119,7 @@ final class Library {
 
     // MARK: - Files
 
-    enum File: String { case cover, avatar, icon, source, thumbnail }
+    enum File: String { case cover, avatar, icon, source, thumbnail = "tile" }
 
     func folder(_ item: LibraryItem) -> URL {
         directory.appending(path: item.id.uuidString, directoryHint: .isDirectory)
@@ -172,17 +174,26 @@ final class Library {
     func setStyle(_ style: CardStyle, for item: LibraryItem) {
         guard item.style != style else { return }
         item.style = style
-        refreshThumbnail(item)
         save()
     }
 
     // MARK: - Thumbnails
 
+    /// The feed image: the link's preview image or the shared image. Nil when there's none.
     func thumbnail(_ item: LibraryItem) -> UIImage? {
         let key = item.id.uuidString as NSString
         if let cached = thumbnails.object(forKey: key) { return cached }
-        if data(.thumbnail, of: item) == nil { refreshThumbnail(item) }
+        if data(.thumbnail, of: item) == nil, checked.insert(item.id).inserted { refreshThumbnail(item) }
         guard let data = data(.thumbnail, of: item), let image = UIImage(data: data) else { return nil }
+        thumbnails.setObject(image, forKey: key)
+        return image
+    }
+
+    func favicon(_ item: LibraryItem) -> UIImage? {
+        let key = "icon-\(item.id.uuidString)" as NSString
+        if let cached = thumbnails.object(forKey: key) { return cached }
+        guard let data = data(.icon, of: item), let cgImage = ImageData.downsample(data, maxPixel: 64) else { return nil }
+        let image = UIImage(cgImage: cgImage)
         thumbnails.setObject(image, forKey: key)
         return image
     }
@@ -193,17 +204,19 @@ final class Library {
         return data(.source, of: item).flatMap(UIImage.init(data:))
     }
 
+    /// Tiles crop their photo to this range, like Messages link previews.
+    static let tileAspects = 0.6...1.9
+
     func refreshThumbnail(_ item: LibraryItem) {
-        let image: UIImage?
-        if let meta = meta(for: item) {
-            image = CardRenderer.render(meta, style: item.style, scale: 1.2)
-        } else {
-            image = data(.source, of: item).flatMap { ImageData.downsample($0, maxPixel: 720) }.map(UIImage.init(cgImage:))
-        }
-        guard let image, image.size.height > 0 else { return }
-        item.thumbnailAspect = Double(image.size.width / image.size.height)
-        write(image.jpegData(compressionQuality: 0.8), .thumbnail, of: item)
+        let source = data(item.isImage ? .source : .cover, of: item)
+        let image = source.flatMap { ImageData.downsample($0, maxPixel: 720) }
+            .flatMap { item.isImage || min($0.width, $0.height) >= 200 ? $0 : nil }
+        let aspect = image.map { min(max(Double($0.width) / Double($0.height), Self.tileAspects.lowerBound), Self.tileAspects.upperBound) } ?? 0
+        write(image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }, .thumbnail, of: item)
+        try? FileManager.default.removeItem(at: folder(item).appending(path: "thumbnail"))
         thumbnails.removeObject(forKey: item.id.uuidString as NSString)
+        thumbnails.removeObject(forKey: "icon-\(item.id.uuidString)" as NSString)
+        item.thumbnailAspect = aspect
         revision += 1
     }
 }
