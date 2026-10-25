@@ -4,6 +4,7 @@ build/
 # iOS
 xcuserdata/
 *.xcuserstate
+ios/fastlane/raw/
 
 # Android
 .gradle/

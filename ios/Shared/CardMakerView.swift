@@ -37,6 +37,13 @@ struct CardMakerView: View {
                 }
         }
         .task {
+            #if DEBUG
+            if let demo = UserDefaults.standard.string(forKey: "demoURL") {
+                maker.input = demo
+                await maker.make()
+                return
+            }
+            #endif
             guard let initialURL else { return }
             maker.input = initialURL.absoluteString
             maker.autoSharePending = true
@@ -186,7 +193,7 @@ struct InputPane: View {
         fieldFocused = false
         Task {
             guard let url = await ItemProviders.firstLink(in: providers) else {
-                maker.notice = "No link found on the clipboard."
+                maker.notice = String(localized: "No link found on the clipboard.")
                 return
             }
             maker.input = url.absoluteString
@@ -250,6 +257,12 @@ struct CardPane: View {
                 .presentationDetents([.medium, .large])
         }
         .task(id: maker.card) {
+            #if DEBUG
+            if maker.card != nil, UserDefaults.standard.bool(forKey: "demoStyle") {
+                showStyle = true
+                return
+            }
+            #endif
             guard maker.autoSharePending, maker.card != nil else { return }
             maker.autoSharePending = false
             try? await Task.sleep(for: .milliseconds(300))
@@ -337,8 +350,9 @@ struct SourceImageInfo: View {
         Group {
             if let size = meta.imagePixelSize {
                 let small = size.width < 800
-                Label("Source image \(Int(size.width)) × \(Int(size.height))\(small ? " · low resolution" : "")",
-                      systemImage: small ? "exclamationmark.triangle" : "photo")
+                let w = Int(size.width), h = Int(size.height)
+                let title: LocalizedStringKey = small ? "Source image \(w) × \(h) · low resolution" : "Source image \(w) × \(h)"
+                Label(title, systemImage: small ? "exclamationmark.triangle" : "photo")
                     .foregroundStyle(small ? .orange : .secondary)
             } else if meta.hasPreview {
                 Label("No source image", systemImage: "photo.badge.exclamationmark")
@@ -365,7 +379,7 @@ struct TemplatePicker: View {
                     } label: {
                         VStack(spacing: 6) {
                             thumbnail(template)
-                            Text(template == .auto ? "Auto · \(template.resolved(for: meta).label)" : template.label)
+                            Text(template == .auto ? String(localized: "Auto · \(template.resolved(for: meta).label)") : template.label)
                                 .font(.caption)
                                 .foregroundStyle(style.template == template ? .primary : .secondary)
                         }

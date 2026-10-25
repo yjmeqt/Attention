@@ -103,11 +103,11 @@ enum CardTemplate: String, Codable, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .auto: "Auto"
-        case .hero: "Image"
-        case .post: "Post"
-        case .minimal: "Text"
-        case .qr: "QR"
+        case .auto: String(localized: "Auto")
+        case .hero: String(localized: "Image")
+        case .post: String(localized: "Post")
+        case .minimal: String(localized: "Text")
+        case .qr: String(localized: "QR")
         }
     }
 

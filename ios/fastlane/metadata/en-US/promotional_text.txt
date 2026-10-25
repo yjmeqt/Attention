@@ -1,0 +1,1 @@
+Turn YouTube, X and web links into image cards with the title, cover and a QR code, so they look great in WeChat.

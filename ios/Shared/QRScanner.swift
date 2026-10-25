@@ -51,7 +51,7 @@ struct QRScanSheet: View {
                 guard let photo else { return }
                 guard let data = try? await photo.loadTransferable(type: Data.self),
                       let payload = QRDecoder.firstPayload(in: data) else {
-                    message = "No QR code found in that photo."
+                    message = String(localized: "No QR code found in that photo.")
                     return
                 }
                 handle(payload)
@@ -61,7 +61,7 @@ struct QRScanSheet: View {
 
     private func handle(_ payload: String) {
         guard let url = URL.extract(from: payload) else {
-            message = "That QR code doesn't contain a link."
+            message = String(localized: "That QR code doesn't contain a link.")
             return
         }
         onLink(url)
