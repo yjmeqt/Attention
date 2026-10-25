@@ -24,12 +24,12 @@ struct ShareSheetGuide: View {
 
         var caption: String {
             switch self {
-            case .home: guideText("Tap the Share button", "点击分享按钮")
-            case .sheet: guideText("Swipe the app row to the end and tap More", "在 App 一栏滑到最后，点击“更多”")
-            case .list: guideText("Tap Edit", "点击右上角“编辑”")
-            case .editing: guideText("Find \(Brand.name) and tap ⊕ on the left", "找到 \(Brand.name)，点击左边的 ⊕")
-            case .added: guideText("Tap ✓ to finish", "点击 ✓ 完成")
-            case .finished: guideText("\(Brand.name) now shows up front in the share sheet", "以后 \(Brand.name) 会出现在分享面板最前面")
+            case .home: String(localized: "Tap the Share button")
+            case .sheet: String(localized: "Swipe the app row to the end and tap More")
+            case .list: String(localized: "Tap Edit")
+            case .editing: String(localized: "Find \(Brand.name) and tap ⊕ on the left")
+            case .added: String(localized: "Tap ✓ to finish")
+            case .finished: String(localized: "\(Brand.name) now shows up front in the share sheet")
             }
         }
     }
@@ -43,7 +43,7 @@ struct ShareSheetGuide: View {
             .padding()
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(guideText("Pin to Share Sheet", "固定到分享面板"))
+        .navigationTitle(String(localized: "Pin to Share Sheet"))
         .navigationBarTitleDisplayMode(.inline)
         .task(id: run) { await play() }
     }
@@ -96,7 +96,7 @@ struct ShareSheetGuide: View {
                 .multilineTextAlignment(.center)
                 .frame(minHeight: 48)
                 .contentTransition(.opacity)
-            Button(guideText("Replay", "重新播放"), systemImage: "arrow.counterclockwise") { run += 1 }
+            Button(String(localized: "Replay"), systemImage: "arrow.counterclockwise") { run += 1 }
                 .buttonStyle(.bordered)
         }
         .frame(maxWidth: 340)
@@ -128,9 +128,6 @@ struct ShareSheetGuide: View {
     }
 }
 
-func guideText(_ en: String, _ zh: String) -> String {
-    Locale.preferredLanguages.first?.hasPrefix("zh") == true ? zh : en
-}
 
 nonisolated enum GuideTarget: Hashable, Sendable {
     case share, more, edit, add, done
@@ -173,7 +170,7 @@ private struct GuideSourcePage: View {
                     .fill(LinearGradient(colors: [.red.opacity(0.8), .orange.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(height: 150)
                     .overlay { Image(systemName: "play.fill").font(.largeTitle).foregroundStyle(.white) }
-                Text("Never Gonna Give You Up")
+                Text(verbatim: "2026 Total Solar Eclipse")
                     .font(.headline)
                 ForEach([1.0, 0.9, 0.95, 0.6], id: \.self) { w in
                     Capsule().fill(.fill.secondary).frame(height: 8)
@@ -217,7 +214,7 @@ private struct GuideShareSheet: View {
                     .frame(width: 44, height: 44)
                     .overlay { Image(systemName: "play.fill").foregroundStyle(.white) }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Never Gonna Give You Up").font(.subheadline.weight(.semibold)).lineLimit(1)
+                    Text(verbatim: "2026 Total Solar Eclipse").font(.subheadline.weight(.semibold)).lineLimit(1)
                     Text("youtube.com").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
@@ -275,7 +272,7 @@ private struct GuideAppList: View {
                     if editing {
                         checkButton.guideTarget(.done)
                     } else {
-                        Text(guideText("Edit", "编辑"))
+                        Text(String(localized: "Edit"))
                             .font(.subheadline.weight(.medium))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
@@ -286,7 +283,7 @@ private struct GuideAppList: View {
             }
             .padding(.bottom, 8)
 
-            header(guideText("Favorites", "个人收藏"))
+            header(String(localized: "Favorites"))
             group {
                 row(.airdrop, section: .favorite)
                 row(.messages, section: .favorite)
@@ -294,7 +291,7 @@ private struct GuideAppList: View {
                 if added { opticRow(section: .favorite) }
             }
 
-            header(guideText("Suggestions", "建议"))
+            header(String(localized: "Suggestions"))
             group {
                 row(.notes, section: .suggestion)
                 row(.reminders, section: .suggestion)
@@ -412,13 +409,13 @@ private enum GuideApp {
     var name: String {
         switch self {
         case .opticShare: Brand.name
-        case .messages: guideText("Messages", "信息")
-        case .mail: guideText("Mail", "邮件")
-        case .wechat: guideText("WeChat", "微信")
-        case .more: guideText("More", "更多")
-        case .airdrop: guideText("AirDrop", "隔空投送")
-        case .notes: guideText("Notes", "备忘录")
-        case .reminders: guideText("Reminders", "提醒事项")
+        case .messages: String(localized: "Messages")
+        case .mail: String(localized: "Mail")
+        case .wechat: String(localized: "WeChat")
+        case .more: String(localized: "More")
+        case .airdrop: String(localized: "AirDrop")
+        case .notes: String(localized: "Notes")
+        case .reminders: String(localized: "Reminders")
         }
     }
 

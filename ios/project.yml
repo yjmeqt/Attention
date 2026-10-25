@@ -1,5 +1,6 @@
 name: OpticShare
 options:
+  developmentLanguage: en
   bundleIdPrefix: com.yijiang
   deploymentTarget:
     iOS: "26.0"
@@ -10,6 +11,8 @@ settings:
     SWIFT_VERSION: "6.0"
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
     SWIFT_APPROACHABLE_CONCURRENCY: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     TARGETED_DEVICE_FAMILY: "1,2"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: 5AT3UN98GQ
@@ -42,6 +45,7 @@ targets:
         CFBundleDisplayName: OpticShare
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSCameraUsageDescription: Scan a QR code to get its link.
+        ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true

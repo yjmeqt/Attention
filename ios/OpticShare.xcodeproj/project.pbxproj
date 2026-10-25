@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		003B4302BA035DA52A04C204 /* CardMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */; };
 		04A893EB7134C743AD2675FF /* CardMakerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB0535ECDCF0749EFF7B90B /* CardMakerView.swift */; };
+		0646A05BD123698004924B39 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 05C6B88EB4BBD41858BE1973 /* PrivacyInfo.xcprivacy */; };
 		132C1897436DB8FFBD4AF7DC /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F286348891F34CCE7852E1D /* QRTemplate.swift */; };
 		154A4A36D7D51D7461A6D727 /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FCA67BCADDFE12B0A54BDA /* Sharing.swift */; };
 		1A1F9707AAD0FD579C835C99 /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */; };
@@ -33,8 +34,10 @@
 		8FFED7B5A5CDAE9CB2F7C115 /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6645649D13C367EEDA6F68 /* CardPalette.swift */; };
 		97B51903DA042A65F4C27D72 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03CD28759E21F3565A4751B /* HistoryStore.swift */; };
 		9A064CBE12178AE73C42F4AC /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7585922B442FE1DAC5A9F98C /* EmptyState.swift */; };
+		9FDD676136BA266D61EE562F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 11AD34D2BA309764297F5238 /* Localizable.xcstrings */; };
 		A767B1D8C1AB7F624487ACD9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 006B629F4E51C25897C83886 /* InfoPlist.strings */; };
 		A824E943F8B730216DED7D31 /* ItemProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF17EE80690DD5EC04C708A /* ItemProviders.swift */; };
+		AC3EFF6AD77E4F01EE60B8BF /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 11AD34D2BA309764297F5238 /* Localizable.xcstrings */; };
 		B0AB83DFEF9199211805629C /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */; };
 		B6B35D77FE1D8F4E06DA4A82 /* OpticShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2EB554604869CFFAEBF972D2 /* OpticShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B9126FF0F1E199D5213FA217 /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */; };
@@ -46,6 +49,7 @@
 		EC64D59701F29A9404811C17 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7585922B442FE1DAC5A9F98C /* EmptyState.swift */; };
 		F0814D7426DA30694D5BB81B /* HeroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347E81A5F2FB98820F1F80B /* HeroTemplate.swift */; };
 		F0A33DCB5A458F40950D997F /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */; };
+		F3C5B72F809B73B5C608F9D2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 629D0500D1A56EE531D6BEFE /* PrivacyInfo.xcprivacy */; };
 		F4D2B5F56B59D022477AA471 /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */; };
 		FEF4BBF4C958E6FD96806E7F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9E8BF76F123F6694704017 /* Model.swift */; };
 /* End PBXBuildFile section */
@@ -83,8 +87,10 @@
 
 /* Begin PBXFileReference section */
 		006B629F4E51C25897C83886 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		05C6B88EB4BBD41858BE1973 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		0A8A4B31235A63FB6BAAAC01 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetGuide.swift; sourceTree = "<group>"; };
+		11AD34D2BA309764297F5238 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardMaker.swift; sourceTree = "<group>"; };
 		163F33EBE6C4BF9FE4EE8A1E /* OpticShareApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpticShareApp.swift; sourceTree = "<group>"; };
 		17C684874ECACF755F2644BE /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -96,6 +102,7 @@
 		408FEEF739D022ABC229B993 /* OpticShare.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = OpticShare.icon; sourceTree = "<group>"; };
 		4356B64C5358A0025F13BFC7 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unfurler.swift; sourceTree = "<group>"; };
+		629D0500D1A56EE531D6BEFE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		63FCA67BCADDFE12B0A54BDA /* Sharing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sharing.swift; sourceTree = "<group>"; };
 		660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTemplate.swift; sourceTree = "<group>"; };
 		6F286348891F34CCE7852E1D /* QRTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTemplate.swift; sourceTree = "<group>"; };
@@ -142,6 +149,7 @@
 				7585922B442FE1DAC5A9F98C /* EmptyState.swift */,
 				C03CD28759E21F3565A4751B /* HistoryStore.swift */,
 				ACF17EE80690DD5EC04C708A /* ItemProviders.swift */,
+				11AD34D2BA309764297F5238 /* Localizable.xcstrings */,
 				BB9E8BF76F123F6694704017 /* Model.swift */,
 				D1534492D7D14DCC4001080D /* QRScanner.swift */,
 				0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */,
@@ -160,6 +168,7 @@
 				8BCFB05A22A3840AFDDE788C /* OpticShare.entitlements */,
 				408FEEF739D022ABC229B993 /* OpticShare.icon */,
 				163F33EBE6C4BF9FE4EE8A1E /* OpticShareApp.swift */,
+				05C6B88EB4BBD41858BE1973 /* PrivacyInfo.xcprivacy */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -170,6 +179,7 @@
 				973177BD83218470F72313F1 /* Info.plist */,
 				2CB2FBCD7AAF847F1E549EF6 /* InfoPlist.strings */,
 				C381E4DEAA42702E68315318 /* OpticShareExtension.entitlements */,
+				629D0500D1A56EE531D6BEFE /* PrivacyInfo.xcprivacy */,
 				17C684874ECACF755F2644BE /* ShareViewController.swift */,
 			);
 			path = ShareExtension;
@@ -317,6 +327,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1B590B902BAFA927FE1E22DB /* InfoPlist.strings in Resources */,
+				9FDD676136BA266D61EE562F /* Localizable.xcstrings in Resources */,
+				F3C5B72F809B73B5C608F9D2 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,7 +337,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A767B1D8C1AB7F624487ACD9 /* InfoPlist.strings in Resources */,
+				AC3EFF6AD77E4F01EE60B8BF /* Localizable.xcstrings in Resources */,
 				79837697203B21BC9B985A1A /* OpticShare.icon in Resources */,
+				0646A05BD123698004924B39 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,6 +524,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -522,6 +537,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -628,6 +644,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -639,6 +656,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

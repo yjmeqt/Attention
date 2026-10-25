@@ -1,0 +1,57 @@
+#!/bin/zsh
+# Captures raw App Store screenshots from dedicated simulators using the Debug-only
+# demo launch arguments (demoURL, demoStyle). Output: ios/fastlane/raw/<locale>/<device>-<scene>.png
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+DERIVED=../build/ios
+APP=$DERIVED/Build/Products/Debug-iphonesimulator/OpticShare.app
+BUNDLE=com.yijiang.opticshare
+OUT=fastlane/raw
+
+xcodebuild -project OpticShare.xcodeproj -scheme OpticShare -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath $DERIVED build -quiet
+
+devices=(
+  "OpticShare-Shots-iPhone|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max|iphone"
+  "OpticShare-Shots-iPad|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad"
+)
+locales=("zh-Hans|zh_CN" "en-US|en_US")
+scenes=(
+  "1-youtube|https://www.youtube.com/watch?v=29ixFQIGZaY|NO"
+  "2-wikipedia|WIKI|NO"
+  "3-web|https://science.nasa.gov/mission/webb/|NO"
+  "4-style|https://www.youtube.com/watch?v=29ixFQIGZaY|YES"
+  "5-empty||NO"
+)
+
+for device in $devices; do
+  IFS='|' read -r name type slug <<< "$device"
+  udid=$(xcrun simctl list devices | sed -n "s/^ *$name (\([0-9A-F-]*\)).*/\1/p" | head -1)
+  [[ -z $udid ]] && udid=$(xcrun simctl create "$name" "$type")
+  xcrun simctl boot "$udid" 2>/dev/null || true
+  xcrun simctl bootstatus "$udid" -b >/dev/null
+  xcrun simctl ui "$udid" appearance light
+  xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 \
+    --wifiBars 3 --cellularMode active --cellularBars 4 --dataNetwork wifi
+  xcrun simctl uninstall "$udid" $BUNDLE 2>/dev/null || true
+  xcrun simctl install "$udid" "$APP"
+
+  for locale in $locales; do
+    IFS='|' read -r lang region <<< "$locale"
+    language=${lang%-US}
+    mkdir -p "$OUT/$lang"
+    for scene in $scenes; do
+      IFS='|' read -r label url style <<< "$scene"
+      args=(-AppleLanguages "($language)" -AppleLocale "$region" -seenShareGuide YES -demoStyle "$style")
+      [[ $url == WIKI ]] && url=$([[ $language == zh-Hans ]] && echo "https://zh.wikipedia.org/wiki/%E6%97%A5%E9%A3%9F" || echo "https://en.wikipedia.org/wiki/Solar_eclipse")
+      [[ -n $url ]] && args+=(-demoURL "$url")
+      xcrun simctl terminate "$udid" $BUNDLE 2>/dev/null || true
+      xcrun simctl launch "$udid" $BUNDLE "${args[@]}" >/dev/null
+      sleep 9
+      xcrun simctl io "$udid" screenshot --type=png "$OUT/$lang/$slug-$label.png" >/dev/null 2>&1
+      echo "captured $lang/$slug-$label"
+    done
+  done
+  xcrun simctl terminate "$udid" $BUNDLE 2>/dev/null || true
+done

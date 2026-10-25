@@ -19,7 +19,7 @@ final class CardMaker {
 
     func make() async {
         guard let url = URL.extract(from: input) else {
-            notice = "No link found in that text."
+            notice = String(localized: "No link found in that text.")
             return
         }
         loading = true
@@ -28,7 +28,7 @@ final class CardMaker {
         loading = false
         show(result.meta)
         history.add(result.meta)
-        if result.isFallback { notice = "Couldn't load a preview, so this is a basic card." }
+        if result.isFallback { notice = String(localized: "Couldn't load a preview, so this is a basic card.") }
     }
 
     func show(_ meta: LinkMeta) {

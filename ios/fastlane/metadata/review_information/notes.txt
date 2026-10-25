@@ -1,0 +1,8 @@
+No account or login is required.
+
+To test:
+1. Open OpticShare, paste a link (for example https://www.youtube.com/watch?v=dQw4w9WgXcQ) and tap Generate. A card image is created on the device.
+2. Tap Share to send the card through the system share sheet. The cleaned link is copied to the clipboard at the same time.
+3. The share extension: in Safari, open any page, tap Share and choose OpticShare.
+
+The app reads public page metadata (title, preview image, icon) for the link the user enters. It uses public endpoints from YouTube (oEmbed), Bilibili and FxTwitter for richer previews of those sites. No user data is sent to the developer.
