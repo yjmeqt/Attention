@@ -170,6 +170,14 @@ extension CardStyle {
 }
 
 extension URL {
+    /// Apps like Xiaohongshu copy `http://` links, which App Transport Security refuses to load.
+    nonisolated var upgradedToHTTPS: URL {
+        guard scheme?.lowercased() == "http",
+              var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else { return self }
+        components.scheme = "https"
+        return components.url ?? self
+    }
+
     nonisolated static func extract(from text: String) -> URL? {
         let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         return detector?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text))?.url

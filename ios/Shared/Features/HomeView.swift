@@ -69,6 +69,7 @@ struct HomeView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 library.reload()
+                Task { await library.retryMissingPreviews() }
                 Task { clipboardHasLink = await Clipboard.hasNewLink() }
             } else if phase == .background {
                 lockPrivate()
@@ -91,6 +92,7 @@ struct HomeView: View {
         .task {
             if !seenShareGuide { showsGuide = true }
             HistoryImport.run(into: library)
+            Task { await library.retryMissingPreviews() }
             clipboardHasLink = await Clipboard.hasNewLink()
         }
         .onAppear {

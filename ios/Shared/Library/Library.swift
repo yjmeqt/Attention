@@ -21,6 +21,7 @@ final class Library {
     @ObservationIgnored private let tints = NSCache<NSString, Tint>()
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
+    @ObservationIgnored var retriedPreviews: Set<UUID> = []
 
     init(directory: URL = AppGroup.container.appending(path: "Library", directoryHint: .isDirectory),
          inMemory: Bool = false) {

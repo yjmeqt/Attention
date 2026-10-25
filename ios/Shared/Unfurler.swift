@@ -16,6 +16,7 @@ enum Unfurler {
     }()
 
     static func unfurlWithFallback(_ url: URL) async -> Result {
+        let url = url.upgradedToHTTPS
         async let originIcon = favicon(near: url)
         async let googleIcon = googleFavicon(url)
         var result = await unfurl(url)

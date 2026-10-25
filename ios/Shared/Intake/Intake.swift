@@ -42,6 +42,7 @@ extension Library {
     func save(_ capture: Capture) -> LibraryItem {
         switch capture {
         case let .link(url, image):
+            let url = url.upgradedToHTTPS
             let item = upsert(key: DomainTag.key(for: url), url: url, site: Unfurler.siteName(url), style: CardStyle.load())
             if let image { write(image, .source, of: item) }
             if data(.thumbnail, of: item) == nil { refreshThumbnail(item) }
@@ -59,6 +60,26 @@ extension Library {
     /// Fetches the link preview and reads text from the shared image, updating the saved item.
     /// Returns a notice to show when only a basic card could be made.
     @discardableResult
+    /// Retries links saved without a preview, e.g. when the share extension closed before the page
+    /// loaded. Each item is retried once per launch so pages that never preview don't refetch forever.
+    func retryMissingPreviews() async {
+        let stale = items.filter {
+            !$0.isImage && $0.title.isEmpty && data(.cover, of: $0) == nil
+                && !enriching.contains($0.id) && retriedPreviews.insert($0.id).inserted
+        }
+        for item in stale.prefix(20) {
+            if let url = item.url, url.upgradedToHTTPS != url {
+                let key = DomainTag.key(for: url.upgradedToHTTPS)
+                if self.item(forKey: key) == nil {
+                    item.urlString = url.upgradedToHTTPS.absoluteString
+                    item.key = key
+                    save()
+                }
+            }
+            _ = await enrich(item)
+        }
+    }
+
     func enrich(_ item: LibraryItem) async -> String? {
         enriching.insert(item.id)
         defer { enriching.remove(item.id) }
