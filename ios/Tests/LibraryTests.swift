@@ -58,6 +58,36 @@ struct LibraryTests {
         _ = second
     }
 
+    @Test func capRemovesArchivedFirst() {
+        let library = makeLibrary()
+        library.maxItems = 3
+        let a = library.save(.link(URL(string: "https://a.com")!, image: nil))
+        let b = library.save(.link(URL(string: "https://b.com")!, image: nil))
+        library.setArchived(true, [b])
+        library.save(.link(URL(string: "https://c.com")!, image: nil))
+        library.save(.link(URL(string: "https://d.com")!, image: nil))
+        let keys = Set(library.items.map(\.key))
+        #expect(keys.contains(a.key))
+        #expect(!keys.contains("https://b.com"))
+    }
+
+    @Test func archivedItemsShowOnlyInArchivedOfTheirSection() {
+        let library = makeLibrary()
+        let live = library.save(.link(URL(string: "https://a.com")!, image: nil))
+        let archived = library.save(.link(URL(string: "https://b.com")!, image: nil))
+        let privateArchived = library.save(.link(URL(string: "https://c.com")!, image: nil))
+        library.setArchived(true, [archived, privateArchived])
+        library.setPrivate(true, [privateArchived])
+
+        let filter = FeedFilter()
+        #expect(filter.apply(library.items).map(\.id) == [live.id])
+        filter.showsArchived = true
+        #expect(filter.apply(library.items).map(\.id) == [archived.id])
+        filter.showsPrivate = true
+        filter.privateUnlocked = true
+        #expect(filter.apply(library.items).map(\.id) == [privateArchived.id])
+    }
+
     @Test func privateItemsOnlyShowInPrivate() {
         let library = makeLibrary()
         let open = library.save(.link(URL(string: "https://a.com")!, image: nil))

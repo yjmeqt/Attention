@@ -202,34 +202,52 @@ struct FilterBar: View {
     var body: some View {
         let section = filter.section(items)
         ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty && !filter.showsPrivate) {
-                    filter.reset()
-                }
-                ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
-                    chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
-                        toggle(domain, in: \.domains)
+            GlassEffectContainer(spacing: 8) {
+                HStack(spacing: 8) {
+                    chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty && !filter.showsArchived) {
+                        filter.clearFilters()
+                        filter.showsArchived = false
+                    }
+                    ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
+                        chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
+                            toggle(domain, in: \.domains)
+                        }
+                    }
+                    ForEach(Self.ranked(section.flatMap(\.tags)), id: \.self) { tag in
+                        chip("#\(tag)", selected: filter.tags.contains(tag)) {
+                            toggle(tag, in: \.tags)
+                        }
+                    }
+                    chip(String(localized: "Archived"), systemImage: "archivebox", selected: filter.showsArchived) {
+                        filter.clearFilters()
+                        filter.showsArchived.toggle()
+                    }
+                    chip(String(localized: "Private"), systemImage: "lock.fill", selected: filter.showsPrivate) {
+                        if filter.showsPrivate { filter.reset() } else { onPrivate() }
                     }
                 }
-                ForEach(Self.ranked(section.flatMap(\.tags)), id: \.self) { tag in
-                    chip("#\(tag)", selected: filter.tags.contains(tag)) {
-                        toggle(tag, in: \.tags)
-                    }
-                }
-                chip(String(localized: "Private"), systemImage: "lock.fill", selected: filter.showsPrivate) {
-                    if filter.showsPrivate { filter.reset() } else { onPrivate() }
-                }
+                .padding(.horizontal)
+                .padding(.vertical, 6)
             }
-            .padding(.horizontal)
         }
         .scrollIndicators(.hidden)
+        .scrollClipDisabled()
     }
 
     private func chip(_ text: String, systemImage: String? = nil, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            TagChip(text: text, systemImage: systemImage, isSelected: selected)
+            HStack(spacing: 4) {
+                if let systemImage { Image(systemName: systemImage).imageScale(.small) }
+                Text(text).lineLimit(1)
+            }
+            .font(.subheadline.weight(selected ? .semibold : .regular))
+            .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .contentShape(.capsule)
         }
         .buttonStyle(.plain)
+        .glassEffect(selected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 

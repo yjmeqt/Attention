@@ -18,6 +18,8 @@ final class LibraryItem {
     var aspectRaw: String
     var tags: [String]
     var isPrivate: Bool
+    /// Hidden from the feed but kept, unlike deleted items.
+    var isArchived: Bool = false
     /// Width ÷ height of the thumbnail, so the feed can lay out tiles before loading them.
     var thumbnailAspect: Double
 

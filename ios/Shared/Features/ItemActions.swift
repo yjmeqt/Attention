@@ -13,6 +13,7 @@ final class ItemActions {
     var privateUnlocked = false
     var showsPasscodeRequired = false
     @ObservationIgnored var onDeleted: ([LibraryItem]) -> Void = { _ in }
+    @ObservationIgnored var onArchived: ([LibraryItem]) -> Void = { _ in }
 
     init(library: Library) { self.library = library }
 
@@ -48,6 +49,11 @@ final class ItemActions {
             }
         }
         library.setPrivate(isPrivate, items)
+    }
+
+    func setArchived(_ isArchived: Bool, _ items: [LibraryItem]) {
+        library.setArchived(isArchived, items)
+        onArchived(items)
     }
 
     func delete(_ items: [LibraryItem]) { pendingDelete = items }
@@ -95,7 +101,14 @@ struct ItemMenu: View {
                 Button("Select", systemImage: "checkmark.circle", action: onSelect)
             }
         }
-        Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
+        Section {
+            if item.isArchived {
+                Button("Unarchive", systemImage: "tray.and.arrow.up") { actions.setArchived(false, [item]) }
+            } else {
+                Button("Archive", systemImage: "archivebox") { actions.setArchived(true, [item]) }
+            }
+            Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
+        }
     }
 }
 
