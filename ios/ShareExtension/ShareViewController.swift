@@ -17,23 +17,43 @@ final class ShareViewController: UIViewController {
     }
 }
 
-/// Shows the card maker right away; the shared link can take a moment to load from the host app.
+/// Saves whatever was shared as soon as it's read, then shows it with Share and Done.
 private struct ShareRoot: View {
     let items: [NSExtensionItem]
     let onDone: () -> Void
-    @State private var url: URL?
-    @State private var loaded = false
+    @State private var library = Library()
+    @State private var item: LibraryItem?
+    @State private var failed = false
 
     var body: some View {
-        if loaded {
-            CardMakerView(initialURL: url, onDone: onDone)
-        } else {
-            ProgressView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .task {
-                    url = await ItemProviders.firstLink(in: items)
-                    loaded = true
+        NavigationStack {
+            Group {
+                if let item {
+                    ItemDetailView(item: item, library: library, onDone: onDone)
+                } else if failed {
+                    ContentUnavailableView("Nothing to save", systemImage: "link.badge.plus",
+                                           description: Text("No link or image was shared."))
+                } else {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            }
+            .toolbar {
+                if item == nil {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(role: .close, action: onDone)
+                    }
+                }
+            }
+        }
+        .task {
+            guard let capture = await Intake.capture(from: items) else {
+                failed = true
+                return
+            }
+            let saved = library.save(capture)
+            item = saved
+            await library.enrich(saved)
         }
     }
 }

@@ -24,6 +24,8 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>Scan a QR code to get its link.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your private items.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save link cards to your photo library.</string>
 	<key>UIApplicationSceneManifest</key>

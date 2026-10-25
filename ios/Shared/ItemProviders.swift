@@ -1,9 +1,11 @@
 import Foundation
+import UIKit
 import UniformTypeIdentifiers
 import os
 
 enum ItemProviders {
     static let linkTypes: [UTType] = [.url, .plainText, .text]
+    static let pasteTypes: [UTType] = [.url, .plainText, .text, .image]
     nonisolated static let log = Logger(subsystem: "com.yijiang.opticshare", category: "share")
 
     /// Some hosts never call back for a type they advertise, so every load is bounded.
@@ -11,14 +13,12 @@ enum ItemProviders {
 
     /// Returns the first web link in a share request: attachments first (as a URL, as text, then as
     /// whatever raw type they registered), then the item's attributed text and title.
-    static func firstLink(in items: [NSExtensionItem]) async -> URL? {
+    static func firstLink(in items: [NSExtensionItem], skippingImages: Bool = false) async -> URL? {
         log.info("share request: \(items.count, privacy: .public) item(s)")
         for (index, item) in items.enumerated() {
             let attachments = item.attachments ?? []
             log.info("item \(index, privacy: .public): \(attachments.count, privacy: .public) attachment(s), text: \(item.attributedContentText?.string ?? "nil", privacy: .public), title: \(item.attributedTitle?.string ?? "nil", privacy: .public)")
-            for provider in attachments {
-                if let url = await firstLink(in: provider) { return url }
-            }
+            if let url = await firstLink(in: attachments, skippingImages: skippingImages) { return url }
         }
         for item in items {
             for text in [item.attributedContentText?.string, item.attributedTitle?.string].compactMap(\.self) {
@@ -28,15 +28,37 @@ enum ItemProviders {
                 }
             }
         }
-        log.error("no link found in share request")
+        log.info("no link found in share request")
         return nil
     }
 
-    static func firstLink(in providers: [NSItemProvider]) async -> URL? {
-        for provider in providers {
+    static func firstLink(in providers: [NSItemProvider], skippingImages: Bool = false) async -> URL? {
+        for provider in providers where !(skippingImages && isImage(provider)) {
             if let url = await firstLink(in: provider) { return url }
         }
         return nil
+    }
+
+    /// The data of the first image attachment.
+    static func firstImage(in providers: [NSItemProvider]) async -> Data? {
+        for provider in providers where isImage(provider) {
+            let type = provider.registeredTypeIdentifiers.first { UTType($0)?.conforms(to: .image) == true } ?? UTType.image.identifier
+            if let data = await load("image", timeout: .seconds(10), { done in _ = provider.loadDataRepresentation(forTypeIdentifier: type) { data, _ in done(data) } }) {
+                log.info("found image as \(type, privacy: .public): \(data.count, privacy: .public) bytes")
+                return data
+            }
+            if provider.canLoadObject(ofClass: UIImage.self),
+               let data = await load("UIImage", { done in
+                   _ = provider.loadObject(ofClass: UIImage.self) { image, _ in done((image as? UIImage)?.pngData()) }
+               }) {
+                return data
+            }
+        }
+        return nil
+    }
+
+    private static func isImage(_ provider: NSItemProvider) -> Bool {
+        provider.hasItemConformingToTypeIdentifier(UTType.image.identifier)
     }
 
     private static func firstLink(in provider: NSItemProvider) async -> URL? {
@@ -85,12 +107,12 @@ enum ItemProviders {
     }
 
     /// Starts a callback-based load and returns its value, or nil after `loadTimeout`.
-    private static func load<T: Sendable>(_ label: String, _ start: (@escaping @Sendable (T?) -> Void) -> Void) async -> T? {
+    private static func load<T: Sendable>(_ label: String, timeout: Duration = loadTimeout, _ start: (@escaping @Sendable (T?) -> Void) -> Void) async -> T? {
         let value: T? = await withCheckedContinuation { continuation in
             let once = Once(continuation)
             start { once.resume($0) }
             Task {
-                try? await Task.sleep(for: loadTimeout)
+                try? await Task.sleep(for: timeout)
                 once.resume(nil)
             }
         }

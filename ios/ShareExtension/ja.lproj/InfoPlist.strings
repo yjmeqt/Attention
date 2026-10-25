@@ -1,1 +1,2 @@
 "NSPhotoLibraryAddUsageDescription" = "リンクカードを写真ライブラリに保存します。";
+"NSFaceIDUsageDescription" = "プライベートの項目のロックを解除します。";
