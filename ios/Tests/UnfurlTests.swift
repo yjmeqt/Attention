@@ -1,6 +1,6 @@
 import Testing
 import UIKit
-@testable import OpticShare
+@testable import Attention
 
 /// Live-network smoke tests: unfurl links people commonly share, render a card for each,
 /// and write the PNGs to `cards/` in the test's temporary directory for visual review.

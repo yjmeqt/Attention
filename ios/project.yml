@@ -1,4 +1,4 @@
-name: OpticShare
+name: Attention
 options:
   developmentLanguage: en
   bundleIdPrefix: com.yijiang
@@ -23,26 +23,26 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  OpticShare:
+  Attention:
     type: application
     platform: iOS
     sources:
       - path: App
-        excludes: [OpticShare.icon]
-      - path: App/OpticShare.icon
+        excludes: [Attention.icon]
+      - path: App/Attention.icon
         type: file
         buildPhase: resources
       - Shared
     dependencies:
-      - target: OpticShareExtension
+      - target: AttentionExtension
     entitlements:
-      path: App/OpticShare.entitlements
+      path: App/Attention.entitlements
       properties:
-        com.apple.security.application-groups: [group.com.yijiang.opticshare]
+        com.apple.security.application-groups: [group.com.yijiang.attention]
     info:
       path: App/Info.plist
       properties:
-        CFBundleDisplayName: OpticShare
+        CFBundleDisplayName: Attention
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSCameraUsageDescription: Scan a QR code to get its link.
         NSFaceIDUsageDescription: Unlock your private items.
@@ -61,34 +61,34 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare
-        ASSETCATALOG_COMPILER_APPICON_NAME: OpticShare
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.attention
+        ASSETCATALOG_COMPILER_APPICON_NAME: Attention
     scheme:
-      testTargets: [OpticShareTests]
+      testTargets: [AttentionTests]
 
-  OpticShareTests:
+  AttentionTests:
     type: bundle.unit-test
     platform: iOS
     sources: [Tests]
     dependencies:
-      - target: OpticShare
+      - target: Attention
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.attention.tests
         GENERATE_INFOPLIST_FILE: YES
 
-  OpticShareExtension:
+  AttentionExtension:
     type: app-extension
     platform: iOS
     sources: [ShareExtension, Shared]
     entitlements:
-      path: ShareExtension/OpticShareExtension.entitlements
+      path: ShareExtension/AttentionExtension.entitlements
       properties:
-        com.apple.security.application-groups: [group.com.yijiang.opticshare]
+        com.apple.security.application-groups: [group.com.yijiang.attention]
     info:
       path: ShareExtension/Info.plist
       properties:
-        CFBundleDisplayName: OpticShare
+        CFBundleDisplayName: Attention
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSFaceIDUsageDescription: Unlock your private items.
         NSExtension:
@@ -101,5 +101,5 @@ targets:
               NSExtensionActivationSupportsImageWithMaxCount: 1
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare.share
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.attention.share
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"

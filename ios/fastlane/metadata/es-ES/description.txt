@@ -1,7 +1,7 @@
-En WeChat, los enlaces de YouTube, X y muchos otros sitios aparecen como una simple dirección, sin título ni miniatura. OpticShare convierte cualquier enlace en una tarjeta de imagen limpia, para que quien la reciba vea de un vistazo qué le compartes.
+En WeChat, los enlaces de YouTube, X y muchos otros sitios aparecen como una simple dirección, sin título ni miniatura. Attention convierte cualquier enlace en una tarjeta de imagen limpia, para que quien la reciba vea de un vistazo qué le compartes.
 
 CÓMO FUNCIONA
-1. Copia un enlace, o toca Compartir en Safari u otra app y elige OpticShare
+1. Copia un enlace, o toca Compartir en Safari u otra app y elige Attention
 2. Obtén una tarjeta con el título, la imagen de portada, el autor y un código QR
 3. Envía la imagen en WeChat y pega el enlace: ya está en el portapapeles
 

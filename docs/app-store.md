@@ -6,9 +6,9 @@ Everything needed to create the App Store listing lives in the repo. Pricing and
 
 | Item | Value |
 |---|---|
-| App bundle ID | `com.yijiang.opticshare` |
-| Share extension | `com.yijiang.opticshare.share` |
-| App Group | `group.com.yijiang.opticshare` |
+| App bundle ID | `com.yijiang.attention` |
+| Share extension | `com.yijiang.attention.share` |
+| App Group | `group.com.yijiang.attention` |
 | Team | `5AT3UN98GQ` (set in `ios/project.yml`) |
 | Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/project.yml` |
 
@@ -35,7 +35,7 @@ Upload with `fastlane deliver --skip_binary_upload --skip_screenshots` from `ios
 ## Screenshots
 
 1. `ios/Tools/capture-screenshots.sh` builds the Debug app, creates two simulators (iPhone 17 Pro Max, 6.9-inch, and iPad Pro 13-inch) and captures every scene in every locale into `ios/fastlane/raw/` (git-ignored). `ONLY="ko ja"` limits a run to some locales. Scenes are driven by Debug-only launch arguments: `-demoURL <link>` generates a card on launch, `-demoStyle YES` opens the Style sheet, `-demoHistory YES` opens History, and `-demoNoAutoShare YES` keeps the share extension's card on screen instead of opening the share sheet. Demo content is limited to Apple's own pages (App Store, Apple Music, Apple Maps).
-2. Two scenes are captured by hand, for Chinese and English only: `2-extension` (in Safari, tap Share and choose OpticShare; the simulator's system language must match) and the iPhone Duo set (`duo-*`, unfolded, rotated to landscape). Save them into `ios/fastlane/raw/<locale>/` with those names.
+2. Two scenes are captured by hand, for Chinese and English only: `2-extension` (in Safari, tap Share and choose Attention; the simulator's system language must match) and the iPhone Duo set (`duo-*`, unfolded, rotated to landscape). Save them into `ios/fastlane/raw/<locale>/` with those names.
 3. `ios/Tools/frame-screenshots.swift` adds the caption and background and writes the upload-ready images to `ios/fastlane/screenshots/<locale>/`. Captions are defined at the top of that script. `es-MX` reuses the `es-ES` images. App Store Connect has no foldable size class, so the iPhone Duo images go to `ios/fastlane/extra/` for marketing use.
 
 Sizes: iPhone 1320 × 2868, iPad 2064 × 2752. Those are the only sizes App Store Connect requires; smaller devices are scaled from them.

@@ -1,1 +1,1 @@
-OpticShare の最初のリリースです。
+Attention の最初のリリースです。

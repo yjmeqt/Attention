@@ -1,7 +1,7 @@
-Links von YouTube, X und vielen anderen Websites erscheinen in WeChat nur als nackte Adresse – ohne Titel und ohne Vorschaubild. OpticShare macht aus jedem Link eine saubere Bildkarte, damit deine Kontakte auf einen Blick sehen, worum es geht.
+Links von YouTube, X und vielen anderen Websites erscheinen in WeChat nur als nackte Adresse – ohne Titel und ohne Vorschaubild. Attention macht aus jedem Link eine saubere Bildkarte, damit deine Kontakte auf einen Blick sehen, worum es geht.
 
 SO FUNKTIONIERT’S
-1. Kopiere einen Link oder tippe in Safari oder einer anderen App auf „Teilen“ und wähle OpticShare
+1. Kopiere einen Link oder tippe in Safari oder einer anderen App auf „Teilen“ und wähle Attention
 2. Du erhältst eine Karte mit Titel, Coverbild, Autor und QR-Code
 3. Sende das Bild in WeChat und füge dann den Link ein – er ist schon in der Zwischenablage
 

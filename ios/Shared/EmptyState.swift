@@ -47,7 +47,7 @@ struct EmptyState: View {
     /// A first link to save, so the library is never a dead end.
     private func sampleLink(_ save: @escaping (URL) -> Void) -> some View {
         HStack(spacing: 12) {
-            OpticShareGlyph(size: 44)
+            AttentionGlyph(size: 44)
             VStack(alignment: .leading, spacing: 2) {
                 Text(Brand.name).font(.subheadline.weight(.semibold))
                 Text("Try saving this link")

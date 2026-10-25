@@ -29,7 +29,7 @@ private struct HeaderGlyph: View {
     let scroll: HomeScroll
 
     var body: some View {
-        OpticShareGlyph(size: 30)
+        AttentionGlyph(size: 30)
             .opacity(scroll.scrolled ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: scroll.scrolled)
             .accessibilityLabel(Brand.name)

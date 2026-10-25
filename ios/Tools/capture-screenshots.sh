@@ -5,16 +5,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 DERIVED=../build/ios
-APP=$DERIVED/Build/Products/Debug-iphonesimulator/OpticShare.app
-BUNDLE=com.yijiang.opticshare
+APP=$DERIVED/Build/Products/Debug-iphonesimulator/Attention.app
+BUNDLE=com.yijiang.attention
 OUT=fastlane/raw
 
-xcodebuild -project OpticShare.xcodeproj -scheme OpticShare -configuration Debug \
+xcodebuild -project Attention.xcodeproj -scheme Attention -configuration Debug \
   -destination 'generic/platform=iOS Simulator' -derivedDataPath $DERIVED build -quiet
 
 devices=(
-  "OpticShare-Shots-iPhone|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max|iphone"
-  "OpticShare-Shots-iPad|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad"
+  "Attention-Shots-iPhone|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max|iphone"
+  "Attention-Shots-iPad|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB|ipad"
 )
 # fastlane locale|app language|region|App Store storefront. es-MX reuses the es-ES shots.
 locales=(

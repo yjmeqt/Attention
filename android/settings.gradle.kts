@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "OpticShare"
+rootProject.name = "Attention"
 include(":app")
