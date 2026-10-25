@@ -43,6 +43,7 @@
 		53B2FB75D80D00595A30E94A /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928DD4E2EC98DA34C218E7C4 /* Library.swift */; };
 		54AF54C1ED74471A1245D6E3 /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257256ECFF03867390921EC /* LibraryTests.swift */; };
 		56A6BE57AF8E2BD8E7EB7F13 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A3FADEEC30FFD8606052 /* QRTemplate.swift */; };
+		58B672D90D47CC651C1F85A1 /* LongPressTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */; };
 		5BD688763B6A959DB738414A /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */; };
 		5BDFCF3774511AD8A54A2C8C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B2442464749711F36940212 /* InfoPlist.strings */; };
 		5C22298F2D05DAB9E1E44F2B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */; };
@@ -54,6 +55,7 @@
 		6844E94B14C4218ED2FF97E5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 236301C39C52D5FA004AD1CA /* InfoPlist.strings */; };
 		6C0841EE34FEF9986BA16F91 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5AAF1C1113490DF53B80233 /* InfoPlist.strings */; };
 		70CCC1F0F58333DCE052E9CA /* ImageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C124B6E5A25B69451C95D9 /* ImageData.swift */; };
+		713260F104CCCC35DF5BAF11 /* LongPressTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */; };
 		748A97FA37A143EE88B1C280 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C7A42650D73081334C9072A /* InfoPlist.strings */; };
 		782D9C1D58D0DEEFC73FF533 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8EF56438FBF82574D6E180 /* Feed.swift */; };
 		7FAEB0C5AF81F16DDF0FEC53 /* UnfurlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2727A28BE0D218D5ED70BD /* UnfurlTests.swift */; };
@@ -127,6 +129,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressTip.swift; sourceTree = "<group>"; };
 		18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetGuide.swift; sourceTree = "<group>"; };
 		1AF7324B5EBF1F088F7F36B0 /* Intake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intake.swift; sourceTree = "<group>"; };
 		1E7465AC0D67046C8C505116 /* CardPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPalette.swift; sourceTree = "<group>"; };
@@ -251,6 +254,7 @@
 				ACE3A99FD286CA9E07E0085B /* HomeView.swift */,
 				B5D373591C6BA544F936EDDC /* ItemActions.swift */,
 				D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */,
+				0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */,
 				C4A0053B5A944F84E96744AC /* Opening.swift */,
 				71243223C1A41C8631BC1363 /* TagEditor.swift */,
 			);
@@ -525,6 +529,7 @@
 				1DDF87389813C94D729712F3 /* ItemProviders.swift in Sources */,
 				04C1D5C725C41C195B9C0514 /* Library.swift in Sources */,
 				34F499FBFBFB3B907A7A44E8 /* LibraryItem.swift in Sources */,
+				58B672D90D47CC651C1F85A1 /* LongPressTip.swift in Sources */,
 				5BD688763B6A959DB738414A /* MinimalTemplate.swift in Sources */,
 				B916B315BD6DAA839C2E3D3B /* Model.swift in Sources */,
 				672E63EDA9C47EFF75BF2D12 /* Opening.swift in Sources */,
@@ -561,6 +566,7 @@
 				90C0794F7F3D266EDF4FB3EB /* ItemProviders.swift in Sources */,
 				53B2FB75D80D00595A30E94A /* Library.swift in Sources */,
 				1058DD43019BE0DED8EA70E3 /* LibraryItem.swift in Sources */,
+				713260F104CCCC35DF5BAF11 /* LongPressTip.swift in Sources */,
 				CF9F399EDAF960BB79C971A2 /* MinimalTemplate.swift in Sources */,
 				8382A285996778C8E1F95B05 /* Model.swift in Sources */,
 				9A22F77D2E35010E3C499BEB /* Opening.swift in Sources */,

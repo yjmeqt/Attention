@@ -8,6 +8,8 @@ struct ItemDetailView: View {
 
     @State private var actions: ItemActions
     @State private var image: UIImage?
+    /// The link's preview image and the image it was shared as, when they differ.
+    @State private var covers: (preview: UIImage?, shared: UIImage?)?
     @Environment(\.dismiss) private var dismiss
 
     init(item: LibraryItem, library: Library, privateUnlocked: Bool = false, onDone: (() -> Void)? = nil) {
@@ -49,6 +51,10 @@ struct ItemDetailView: View {
         .itemActionPresentations(actions)
         .task(id: "\(library.revision)-\(item.templateRaw)-\(item.aspectRaw)") {
             image = library.fullImage(item)
+            covers = library.hasCoverChoice(item)
+                ? (library.data(.cover, of: item).flatMap(Self.coverThumbnail),
+                   library.data(.source, of: item).flatMap(Self.coverThumbnail))
+                : nil
         }
         .onAppear {
             actions.linkCopied = false
@@ -107,6 +113,10 @@ struct ItemDetailView: View {
 
             if let meta = library.meta(for: item) {
                 VStack(alignment: .leading, spacing: 12) {
+                    if let covers {
+                        Text("Cover").font(.headline)
+                        CoverPicker(preview: covers.preview, shared: covers.shared, usesShared: sharedImageBinding)
+                    }
                     Text("Template").font(.headline)
                     TemplatePicker(meta: meta, style: styleBinding)
                     Text("Aspect ratio").font(.headline)
@@ -122,6 +132,14 @@ struct ItemDetailView: View {
                 RecognizedText(text: text)
             }
         }
+    }
+
+    private var sharedImageBinding: Binding<Bool> {
+        Binding { item.usesSharedImage } set: { library.setUsesSharedImage($0, for: item) }
+    }
+
+    private static func coverThumbnail(_ data: Data) -> UIImage? {
+        ImageData.downsample(data, maxPixel: 300).map(UIImage.init(cgImage:))
     }
 
     private var styleBinding: Binding<CardStyle> {

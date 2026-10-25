@@ -57,9 +57,6 @@ extension Library {
         }
     }
 
-    /// Fetches the link preview and reads text from the shared image, updating the saved item.
-    /// Returns a notice to show when only a basic card could be made.
-    @discardableResult
     /// Retries links saved without a preview, e.g. when the share extension closed before the page
     /// loaded. Each item is retried once per launch so pages that never preview don't refetch forever.
     func retryMissingPreviews() async {
@@ -80,6 +77,9 @@ extension Library {
         }
     }
 
+    /// Fetches the link preview and reads text from the shared image, updating the saved item.
+    /// Returns a notice to show when only a basic card could be made.
+    @discardableResult
     func enrich(_ item: LibraryItem) async -> String? {
         enriching.insert(item.id)
         defer { enriching.remove(item.id) }
