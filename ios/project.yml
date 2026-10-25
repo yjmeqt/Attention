@@ -45,6 +45,7 @@ targets:
         CFBundleDisplayName: OpticShare
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSCameraUsageDescription: Scan a QR code to get its link.
+        NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         UIApplicationSceneManifest:
@@ -89,6 +90,7 @@ targets:
       properties:
         CFBundleDisplayName: OpticShare
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSFaceIDUsageDescription: Unlock your private items.
         NSExtension:
           NSExtensionPointIdentifier: com.apple.share-services
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
@@ -96,6 +98,8 @@ targets:
             NSExtensionActivationRule:
               NSExtensionActivationSupportsWebURLWithMaxCount: 1
               NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsImageWithMaxCount: 1
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare.share
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"

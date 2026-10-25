@@ -26,6 +26,8 @@
 		<dict>
 			<key>NSExtensionActivationRule</key>
 			<dict>
+				<key>NSExtensionActivationSupportsImageWithMaxCount</key>
+				<integer>1</integer>
 				<key>NSExtensionActivationSupportsText</key>
 				<true/>
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
@@ -37,6 +39,8 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
 	</dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your private items.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save link cards to your photo library.</string>
 </dict>

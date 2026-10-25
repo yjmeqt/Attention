@@ -1,2 +1,3 @@
 "NSPhotoLibraryAddUsageDescription" = "将链接卡片保存到相册。";
 "NSCameraUsageDescription" = "扫描二维码以获取其中的链接。";
+"NSFaceIDUsageDescription" = "解锁你的私密内容。";

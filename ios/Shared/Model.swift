@@ -170,7 +170,7 @@ extension CardStyle {
 }
 
 extension URL {
-    static func extract(from text: String) -> URL? {
+    nonisolated static func extract(from text: String) -> URL? {
         let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         return detector?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text))?.url
     }

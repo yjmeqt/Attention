@@ -1,2 +1,3 @@
 "NSPhotoLibraryAddUsageDescription" = "Enregistrer les cartes de lien dans Photos.";
 "NSCameraUsageDescription" = "Scanner un code QR pour obtenir son lien.";
+"NSFaceIDUsageDescription" = "Déverrouiller vos éléments privés.";

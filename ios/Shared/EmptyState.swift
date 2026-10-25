@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct EmptyState: View {
-    let maker: CardMaker
     var showsSample = true
     var showsPaste = true
     let paste: ([NSItemProvider]) -> Void
@@ -24,7 +23,7 @@ struct EmptyState: View {
             .multilineTextAlignment(.center)
 
             if showsPaste {
-                PasteButton(supportedContentTypes: ItemProviders.linkTypes, payloadAction: paste)
+                PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
                     .buttonBorderShape(.capsule)
                     .controlSize(.large)
             }
@@ -37,8 +36,6 @@ struct EmptyState: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
             .background(.fill.quinary, in: .rect(cornerRadius: 16))
-
-            RecentList(maker: maker)
 
             if seenShareGuide { pinGuideLink }
         }
@@ -68,47 +65,6 @@ struct EmptyState: View {
         .buttonStyle(.plain)
     }
 
-}
-
-struct RecentList: View {
-    let maker: CardMaker
-    var limit = 3
-    var excluding: URL?
-
-    var body: some View {
-        let entries = Array(maker.history.entries.filter { $0.meta.url != excluding }.prefix(limit))
-        if !entries.isEmpty {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Recent").font(.headline).padding(.bottom, 4)
-                rows(entries)
-            }
-        }
-    }
-
-    private func rows(_ entries: [HistoryEntry]) -> some View {
-        ForEach(entries) { entry in
-                Button {
-                    maker.show(maker.history.meta(for: entry))
-                } label: {
-                    HStack(spacing: 12) {
-                        FaviconView(meta: entry.meta)
-                        Text(entry.meta.hasPreview ? entry.meta.title : entry.meta.displayURL)
-                            .lineLimit(1)
-                        Spacer()
-                        Text(entry.meta.site)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                    .padding(.vertical, 8)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                if entry.id != entries.last?.id { Divider() }
-        }
-    }
 }
 
 private struct StepRow: View {

@@ -25,10 +25,10 @@ struct CardView: View {
 }
 
 enum CardRenderer {
-    static func render(_ meta: LinkMeta, style: CardStyle) -> UIImage? {
+    static func render(_ meta: LinkMeta, style: CardStyle, scale: CGFloat = 3) -> UIImage? {
         let renderer = ImageRenderer(content: CardView(meta: meta, style: style))
         renderer.proposedSize = ProposedViewSize(style.aspect.size)
-        renderer.scale = 3
+        renderer.scale = scale
         renderer.isOpaque = true
         return renderer.uiImage
     }

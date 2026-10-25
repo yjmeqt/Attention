@@ -1,1 +1,2 @@
 "NSPhotoLibraryAddUsageDescription" = "Сохранение карточек ссылок в Фото.";
+"NSFaceIDUsageDescription" = "Разблокировка личных объектов.";

@@ -1,2 +1,3 @@
 "NSPhotoLibraryAddUsageDescription" = "Linkkarten in Fotos sichern.";
 "NSCameraUsageDescription" = "QR-Code scannen, um den Link zu erhalten.";
+"NSFaceIDUsageDescription" = "Deine privaten Objekte entsperren.";

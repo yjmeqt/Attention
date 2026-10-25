@@ -1,2 +1,3 @@
 "NSPhotoLibraryAddUsageDescription" = "リンクカードを写真ライブラリに保存します。";
 "NSCameraUsageDescription" = "QR コードをスキャンしてリンクを取得します。";
+"NSFaceIDUsageDescription" = "プライベートの項目のロックを解除します。";
