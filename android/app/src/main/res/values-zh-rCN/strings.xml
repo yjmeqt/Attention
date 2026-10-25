@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="paste_link">粘贴链接</string>
+    <string name="generate">生成</string>
+    <string name="empty_title">让微信也能预览的链接</string>
+    <string name="empty_body">YouTube、X 等很多网站的链接在微信里只显示一串网址。把它们变成带标题、封面和二维码的图片卡片。</string>
+</resources>

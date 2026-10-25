@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">OpticShare</string>
+    <string name="paste_link">Paste a link</string>
+    <string name="generate">Generate</string>
+    <string name="empty_title">Links WeChat can preview</string>
+    <string name="empty_body">YouTube, X and many sites show up in WeChat as a bare link. Turn them into an image card with the title, cover and a QR code.</string>
+</resources>

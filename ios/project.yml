@@ -1,0 +1,97 @@
+name: OpticShare
+options:
+  bundleIdPrefix: com.yijiang
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    TARGETED_DEVICE_FAMILY: "1,2"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 5AT3UN98GQ
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  OpticShare:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes: [OpticShare.icon]
+      - path: App/OpticShare.icon
+        type: file
+        buildPhase: resources
+      - Shared
+    dependencies:
+      - target: OpticShareExtension
+    entitlements:
+      path: App/OpticShare.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.yijiang.opticshare]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: OpticShare
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSCameraUsageDescription: Scan a QR code to get its link.
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare
+        ASSETCATALOG_COMPILER_APPICON_NAME: OpticShare
+    scheme:
+      testTargets: [OpticShareTests]
+
+  OpticShareTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    dependencies:
+      - target: OpticShare
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+  OpticShareExtension:
+    type: app-extension
+    platform: iOS
+    sources: [ShareExtension, Shared]
+    entitlements:
+      path: ShareExtension/OpticShareExtension.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.yijiang.opticshare]
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: OpticShare
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yijiang.opticshare.share

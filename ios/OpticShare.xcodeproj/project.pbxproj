@@ -1,0 +1,690 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		003B4302BA035DA52A04C204 /* CardMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */; };
+		04A893EB7134C743AD2675FF /* CardMakerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB0535ECDCF0749EFF7B90B /* CardMakerView.swift */; };
+		132C1897436DB8FFBD4AF7DC /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F286348891F34CCE7852E1D /* QRTemplate.swift */; };
+		154A4A36D7D51D7461A6D727 /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FCA67BCADDFE12B0A54BDA /* Sharing.swift */; };
+		1A1F9707AAD0FD579C835C99 /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */; };
+		1B590B902BAFA927FE1E22DB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2CB2FBCD7AAF847F1E549EF6 /* InfoPlist.strings */; };
+		261FBFCD5A69EC55FFD5A056 /* OpticShareApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 163F33EBE6C4BF9FE4EE8A1E /* OpticShareApp.swift */; };
+		26F56855A3D154E28D266E1C /* PostTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2194E9C16C204458CA4C6358 /* PostTemplate.swift */; };
+		2AF790428FB960634725DF5E /* UnfurlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02D52A78F2927C09C6B8CF7 /* UnfurlTests.swift */; };
+		2EE164142B42F5FD4AF534E3 /* CardMakerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB0535ECDCF0749EFF7B90B /* CardMakerView.swift */; };
+		368715E315FCC84142F93461 /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FCA67BCADDFE12B0A54BDA /* Sharing.swift */; };
+		396C709075B7D196F9335891 /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6645649D13C367EEDA6F68 /* CardPalette.swift */; };
+		3D9C9505C631A409F962C2C1 /* QRScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1534492D7D14DCC4001080D /* QRScanner.swift */; };
+		4062243B03BE2B4151D0BECC /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03CD28759E21F3565A4751B /* HistoryStore.swift */; };
+		43C0E9F12617A298778DEF53 /* PostTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2194E9C16C204458CA4C6358 /* PostTemplate.swift */; };
+		443577EE8D4C972DE878CD3A /* ItemProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF17EE80690DD5EC04C708A /* ItemProviders.swift */; };
+		4695C022EFF39CD635A244FD /* HeroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347E81A5F2FB98820F1F80B /* HeroTemplate.swift */; };
+		5A86A6F6A41AB5946281331F /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */; };
+		5AC6021C58AAE39F1ACF8476 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F286348891F34CCE7852E1D /* QRTemplate.swift */; };
+		74F844D8325FDDA21E7E62D5 /* CardMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */; };
+		79837697203B21BC9B985A1A /* OpticShare.icon in Resources */ = {isa = PBXBuildFile; fileRef = 408FEEF739D022ABC229B993 /* OpticShare.icon */; };
+		869F6E35CFEDA65821228615 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C684874ECACF755F2644BE /* ShareViewController.swift */; };
+		8CBBF14325D0BD7A7CFCC2CB /* QRScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1534492D7D14DCC4001080D /* QRScanner.swift */; };
+		8FFED7B5A5CDAE9CB2F7C115 /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6645649D13C367EEDA6F68 /* CardPalette.swift */; };
+		97B51903DA042A65F4C27D72 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03CD28759E21F3565A4751B /* HistoryStore.swift */; };
+		9A064CBE12178AE73C42F4AC /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7585922B442FE1DAC5A9F98C /* EmptyState.swift */; };
+		A767B1D8C1AB7F624487ACD9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 006B629F4E51C25897C83886 /* InfoPlist.strings */; };
+		A824E943F8B730216DED7D31 /* ItemProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF17EE80690DD5EC04C708A /* ItemProviders.swift */; };
+		B0AB83DFEF9199211805629C /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */; };
+		B6B35D77FE1D8F4E06DA4A82 /* OpticShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2EB554604869CFFAEBF972D2 /* OpticShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B9126FF0F1E199D5213FA217 /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */; };
+		CAAABEA5EBEB4293096BF50F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9E8BF76F123F6694704017 /* Model.swift */; };
+		D172BAB8252B2F72AE56DE20 /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */; };
+		D2929EC24350C2EF419FF17B /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4356B64C5358A0025F13BFC7 /* CardView.swift */; };
+		D3138CBF79FD7D1640B4959D /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */; };
+		DC003CA0268759444DED951F /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4356B64C5358A0025F13BFC7 /* CardView.swift */; };
+		EC64D59701F29A9404811C17 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7585922B442FE1DAC5A9F98C /* EmptyState.swift */; };
+		F0814D7426DA30694D5BB81B /* HeroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347E81A5F2FB98820F1F80B /* HeroTemplate.swift */; };
+		F0A33DCB5A458F40950D997F /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */; };
+		F4D2B5F56B59D022477AA471 /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */; };
+		FEF4BBF4C958E6FD96806E7F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9E8BF76F123F6694704017 /* Model.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		46B5E74778E96655F1CFCD2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0AEE48763C28FF18874BE6E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 376DE983D4D9923242F67088;
+			remoteInfo = OpticShareExtension;
+		};
+		501B259AEC4C0BFDBE6B1982 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0AEE48763C28FF18874BE6E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F39F7597D774C60540A14097;
+			remoteInfo = OpticShare;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FDFAA723E26211F88AE36BFA /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B6B35D77FE1D8F4E06DA4A82 /* OpticShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		006B629F4E51C25897C83886 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		0A8A4B31235A63FB6BAAAC01 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetGuide.swift; sourceTree = "<group>"; };
+		12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardMaker.swift; sourceTree = "<group>"; };
+		163F33EBE6C4BF9FE4EE8A1E /* OpticShareApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpticShareApp.swift; sourceTree = "<group>"; };
+		17C684874ECACF755F2644BE /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		2194E9C16C204458CA4C6358 /* PostTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostTemplate.swift; sourceTree = "<group>"; };
+		26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardComponents.swift; sourceTree = "<group>"; };
+		2CB2FBCD7AAF847F1E549EF6 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		2E642949FDFCC4C0863513EF /* OpticShareTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpticShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EB554604869CFFAEBF972D2 /* OpticShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = OpticShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		408FEEF739D022ABC229B993 /* OpticShare.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = OpticShare.icon; sourceTree = "<group>"; };
+		4356B64C5358A0025F13BFC7 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unfurler.swift; sourceTree = "<group>"; };
+		63FCA67BCADDFE12B0A54BDA /* Sharing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sharing.swift; sourceTree = "<group>"; };
+		660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTemplate.swift; sourceTree = "<group>"; };
+		6F286348891F34CCE7852E1D /* QRTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTemplate.swift; sourceTree = "<group>"; };
+		7585922B442FE1DAC5A9F98C /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
+		8347E81A5F2FB98820F1F80B /* HeroTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroTemplate.swift; sourceTree = "<group>"; };
+		8BCFB05A22A3840AFDDE788C /* OpticShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpticShare.entitlements; sourceTree = "<group>"; };
+		973177BD83218470F72313F1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9CB0535ECDCF0749EFF7B90B /* CardMakerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardMakerView.swift; sourceTree = "<group>"; };
+		9D6645649D13C367EEDA6F68 /* CardPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPalette.swift; sourceTree = "<group>"; };
+		A9F9A6E2765CB88AE347D993 /* OpticShare.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OpticShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACF17EE80690DD5EC04C708A /* ItemProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemProviders.swift; sourceTree = "<group>"; };
+		BB9E8BF76F123F6694704017 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		C03CD28759E21F3565A4751B /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		C381E4DEAA42702E68315318 /* OpticShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpticShareExtension.entitlements; sourceTree = "<group>"; };
+		D02D52A78F2927C09C6B8CF7 /* UnfurlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfurlTests.swift; sourceTree = "<group>"; };
+		D1534492D7D14DCC4001080D /* QRScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScanner.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0C128F76AFBD7F24AA4E3CD5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				D02D52A78F2927C09C6B8CF7 /* UnfurlTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		26FE1F250C2FE34910DA6CBD /* Card */ = {
+			isa = PBXGroup;
+			children = (
+				26CA8D23FB5FC4988945C5F8 /* CardComponents.swift */,
+				9D6645649D13C367EEDA6F68 /* CardPalette.swift */,
+				4356B64C5358A0025F13BFC7 /* CardView.swift */,
+				9757E4A806131A6C2498F264 /* Templates */,
+			);
+			path = Card;
+			sourceTree = "<group>";
+		};
+		4B1BCB8B99B3B8B1EF07388B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				12C37F742ADAA22DB25E5FC0 /* CardMaker.swift */,
+				9CB0535ECDCF0749EFF7B90B /* CardMakerView.swift */,
+				7585922B442FE1DAC5A9F98C /* EmptyState.swift */,
+				C03CD28759E21F3565A4751B /* HistoryStore.swift */,
+				ACF17EE80690DD5EC04C708A /* ItemProviders.swift */,
+				BB9E8BF76F123F6694704017 /* Model.swift */,
+				D1534492D7D14DCC4001080D /* QRScanner.swift */,
+				0FFB3DFA7A65144442AD637C /* ShareSheetGuide.swift */,
+				63FCA67BCADDFE12B0A54BDA /* Sharing.swift */,
+				5C8C6CB6DE208B4EA95AC99F /* Unfurler.swift */,
+				26FE1F250C2FE34910DA6CBD /* Card */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		581E503F707C66AB1D59CE71 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0A8A4B31235A63FB6BAAAC01 /* Info.plist */,
+				006B629F4E51C25897C83886 /* InfoPlist.strings */,
+				8BCFB05A22A3840AFDDE788C /* OpticShare.entitlements */,
+				408FEEF739D022ABC229B993 /* OpticShare.icon */,
+				163F33EBE6C4BF9FE4EE8A1E /* OpticShareApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8CE93B74F6750F0795411D0C /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				973177BD83218470F72313F1 /* Info.plist */,
+				2CB2FBCD7AAF847F1E549EF6 /* InfoPlist.strings */,
+				C381E4DEAA42702E68315318 /* OpticShareExtension.entitlements */,
+				17C684874ECACF755F2644BE /* ShareViewController.swift */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		9090DF3DE2051DADBF7201E0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A9F9A6E2765CB88AE347D993 /* OpticShare.app */,
+				2EB554604869CFFAEBF972D2 /* OpticShareExtension.appex */,
+				2E642949FDFCC4C0863513EF /* OpticShareTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9757E4A806131A6C2498F264 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				8347E81A5F2FB98820F1F80B /* HeroTemplate.swift */,
+				660F3DAD5C20FF629DCA29A6 /* MinimalTemplate.swift */,
+				2194E9C16C204458CA4C6358 /* PostTemplate.swift */,
+				6F286348891F34CCE7852E1D /* QRTemplate.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		DA39CE1C0E050300BD4A6A19 = {
+			isa = PBXGroup;
+			children = (
+				581E503F707C66AB1D59CE71 /* App */,
+				4B1BCB8B99B3B8B1EF07388B /* Shared */,
+				8CE93B74F6750F0795411D0C /* ShareExtension */,
+				0C128F76AFBD7F24AA4E3CD5 /* Tests */,
+				9090DF3DE2051DADBF7201E0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		376DE983D4D9923242F67088 /* OpticShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6386B4D40FF1ED548A1C49A9 /* Build configuration list for PBXNativeTarget "OpticShareExtension" */;
+			buildPhases = (
+				67B57E5B148F8BAB03960B10 /* Sources */,
+				BE13AB9E74DBB49D63CD7661 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpticShareExtension;
+			packageProductDependencies = (
+			);
+			productName = OpticShareExtension;
+			productReference = 2EB554604869CFFAEBF972D2 /* OpticShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		F39F7597D774C60540A14097 /* OpticShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31B27AFD8CA077A1B6CB6683 /* Build configuration list for PBXNativeTarget "OpticShare" */;
+			buildPhases = (
+				BFF433F734D697399621530F /* Sources */,
+				EF703A33F2232B8C408896D0 /* Resources */,
+				FDFAA723E26211F88AE36BFA /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8047B8EFA637A52AABE63B59 /* PBXTargetDependency */,
+			);
+			name = OpticShare;
+			packageProductDependencies = (
+			);
+			productName = OpticShare;
+			productReference = A9F9A6E2765CB88AE347D993 /* OpticShare.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FD1A67859DFD2AACB9FE4E68 /* OpticShareTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66AB957D6B948E4D64A9AC73 /* Build configuration list for PBXNativeTarget "OpticShareTests" */;
+			buildPhases = (
+				C9ED96E91748323C7F48B51A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FBBE6EB7A1985416982B098D /* PBXTargetDependency */,
+			);
+			name = OpticShareTests;
+			packageProductDependencies = (
+			);
+			productName = OpticShareTests;
+			productReference = 2E642949FDFCC4C0863513EF /* OpticShareTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A0AEE48763C28FF18874BE6E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					376DE983D4D9923242F67088 = {
+						DevelopmentTeam = 5AT3UN98GQ;
+						ProvisioningStyle = Automatic;
+					};
+					F39F7597D774C60540A14097 = {
+						DevelopmentTeam = 5AT3UN98GQ;
+						ProvisioningStyle = Automatic;
+					};
+					FD1A67859DFD2AACB9FE4E68 = {
+						DevelopmentTeam = 5AT3UN98GQ;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = F07F85408E23A5FC0AFA7921 /* Build configuration list for PBXProject "OpticShare" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				"zh-Hans",
+			);
+			mainGroup = DA39CE1C0E050300BD4A6A19;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9090DF3DE2051DADBF7201E0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F39F7597D774C60540A14097 /* OpticShare */,
+				376DE983D4D9923242F67088 /* OpticShareExtension */,
+				FD1A67859DFD2AACB9FE4E68 /* OpticShareTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BE13AB9E74DBB49D63CD7661 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B590B902BAFA927FE1E22DB /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF703A33F2232B8C408896D0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A767B1D8C1AB7F624487ACD9 /* InfoPlist.strings in Resources */,
+				79837697203B21BC9B985A1A /* OpticShare.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		67B57E5B148F8BAB03960B10 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9126FF0F1E199D5213FA217 /* CardComponents.swift in Sources */,
+				003B4302BA035DA52A04C204 /* CardMaker.swift in Sources */,
+				04A893EB7134C743AD2675FF /* CardMakerView.swift in Sources */,
+				396C709075B7D196F9335891 /* CardPalette.swift in Sources */,
+				DC003CA0268759444DED951F /* CardView.swift in Sources */,
+				EC64D59701F29A9404811C17 /* EmptyState.swift in Sources */,
+				F0814D7426DA30694D5BB81B /* HeroTemplate.swift in Sources */,
+				4062243B03BE2B4151D0BECC /* HistoryStore.swift in Sources */,
+				A824E943F8B730216DED7D31 /* ItemProviders.swift in Sources */,
+				5A86A6F6A41AB5946281331F /* MinimalTemplate.swift in Sources */,
+				CAAABEA5EBEB4293096BF50F /* Model.swift in Sources */,
+				43C0E9F12617A298778DEF53 /* PostTemplate.swift in Sources */,
+				3D9C9505C631A409F962C2C1 /* QRScanner.swift in Sources */,
+				132C1897436DB8FFBD4AF7DC /* QRTemplate.swift in Sources */,
+				F0A33DCB5A458F40950D997F /* ShareSheetGuide.swift in Sources */,
+				869F6E35CFEDA65821228615 /* ShareViewController.swift in Sources */,
+				368715E315FCC84142F93461 /* Sharing.swift in Sources */,
+				D172BAB8252B2F72AE56DE20 /* Unfurler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFF433F734D697399621530F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0AB83DFEF9199211805629C /* CardComponents.swift in Sources */,
+				74F844D8325FDDA21E7E62D5 /* CardMaker.swift in Sources */,
+				2EE164142B42F5FD4AF534E3 /* CardMakerView.swift in Sources */,
+				8FFED7B5A5CDAE9CB2F7C115 /* CardPalette.swift in Sources */,
+				D2929EC24350C2EF419FF17B /* CardView.swift in Sources */,
+				9A064CBE12178AE73C42F4AC /* EmptyState.swift in Sources */,
+				4695C022EFF39CD635A244FD /* HeroTemplate.swift in Sources */,
+				97B51903DA042A65F4C27D72 /* HistoryStore.swift in Sources */,
+				443577EE8D4C972DE878CD3A /* ItemProviders.swift in Sources */,
+				F4D2B5F56B59D022477AA471 /* MinimalTemplate.swift in Sources */,
+				FEF4BBF4C958E6FD96806E7F /* Model.swift in Sources */,
+				261FBFCD5A69EC55FFD5A056 /* OpticShareApp.swift in Sources */,
+				26F56855A3D154E28D266E1C /* PostTemplate.swift in Sources */,
+				8CBBF14325D0BD7A7CFCC2CB /* QRScanner.swift in Sources */,
+				5AC6021C58AAE39F1ACF8476 /* QRTemplate.swift in Sources */,
+				D3138CBF79FD7D1640B4959D /* ShareSheetGuide.swift in Sources */,
+				154A4A36D7D51D7461A6D727 /* Sharing.swift in Sources */,
+				1A1F9707AAD0FD579C835C99 /* Unfurler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9ED96E91748323C7F48B51A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2AF790428FB960634725DF5E /* UnfurlTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8047B8EFA637A52AABE63B59 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 376DE983D4D9923242F67088 /* OpticShareExtension */;
+			targetProxy = 46B5E74778E96655F1CFCD2B /* PBXContainerItemProxy */;
+		};
+		FBBE6EB7A1985416982B098D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F39F7597D774C60540A14097 /* OpticShare */;
+			targetProxy = 501B259AEC4C0BFDBE6B1982 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DE35B610D3BDF6A7C6EB49C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = OpticShare;
+				CODE_SIGN_ENTITLEMENTS = App/OpticShare.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5DCEB2B89592E684D3806FBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/OpticShareExtension.entitlements;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare.share;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5F1549002263EE3A887C4B5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/OpticShareExtension.entitlements;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare.share;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6C7D96587411DBD902044D77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 5AT3UN98GQ;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		98A04C1E243F75641C399822 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpticShare.app/OpticShare";
+			};
+			name = Release;
+		};
+		C6AE9FD4013D8899FDEC4B8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = OpticShare;
+				CODE_SIGN_ENTITLEMENTS = App/OpticShare.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D2091091166C4010E87649F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.opticshare.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpticShare.app/OpticShare";
+			};
+			name = Debug;
+		};
+		EF51FF9143981B5211B38B8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 5AT3UN98GQ;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		31B27AFD8CA077A1B6CB6683 /* Build configuration list for PBXNativeTarget "OpticShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DE35B610D3BDF6A7C6EB49C /* Debug */,
+				C6AE9FD4013D8899FDEC4B8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6386B4D40FF1ED548A1C49A9 /* Build configuration list for PBXNativeTarget "OpticShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5DCEB2B89592E684D3806FBB /* Debug */,
+				5F1549002263EE3A887C4B5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		66AB957D6B948E4D64A9AC73 /* Build configuration list for PBXNativeTarget "OpticShareTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D2091091166C4010E87649F0 /* Debug */,
+				98A04C1E243F75641C399822 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F07F85408E23A5FC0AFA7921 /* Build configuration list for PBXProject "OpticShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C7D96587411DBD902044D77 /* Debug */,
+				EF51FF9143981B5211B38B8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A0AEE48763C28FF18874BE6E /* Project object */;
+}

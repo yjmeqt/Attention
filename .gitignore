@@ -1,0 +1,14 @@
+.DS_Store
+build/
+
+# iOS
+xcuserdata/
+*.xcuserstate
+
+# Android
+.gradle/
+.kotlin/
+.idea/
+*.iml
+local.properties
+captures/
