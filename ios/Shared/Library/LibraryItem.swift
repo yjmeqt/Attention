@@ -20,6 +20,8 @@ final class LibraryItem {
     var isPrivate: Bool
     /// Hidden from the feed but kept, unlike deleted items.
     var isArchived: Bool = false
+    /// For links shared as an image: show that image instead of the link's preview image.
+    var usesSharedImage: Bool = false
     /// Width ÷ height of the thumbnail, so the feed can lay out tiles before loading them.
     var thumbnailAspect: Double
 

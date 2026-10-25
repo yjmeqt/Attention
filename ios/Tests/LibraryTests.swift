@@ -33,6 +33,30 @@ struct LibraryTests {
         #expect(second.tags == ["read later"])
     }
 
+    @Test func linkSharedAsImageCanShowEitherImage() throws {
+        func jpeg(_ width: CGFloat, _ height: CGFloat, _ color: UIColor) throws -> Data {
+            let image = UIGraphicsImageRenderer(size: CGSize(width: width, height: height)).image { context in
+                color.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+            }
+            return try #require(image.jpegData(compressionQuality: 0.9))
+        }
+        let library = makeLibrary()
+        let url = URL(string: "https://example.com/post")!
+        let shared = try jpeg(400, 300, .red)
+        let preview = try jpeg(300, 400, .blue)
+        let item = library.save(.link(url, image: shared))
+        library.setMeta(LinkMeta(url: url, site: "Example", title: "Post", imageData: preview), for: item)
+
+        #expect(library.hasCoverChoice(item))
+        #expect(library.meta(for: item)?.imageData == preview)
+        #expect(abs(item.thumbnailAspect - 0.75) < 0.01)
+
+        library.setUsesSharedImage(true, for: item)
+        #expect(library.meta(for: item)?.imageData == shared)
+        #expect(abs(item.thumbnailAspect - 4.0 / 3) < 0.01)
+    }
+
     @Test func sameImageIsSavedOnce() {
         let library = makeLibrary()
         let data = Data(repeating: 7, count: 64)

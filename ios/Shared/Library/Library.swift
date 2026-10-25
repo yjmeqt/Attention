@@ -163,8 +163,27 @@ final class Library {
         guard let url = item.url else { return nil }
         return LinkMeta(url: url, site: item.site, title: item.title,
                         authorName: item.authorName, authorHandle: item.authorHandle,
-                        imageData: data(.cover, of: item), avatarData: data(.avatar, of: item),
+                        imageData: coverData(item), avatarData: data(.avatar, of: item),
                         iconData: data(.icon, of: item))
+    }
+
+    /// The image a link's card and tile show: its preview image, or the image it was shared as.
+    func coverData(_ item: LibraryItem) -> Data? {
+        if item.usesSharedImage, let source = data(.source, of: item) { return source }
+        return data(.cover, of: item)
+    }
+
+    /// Both a preview image and a different shared image, so there's a choice to make.
+    func hasCoverChoice(_ item: LibraryItem) -> Bool {
+        guard !item.isImage, let source = data(.source, of: item), let cover = data(.cover, of: item) else { return false }
+        return source != cover
+    }
+
+    func setUsesSharedImage(_ uses: Bool, for item: LibraryItem) {
+        guard item.usesSharedImage != uses else { return }
+        item.usesSharedImage = uses
+        refreshThumbnail(item)
+        save()
     }
 
     func setMeta(_ meta: LinkMeta, for item: LibraryItem) {
@@ -234,7 +253,7 @@ final class Library {
     static let tileAspects = 0.6...1.9
 
     func refreshThumbnail(_ item: LibraryItem) {
-        let source = data(item.isImage ? .source : .cover, of: item)
+        let source = item.isImage ? data(.source, of: item) : coverData(item)
         let image = source.flatMap { ImageData.downsample($0, maxPixel: 720) }
             .flatMap { item.isImage || min($0.width, $0.height) >= 200 ? $0 : nil }
         let aspect = image.map { min(max(Double($0.width) / Double($0.height), Self.tileAspects.lowerBound), Self.tileAspects.upperBound) } ?? 0

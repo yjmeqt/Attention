@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 /// Lives outside `HomeView` so scrolling only redraws the header glyph and the filter bar,
 /// not the feed.
@@ -64,6 +65,7 @@ struct HomeView: View {
     @State private var typedLink = ""
     @State private var scroll = HomeScroll()
     @State private var barHeight: CGFloat = 48
+    private let longPressTip = LongPressTip()
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
@@ -196,6 +198,7 @@ struct HomeView: View {
             Task { await library.retryMissingPreviews() }
             clipboardHasLink = await Clipboard.hasNewLink()
         }
+        .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
         .onAppear {
             actions.onDeleted = { deleted in selection.subtract(deleted.map(\.id)) }
             actions.onArchived = { archived in selection.subtract(archived.map(\.id)) }
@@ -242,11 +245,13 @@ struct HomeView: View {
             }
             .buttonStyle(PressableStyle())
             .matchedTransitionSource(id: item.id, in: zoom)
+            .popoverTip(item.id == visible.first?.id ? longPressTip : nil, arrowEdge: .top)
             .contextMenu {
                 ItemMenu(item: item, actions: actions, filter: filter) {
                     selecting = true
                     selection = [item.id]
                 }
+                .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
             } preview: {
                 FeedTile(item: item, library: library).frame(width: 280)
             }

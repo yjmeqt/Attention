@@ -68,3 +68,42 @@ struct TemplatePicker: View {
             .accessibilityHidden(true)
     }
 }
+
+/// For links shared as an image: the link's preview image or the shared image.
+struct CoverPicker: View {
+    let preview: UIImage?
+    let shared: UIImage?
+    @Binding var usesShared: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            option(String(localized: "Link Preview"), image: preview, selected: !usesShared) { usesShared = false }
+            option(String(localized: "Shared Image"), image: shared, selected: usesShared) { usesShared = true }
+        }
+    }
+
+    private func option(_ title: String, image: UIImage?, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Color.clear
+                    .frame(width: 96, height: 72)
+                    .overlay {
+                        if let image { Image(uiImage: image).resizable().scaledToFill() }
+                    }
+                    .background(.fill.tertiary)
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
+                    }
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(selected ? .primary : .secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+}
