@@ -6,7 +6,7 @@ import os
 enum ItemProviders {
     static let linkTypes: [UTType] = [.url, .plainText, .text]
     static let pasteTypes: [UTType] = [.url, .plainText, .text, .image]
-    nonisolated static let log = Logger(subsystem: "com.yijiang.attention", category: "share")
+    nonisolated static let log = Logger(subsystem: "com.yjmeqt.attention", category: "share")
 
     /// Some hosts never call back for a type they advertise, so every load is bounded.
     private static let loadTimeout: Duration = .seconds(3)

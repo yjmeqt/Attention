@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppGroup {
-    static let id = "group.com.yijiang.attention"
+    static let id = Bundle.main.object(forInfoDictionaryKey: "AppGroupID") as? String ?? "group.com.yjmeqt.attention"
     static let defaults = UserDefaults(suiteName: id) ?? .standard
     static var container: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id)

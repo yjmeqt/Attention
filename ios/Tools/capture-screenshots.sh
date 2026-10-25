@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 DERIVED=../build/ios
 APP=$DERIVED/Build/Products/Debug-iphonesimulator/Attention.app
-BUNDLE=com.yijiang.attention
+BUNDLE=com.yjmeqt.attention.dev
 OUT=fastlane/raw
 
 xcodebuild -project Attention.xcodeproj -scheme Attention -configuration Debug \
