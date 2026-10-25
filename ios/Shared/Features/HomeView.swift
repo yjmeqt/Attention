@@ -190,6 +190,9 @@ struct HomeView: View {
         .task {
             if !seenShareGuide { showsGuide = true }
             HistoryImport.run(into: library)
+            #if DEBUG
+            await DemoLibrary.run(into: library)
+            #endif
             Task { await library.retryMissingPreviews() }
             clipboardHasLink = await Clipboard.hasNewLink()
         }
