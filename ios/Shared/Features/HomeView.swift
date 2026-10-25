@@ -1,5 +1,10 @@
 import SwiftUI
 
+private struct ScrollPosition: Equatable {
+    var offset: CGFloat
+    var inset: CGFloat
+}
+
 struct HomeView: View {
     let library: Library
 
@@ -12,6 +17,12 @@ struct HomeView: View {
     @State private var selecting = false
     @State private var selection: Set<UUID> = []
     @State private var showsGuide = false
+    @State private var showsScanner = false
+    @State private var showsLinkEntry = false
+    @State private var typedLink = ""
+    /// The filter bar hides while scrolling into the feed and comes back on a downward swipe.
+    @State private var showsFilters = false
+    @State private var scrolled = false
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
@@ -22,21 +33,18 @@ struct HomeView: View {
     }
 
     private var visible: [LibraryItem] { filter.apply(library.items) }
+    private var filterBarShown: Bool { !library.items.isEmpty && (showsFilters || !filter.isAll) }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
 
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 16) {
-                    InputBar(clipboardHasLink: $clipboardHasLink, notice: $notice, submit: submit, paste: paste, scanned: scanned)
-                        .frame(maxWidth: 600)
-                        .padding(.horizontal)
                     if library.items.isEmpty {
-                        EmptyState(showsPaste: !clipboardHasLink, paste: paste)
+                        EmptyState(showsPaste: false, paste: paste)
                             .frame(maxWidth: 520)
                             .padding(.horizontal)
                     } else {
-                        FilterBar(filter: filter, items: library.items, onPrivate: unlockPrivate)
                         feed
                     }
                 }
@@ -44,10 +52,47 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity)
             }
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
-            .scrollDismissesKeyboard(.interactively)
+            .onScrollGeometryChange(for: ScrollPosition.self) {
+                ScrollPosition(offset: $0.contentOffset.y + $0.contentInsets.top, inset: $0.contentInsets.top)
+            } action: { oldPosition, position in                // Showing or hiding the filter bar changes the inset; that isn't the user scrolling.
+                guard oldPosition.inset == position.inset else { return }
+                let old = oldPosition.offset, new = position.offset
+                scrolled = new > 12
+                let delta = new - old
+                withAnimation(.snappy) {
+                    if new < -24 || (delta < -6 && new > 0) {
+                        showsFilters = true
+                    } else if delta > 6 && new > 0 {
+                        showsFilters = false
+                    }
+                }
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if filterBarShown {
+                    FilterBar(filter: filter, items: library.items, onPrivate: unlockPrivate)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if let notice {
+                    Text(notice)
+                        .font(.footnote)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .glassEffect(.regular, in: .capsule)
+                        .padding(.bottom, 8)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .task(id: notice) {
+                            try? await Task.sleep(for: .seconds(3))
+                            withAnimation { self.notice = nil }
+                        }
+                }
+            }
+            .animation(.snappy, value: notice)
             .searchable(text: $filter.search, placement: .toolbar)
             .searchToolbarBehavior(.minimize)
             .navigationTitle(Brand.name)
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UUID.self) { id in
                 if let item = library.items.first(where: { $0.id == id }) {
                     ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
@@ -89,6 +134,21 @@ struct HomeView: View {
             }
             .presentationSizing(.page)
         }
+        .sheet(isPresented: $showsScanner) {
+            QRScanSheet(onLink: scanned)
+        }
+        .alert("Enter Link", isPresented: $showsLinkEntry) {
+            TextField("https://", text: $typedLink)
+                .keyboardType(.URL)
+                .textContentType(.URL)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("Cancel", role: .cancel) { typedLink = "" }
+            Button("Go") {
+                submit(typedLink)
+                typedLink = ""
+            }
+        }
         .task {
             if !seenShareGuide { showsGuide = true }
             HistoryImport.run(into: library)
@@ -97,6 +157,7 @@ struct HomeView: View {
         }
         .onAppear {
             actions.onDeleted = { deleted in selection.subtract(deleted.map(\.id)) }
+            actions.onArchived = { archived in selection.subtract(archived.map(\.id)) }
         }
     }
 
@@ -106,7 +167,10 @@ struct HomeView: View {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
         } else if visible.isEmpty {
             if filter.search.isEmpty {
-                ContentUnavailableView(filter.showsPrivate ? "No private items" : "Nothing here", systemImage: "tray")
+                ContentUnavailableView(
+                    filter.showsArchived ? "No archived items" : filter.showsPrivate ? "No private items" : "Nothing here",
+                    systemImage: filter.showsArchived ? "archivebox" : "tray"
+                )
             } else {
                 ContentUnavailableView.search(text: filter.search)
             }
@@ -165,15 +229,28 @@ struct HomeView: View {
                         .disabled(selection.isEmpty)
                 }
                 Spacer()
+                if filter.showsArchived {
+                    Button("Unarchive", systemImage: "tray.and.arrow.up") { actions.setArchived(false, selectedItems) }
+                        .disabled(selection.isEmpty)
+                } else {
+                    Button("Archive", systemImage: "archivebox") { actions.setArchived(true, selectedItems) }
+                        .disabled(selection.isEmpty)
+                }
+                Spacer()
                 Button("Delete", systemImage: "trash", role: .destructive) { actions.delete(selectedItems) }
                     .disabled(selection.isEmpty)
             }
         } else {
-            if !library.items.isEmpty {
-                DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+            ToolbarItem(placement: .principal) {
+                OpticShareGlyph(size: 30)
+                    .opacity(scrolled ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.2), value: scrolled)
+                    .accessibilityLabel(Brand.name)
+                    .accessibilityAddTraits(.isHeader)
             }
             ToolbarItem(placement: .primaryAction) {
                 Menu("More", systemImage: "ellipsis") {
+                    Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
                     if !library.items.isEmpty {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     }
@@ -183,6 +260,19 @@ struct HomeView: View {
                         Label("Pin \(Brand.name) to the front of the share sheet", systemImage: "pin")
                     }
                 }
+            }
+            ToolbarItem(placement: .bottomBar) {
+                Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
+                    .labelStyle(.titleAndIcon)
+                    .tint(.accentColor)
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            if !library.items.isEmpty {
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
         }
     }
@@ -250,69 +340,5 @@ struct HomeView: View {
         let privateIDs = Set(library.items.filter(\.isPrivate).map(\.id))
         if path.contains(where: privateIDs.contains) { path = [] }
         selection.subtract(privateIDs)
-    }
-}
-
-private struct InputBar: View {
-    @Binding var clipboardHasLink: Bool
-    @Binding var notice: String?
-    let submit: (String) -> Void
-    let paste: ([NSItemProvider]) -> Void
-    let scanned: (URL) -> Void
-
-    @State private var input = ""
-    @State private var showScanner = false
-    @FocusState private var fieldFocused: Bool
-
-    var body: some View {
-        VStack(spacing: 12) {
-            if clipboardHasLink {
-                HStack {
-                    Label("You copied a link", systemImage: "link")
-                    Spacer()
-                    PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
-                }
-                .padding(12)
-                .background(.thinMaterial, in: .rect(cornerRadius: 12))
-            }
-            HStack {
-                TextField("Paste a link", text: $input)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.URL)
-                    .textContentType(.URL)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.go)
-                    .focused($fieldFocused)
-                    .onSubmit(go)
-                    .onChange(of: input) { notice = nil }
-                if !input.isEmpty {
-                    Button("Go", systemImage: "arrow.right.circle.fill", action: go)
-                        .labelStyle(.iconOnly)
-                        .font(.title2)
-                }
-                PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
-                    .labelStyle(.iconOnly)
-                Button("Scan QR Code", systemImage: "qrcode.viewfinder") {
-                    fieldFocused = false
-                    showScanner = true
-                }
-                .labelStyle(.iconOnly)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle)
-            }
-            if let notice {
-                Text(notice).font(.footnote).foregroundStyle(.secondary)
-            }
-        }
-        .sheet(isPresented: $showScanner) {
-            QRScanSheet(onLink: scanned)
-        }
-    }
-
-    private func go() {
-        fieldFocused = false
-        submit(input)
-        if notice == nil { input = "" }
     }
 }

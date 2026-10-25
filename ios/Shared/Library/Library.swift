@@ -101,6 +101,11 @@ final class Library {
         save()
     }
 
+    func setArchived(_ isArchived: Bool, _ targets: [LibraryItem]) {
+        for item in targets { item.isArchived = isArchived }
+        save()
+    }
+
     /// Manual tags across the library, most used first.
     var allTags: [String] {
         let counts = items.flatMap(\.tags).reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
@@ -113,10 +118,12 @@ final class Library {
         return tag
     }
 
+    /// Over the cap, the oldest archived items go first, then the oldest others. Private items are never removed.
     private func enforceCap() {
         let excess = items.count - maxItems
         guard excess > 0 else { return }
-        delete(Array(items.reversed().filter { !$0.isPrivate }.prefix(excess)))
+        let oldest = items.reversed().filter { !$0.isPrivate }
+        delete(Array((oldest.filter(\.isArchived) + oldest.filter { !$0.isArchived }).prefix(excess)))
     }
 
     // MARK: - Files
