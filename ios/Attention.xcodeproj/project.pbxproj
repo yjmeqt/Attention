@@ -409,15 +409,15 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					53E2C3F8D4066EF7262A5875 = {
-						DevelopmentTeam = 5AT3UN98GQ;
+						DevelopmentTeam = M3V5P234X3;
 						ProvisioningStyle = Automatic;
 					};
 					AA58317B997D9CB0D1326005 = {
-						DevelopmentTeam = 5AT3UN98GQ;
+						DevelopmentTeam = M3V5P234X3;
 						ProvisioningStyle = Automatic;
 					};
 					CC660836D0310B3A43A22B6A = {
-						DevelopmentTeam = 5AT3UN98GQ;
+						DevelopmentTeam = M3V5P234X3;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -603,7 +603,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -613,6 +613,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_BUNDLE_ID = com.yjmeqt.attn;
+				APP_DISPLAY_NAME = Attention;
+				APP_GROUP_ID = "group.$(APP_BUNDLE_ID).shared";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -646,7 +649,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 5AT3UN98GQ;
+				DEVELOPMENT_TEAM = M3V5P234X3;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -687,7 +690,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention.share;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).share";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHARE_EXTENSION";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -704,7 +707,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Attention.app/Attention";
@@ -722,7 +725,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -738,7 +741,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).tests";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Attention.app/Attention";
@@ -749,6 +752,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_BUNDLE_ID = com.yjmeqt.attn.dev;
+				APP_DISPLAY_NAME = "Attention Dev";
+				APP_GROUP_ID = "group.$(APP_BUNDLE_ID).shared";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -782,7 +788,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 5AT3UN98GQ;
+				DEVELOPMENT_TEAM = M3V5P234X3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -830,7 +836,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yijiang.attention.share;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID).share";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHARE_EXTENSION";
 				TARGETED_DEVICE_FAMILY = "1,2";

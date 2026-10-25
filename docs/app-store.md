@@ -34,19 +34,33 @@ Upload with `fastlane deliver --skip_binary_upload --skip_screenshots` from `ios
 
 ## Screenshots
 
-1. `ios/Tools/capture-screenshots.sh` builds the Debug app, creates two simulators (iPhone 17 Pro Max, 6.9-inch, and iPad Pro 13-inch) and captures every scene in every locale into `ios/fastlane/raw/` (git-ignored). `ONLY="ko ja"` limits a run to some locales. Scenes are driven by Debug-only launch arguments: `-demoURL <link>` generates a card on launch, `-demoStyle YES` opens the Style sheet, `-demoHistory YES` opens History, and `-demoNoAutoShare YES` keeps the share extension's card on screen instead of opening the share sheet. Demo content is limited to Apple's own pages (App Store, Apple Music, Apple Maps).
-2. Two scenes are captured by hand, for Chinese and English only: `2-extension` (in Safari, tap Share and choose Attention; the simulator's system language must match) and the iPhone Duo set (`duo-*`, unfolded, rotated to landscape). Save them into `ios/fastlane/raw/<locale>/` with those names.
-3. `ios/Tools/frame-screenshots.swift` adds the caption and background and writes the upload-ready images to `ios/fastlane/screenshots/<locale>/`. Captions are defined at the top of that script. `es-MX` reuses the `es-ES` images. App Store Connect has no foldable size class, so the iPhone Duo images go to `ios/fastlane/extra/` for marketing use.
+**Status: to be redone before the first submission.** The scenes, captions and scripts below still describe the old card-maker app. Redo them once the library UI stops changing.
 
-Sizes: iPhone 1320 × 2868, iPad 2064 × 2752. Those are the only sizes App Store Connect requires; smaller devices are scaled from them.
+Plan, five scenes for iPhone (1320 × 2868) and iPad (2064 × 2752), positioned around "keep the links you care about":
 
-The capture needs network access, because the demo links are unfurled live.
+1. Home feed, the waterfall of link previews
+2. Saving from any app through the share sheet (captured by hand from Safari)
+3. Item detail: the card with its templates and aspect ratios
+4. Tags, filters and search
+5. Private and Archived
+
+How to rebuild the pipeline:
+
+- Fill the library with the Debug-only `-demoLinks "https://a https://b"` launch argument (newest first, only when the library is empty, needs network access). Add `-seenShareGuide YES` to skip the first-launch guide. Avoid links that don't unfurl reliably, such as bilibili.
+- The simulators are `Attention-Shots-iPhone` (iPhone 17 Pro Max), `Attention-Shots-iPad` (iPad Pro 13-inch) and `Attention-Shots-Duo` (iPhone Duo). App Store Connect has no foldable size class, so Duo images are for marketing only (`ios/fastlane/extra/`).
+- Rewrite the scenes in `ios/Tools/capture-screenshots.sh` and the captions in `ios/Tools/frame-screenshots.swift` (10 locales; `es-MX` reuses `es-ES`). The old `-demoURL`, `-demoStyle`, `-demoHistory` and `-demoNoAutoShare` arguments no longer exist.
+- Update `description.txt`, `subtitle.txt`, `keywords.txt` and `promotional_text.txt` in every locale to the library positioning at the same time.
+
+## Design decisions
+
+- **App icon**: keep the current one.
+- **Paste button**: keep the system `PasteButton`, which pastes without the "Allow Paste" prompt. Its size is fixed, so it is a capsule between the glass Scan and Search buttons. On iPhone Duo the toolbar moves to a column on the right and the paste button can't go there, so it floats at the bottom center.
 
 ## Privacy
 
 - **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking, no collected data; UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
 - **App Privacy questionnaire**: answer **Data Not Collected**. Links are fetched from the device and never sent to the developer.
-- **Privacy policy**: `docs/privacy-policy.md` (Chinese and English). It must be published at a public URL and that URL put in `privacy_url.txt`. The repo is private, so use GitHub Pages from a public repo, a Gist, or any static host.
+- **Privacy policy**: `docs/privacy-policy.md` (Chinese and English). It must be published at a public URL and that URL put in `privacy_url.txt`. The repo is public, so GitHub Pages from this repo works, as does a Gist or any static host.
 - **Permission prompts**: camera (QR scanning) and adding to Photos, in all listed languages (`InfoPlist.strings`).
 
 ## Age rating and export compliance
@@ -58,7 +72,7 @@ The capture needs network access, because the demo links are unfurled live.
 
 - [ ] Publish the privacy policy and a support page; fill in the URLs
 - [ ] Create the app in App Store Connect with the bundle ID above (primary language: Simplified Chinese)
-- [ ] Run the screenshot scripts and review the output
+- [ ] Redo the screenshots and store text (see Screenshots) and review the output
 - [ ] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`)
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [ ] Pricing and availability (not decided yet)
