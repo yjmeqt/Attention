@@ -57,6 +57,8 @@ extension LibraryItem {
     /// The automatic tag: the normalized domain, or "Images" for image items.
     var domain: String { url.map(DomainTag.domain(of:)) ?? DomainTag.images }
     var domainLabel: String { DomainTag.label(domain) }
+    /// The site's own name when known, else its domain.
+    var platformName: String { site.isEmpty ? domainLabel : site }
 
     var displayTitle: String {
         if !title.isEmpty { return title }

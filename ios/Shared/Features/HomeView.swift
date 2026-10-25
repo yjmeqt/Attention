@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var selecting = false
     @State private var selection: Set<UUID> = []
     @State private var showsGuide = false
+    @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -50,6 +51,7 @@ struct HomeView: View {
             .navigationDestination(for: UUID.self) { id in
                 if let item = library.items.first(where: { $0.id == id }) {
                     ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
+                        .navigationTransition(.zoom(sourceID: id, in: zoom))
                 }
             }
             .toolbar { toolbar }
@@ -116,23 +118,27 @@ struct HomeView: View {
 
     @ViewBuilder
     private func tile(_ item: LibraryItem) -> some View {
-        let tile = FeedTile(item: item, library: library, isSelecting: selecting, isSelected: selection.contains(item.id))
         if selecting {
             Button {
                 if selection.contains(item.id) { selection.remove(item.id) } else { selection.insert(item.id) }
-            } label: { tile }
-            .buttonStyle(.plain)
+            } label: {
+                FeedTile(item: item, library: library, isSelecting: true, isSelected: selection.contains(item.id))
+            }
+            .buttonStyle(PressableStyle())
         } else {
-            NavigationLink(value: item.id) { tile }
-                .buttonStyle(.plain)
-                .contextMenu {
-                    ItemMenu(item: item, actions: actions, filter: filter) {
-                        selecting = true
-                        selection = [item.id]
-                    }
-                } preview: {
-                    FeedTile(item: item, library: library).frame(width: 280)
+            NavigationLink(value: item.id) {
+                FeedTile(item: item, library: library) { actions.openInApp(item) }
+            }
+            .buttonStyle(PressableStyle())
+            .matchedTransitionSource(id: item.id, in: zoom)
+            .contextMenu {
+                ItemMenu(item: item, actions: actions, filter: filter) {
+                    selecting = true
+                    selection = [item.id]
                 }
+            } preview: {
+                FeedTile(item: item, library: library).frame(width: 280)
+            }
         }
     }
 
