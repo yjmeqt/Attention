@@ -11,6 +11,8 @@ enum AppGroup {
 
 enum Brand {
     static let name = "OpticShare"
+    /// Apple Music stands in until OpticShare has its own App Store page.
+    static let appStoreURL = URL(string: "https://apps.apple.com/app/apple-music/id1108187390")!
 }
 
 enum LinkKind: String, Codable {

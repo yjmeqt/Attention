@@ -4,6 +4,7 @@ struct EmptyState: View {
     var showsSample = true
     var showsPaste = true
     let paste: ([NSItemProvider]) -> Void
+    var onSample: ((URL) -> Void)?
 
     @AppStorage("seenShareGuide") private var seenShareGuide = false
 
@@ -38,7 +39,29 @@ struct EmptyState: View {
             .background(.fill.quinary, in: .rect(cornerRadius: 16))
 
             if seenShareGuide { pinGuideLink }
+
+            if let onSample { sampleLink(onSample) }
         }
+    }
+
+    /// A first link to save, so the library is never a dead end.
+    private func sampleLink(_ save: @escaping (URL) -> Void) -> some View {
+        HStack(spacing: 12) {
+            OpticShareGlyph(size: 44)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(Brand.name).font(.subheadline.weight(.semibold))
+                Text("Try saving this link")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            Button("Add") { save(Brand.appStoreURL) }
+                .font(.subheadline.weight(.bold))
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+        }
+        .padding(12)
+        .background(.fill.quinary, in: .rect(cornerRadius: 16))
     }
 
     private var pinGuideLink: some View {

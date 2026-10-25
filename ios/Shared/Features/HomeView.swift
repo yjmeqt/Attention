@@ -1,31 +1,26 @@
 import SwiftUI
 
-/// Scroll-driven chrome lives outside `HomeView` so scrolling only redraws the header glyph
-/// and the floating filter bar, not the feed.
+/// Lives outside `HomeView` so scrolling only redraws the header glyph and the filter bar,
+/// not the feed.
 @Observable
 private final class HomeScroll {
     var scrolled = false
-    var floatsFilters = false
-    /// Past the top, the filter bar in the feed is out of view.
-    var pastTop = false
-    @ObservationIgnored var travel: CGFloat = 0
+    /// How far the hidden filter bar has been pulled into view, 0...1.
+    var pull: CGFloat = 0
+    /// Pulled all the way out: the bar stays above the feed until scrolled away.
+    var revealsFilters = false
+    @ObservationIgnored var dragging = false
 
-    func update(from old: CGFloat, to new: CGFloat, barHeight: CGFloat) {
-        let scrolled = new > barHeight + 12
+    /// `offset` is 0 when the feed rests at its top, negative while pulled past it.
+    func update(offset: CGFloat, barHeight: CGFloat) {
+        let scrolled = offset > barHeight + 12
         if self.scrolled != scrolled { self.scrolled = scrolled }
-        let pastTop = new > 2
-        if self.pastTop != pastTop { self.pastTop = pastTop }
-        guard pastTop else {
-            travel = 0
-            if floatsFilters { floatsFilters = false }
-            return
-        }
-        let delta = new - old
-        travel = (delta < 0) == (travel < 0) ? travel + delta : delta
-        if travel < -40, !floatsFilters, new > barHeight * 2 {
-            withAnimation(.snappy) { floatsFilters = true }
-        } else if travel > 24, floatsFilters {
-            withAnimation(.snappy) { floatsFilters = false }
+        if revealsFilters {
+            if offset > barHeight + 24 { revealsFilters = false }
+        } else {
+            let pull = min(max(-offset / barHeight, 0), 1)
+            if self.pull != pull { self.pull = pull }
+            if dragging && pull >= 1 { revealsFilters = true }
         }
     }
 }
@@ -41,17 +36,14 @@ private struct HeaderGlyph: View {
             .accessibilityAddTraits(.isHeader)
     }
 }
-
-/// While a filter is on, the bar stays in reach anywhere in the feed.
-private struct FloatingFilters<Bar: View>: View {
+/// Fades in as it is pulled into view, so it never shows behind the navigation bar at rest.
+private struct PulledFilters<Bar: View>: View {
     let scroll: HomeScroll
-    let filter: FeedFilter
+    let pinned: Bool
     @ViewBuilder let bar: () -> Bar
 
     var body: some View {
-        if scroll.pastTop && (scroll.floatsFilters || !filter.isAll) {
-            bar().transition(.move(edge: .top).combined(with: .opacity))
-        }
+        bar().opacity(pinned || scroll.revealsFilters ? 1 : scroll.pull)
     }
 }
 
@@ -70,11 +62,8 @@ struct HomeView: View {
     @State private var showsScanner = false
     @State private var showsLinkEntry = false
     @State private var typedLink = ""
-    /// The filter bar sits above the feed, tucked under the navigation bar until pulled down,
-    /// and floats back in on a downward swipe further down.
     @State private var scroll = HomeScroll()
     @State private var barHeight: CGFloat = 48
-    @State private var viewportHeight: CGFloat = 0
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
@@ -85,49 +74,42 @@ struct HomeView: View {
     }
 
     private var visible: [LibraryItem] { filter.apply(library.items) }
+    /// While a filter is on, the bar stays so it can be changed or cleared.
+    private var filterBarHidden: Bool { !library.items.isEmpty && !scroll.revealsFilters && filter.isAll }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 0) {
-                        if !library.items.isEmpty {
+            ScrollView {
+                VStack(spacing: 0) {
+                    if !library.items.isEmpty {
+                        PulledFilters(scroll: scroll, pinned: !filter.isAll) {
                             FilterBar(filter: filter, items: library.items, onPrivate: unlockPrivate)
-                                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { barHeight = $0 }
                         }
-                        VStack(spacing: 16) {
-                            if library.items.isEmpty {
-                                EmptyState(showsPaste: false, paste: paste)
-                                    .frame(maxWidth: 520)
-                                    .padding(.horizontal)
-                            } else {
-                                feed
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity)
-                        .id(Self.feedTop)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { barHeight = $0 }
                     }
-                    // Tall enough to tuck the filter bar away even when the feed is short.
-                    .frame(minHeight: library.items.isEmpty ? 0 : viewportHeight + barHeight, alignment: .top)
+                    VStack(spacing: 16) {
+                        if library.items.isEmpty {
+                            EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+                                .frame(maxWidth: 520)
+                                .padding(.horizontal)
+                        } else {
+                            feed
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity)
                 }
-                .onAppear { tuckFilters(proxy) }
-                .onChange(of: library.items.isEmpty) { tuckFilters(proxy) }
             }
+            // The filter bar sits just above the top, out of view until pulled down.
+            .contentMargins(.top, filterBarHidden ? -barHeight : 0, for: .scrollContent)
+            .scrollEdgeEffectHidden(true, for: .vertical)
+            .onScrollPhaseChange { [scroll] _, phase in scroll.dragging = phase == .interacting }
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
             .onScrollGeometryChange(for: CGFloat.self) {
-                $0.containerSize.height - $0.contentInsets.top - $0.contentInsets.bottom
-            } action: { _, height in viewportHeight = height }
-            .onScrollGeometryChange(for: CGFloat.self) {
                 $0.contentOffset.y + $0.contentInsets.top
-            } action: { [scroll, barHeight] old, new in
-                scroll.update(from: old, to: new, barHeight: barHeight)
-            }
-            .overlay(alignment: .top) {
-                FloatingFilters(scroll: scroll, filter: filter) {
-                    FilterBar(filter: filter, items: library.items, onPrivate: unlockPrivate)
-                }
+            } action: { [scroll, barHeight] _, offset in
+                scroll.update(offset: offset, barHeight: barHeight)
             }
             .overlay(alignment: .bottom) {
                 if let notice {
@@ -222,7 +204,11 @@ struct HomeView: View {
         if filter.showsPrivate && !filter.privateUnlocked {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
         } else if visible.isEmpty {
-            if filter.search.isEmpty {
+            if filter.isAll && filter.search.isEmpty {
+                EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+                    .frame(maxWidth: 520)
+                    .padding(.horizontal)
+            } else if filter.search.isEmpty {
                 ContentUnavailableView(
                     filter.showsArchived ? "No archived items" : filter.showsPrivate ? "No private items" : "Nothing here",
                     systemImage: filter.showsArchived ? "archivebox" : "tray"
@@ -325,17 +311,9 @@ struct HomeView: View {
             }
             .sharedBackgroundVisibility(.hidden)
             ToolbarSpacer(.flexible, placement: .bottomBar)
-            if !library.items.isEmpty {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-            }
+            // Unconditional: without it the system moves search up next to More.
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
         }
-    }
-
-    private static let feedTop = "feedTop"
-
-    private func tuckFilters(_ proxy: ScrollViewProxy) {
-        guard !library.items.isEmpty, filter.isAll else { return }
-        Task { proxy.scrollTo(Self.feedTop, anchor: .top) }
     }
 
     // MARK: - Intake
@@ -361,6 +339,8 @@ struct HomeView: View {
     }
 
     private func scanned(_ url: URL) { open(.link(url, image: nil)) }
+
+    private func openSample(_ url: URL) { open(.link(url, image: nil)) }
 
     private func open(_ capture: Capture) {
         notice = nil
