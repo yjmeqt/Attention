@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/icon-dark.png">
+    <img src="docs/images/icon-default.png" alt="OpticShare app icon" width="128" height="128">
+  </picture>
+</p>
+
 # OpticShare
 
 Links from YouTube, X and many other sites show up in WeChat as a bare URL, with no title and no thumbnail. OpticShare unfurls the link on the device, renders a card image with the title, cover, site icon and a QR code, copies the cleaned link, and hands both to the system share sheet.
@@ -9,7 +16,7 @@ Links from YouTube, X and many other sites show up in WeChat as a bare URL, with
 | Path | Platform | Status |
 |---|---|---|
 | [`ios/`](ios) | iOS 26+, iPhone, iPad and iPhone Duo (SwiftUI, Swift 6) | Main app, feature complete for 1.0 |
-| [`android/`](android) | Android 8.0+ (Kotlin, Jetpack Compose, Material 3) | In progress |
+| [`android/`](android) | Android 12+ (Kotlin, Jetpack Compose, Material 3) | In progress |
 | [`docs/`](docs) | App Store preparation, privacy policy | |
 
 HarmonyOS is planned as a sibling `harmony/` folder. Each platform is a self-contained native project; behaviour is kept in sync by porting from the iOS implementation, which is the reference.

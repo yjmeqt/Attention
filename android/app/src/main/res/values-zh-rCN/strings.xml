@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="paste_link">粘贴链接</string>
+    <string name="paste">粘贴</string>
+    <string name="clear">清除</string>
     <string name="generate">生成</string>
+    <string name="history">历史记录</string>
+    <string name="history_empty">暂无历史记录</string>
+    <string name="just_now">刚刚</string>
+    <string name="delete">删除</string>
+    <string name="recent">最近</string>
+
     <string name="empty_title">让微信也能预览的链接</string>
     <string name="empty_body">YouTube、X 等很多网站的链接在微信里只显示一串网址。把它们变成带标题、封面和二维码的图片卡片。</string>
+    <string name="step_copy">复制链接，或在任意 App 中分享到 %1$s</string>
+    <string name="step_card">生成带标题、封面和二维码的卡片</string>
+    <string name="step_send">在微信中发送图片，再粘贴链接——链接已自动复制</string>
+
+    <string name="card_preview">卡片预览</string>
+    <string name="share">分享</string>
+    <string name="share_title">分享卡片</string>
+    <string name="save">保存</string>
+    <string name="saved_to_gallery">已保存到相册</string>
+    <string name="save_failed">无法保存图片</string>
+    <string name="link_copied">链接已复制——发送图片后粘贴即可</string>
+
+    <string name="notice_no_link">这段文字里没有找到链接。</string>
+    <string name="notice_no_clipboard_link">剪贴板里没有链接。</string>
+    <string name="notice_fallback">无法获取预览，已生成基础卡片。</string>
+
+    <string name="style">样式</string>
+    <string name="template">模板</string>
+    <string name="aspect_ratio">比例</string>
+    <string name="restore_default">恢复默认</string>
+    <string name="template_auto">自动</string>
+    <string name="template_auto_resolved">自动 · %1$s</string>
+    <string name="template_hero">大图</string>
+    <string name="template_post">帖子</string>
+    <string name="template_minimal">文字</string>
+    <string name="template_qr">二维码</string>
+    <string name="source_image">原图 %1$d × %2$d</string>
+    <string name="source_image_low">原图 %1$d × %2$d · 分辨率较低</string>
+    <string name="no_source_image">没有原图</string>
 </resources>

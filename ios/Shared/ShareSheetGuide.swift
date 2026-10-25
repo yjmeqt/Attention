@@ -170,7 +170,7 @@ private struct GuideSourcePage: View {
                     .fill(LinearGradient(colors: [.red.opacity(0.8), .orange.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(height: 150)
                     .overlay { Image(systemName: "play.fill").font(.largeTitle).foregroundStyle(.white) }
-                Text(verbatim: "2026 Total Solar Eclipse")
+                Text(verbatim: "WWDC 2025 Keynote")
                     .font(.headline)
                 ForEach([1.0, 0.9, 0.95, 0.6], id: \.self) { w in
                     Capsule().fill(.fill.secondary).frame(height: 8)
@@ -214,7 +214,7 @@ private struct GuideShareSheet: View {
                     .frame(width: 44, height: 44)
                     .overlay { Image(systemName: "play.fill").foregroundStyle(.white) }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: "2026 Total Solar Eclipse").font(.subheadline.weight(.semibold)).lineLimit(1)
+                    Text(verbatim: "WWDC 2025 Keynote").font(.subheadline.weight(.semibold)).lineLimit(1)
                     Text("youtube.com").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
