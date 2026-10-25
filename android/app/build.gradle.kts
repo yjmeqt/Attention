@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.yijiang.opticshare"
+    namespace = "com.yijiang.attention"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.yijiang.opticshare"
+        applicationId = "com.yijiang.attention"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

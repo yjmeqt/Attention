@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Animated walkthrough of pinning OpticShare in the system share sheet.
+/// Animated walkthrough of pinning Attention in the system share sheet.
 struct ShareSheetGuide: View {
     @State private var phase: Phase = .home
     @State private var target: GuideTarget?
@@ -228,7 +228,7 @@ private struct GuideShareSheet: View {
             Divider()
             HStack(alignment: .top, spacing: 8) {
                 if pinned {
-                    GuideAppCell(app: .opticShare)
+                    GuideAppCell(app: .attention)
                         .padding(4)
                         .background(.tint.opacity(0.18), in: .rect(cornerRadius: 16))
                         .padding(-4)
@@ -288,14 +288,14 @@ private struct GuideAppList: View {
                 row(.airdrop, section: .favorite)
                 row(.messages, section: .favorite)
                 row(.mail, section: .favorite, last: !added)
-                if added { opticRow(section: .favorite) }
+                if added { attentionRow(section: .favorite) }
             }
 
             header(String(localized: "Suggestions"))
             group {
                 row(.notes, section: .suggestion)
                 row(.reminders, section: .suggestion)
-                if !added { opticRow(section: .suggestion) }
+                if !added { attentionRow(section: .suggestion) }
                 row(.wechat, section: .suggestion, last: true)
             }
             Spacer(minLength: 0)
@@ -328,9 +328,9 @@ private struct GuideAppList: View {
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 22, style: .continuous))
     }
 
-    private func opticRow(section: GuideRow.Section) -> some View {
-        GuideRow(app: .opticShare, section: section, editing: editing, last: true, highlighted: section == .suggestion && editing)
-            .matchedGeometryEffect(id: "optic", in: ns)
+    private func attentionRow(section: GuideRow.Section) -> some View {
+        GuideRow(app: .attention, section: section, editing: editing, last: true, highlighted: section == .suggestion && editing)
+            .matchedGeometryEffect(id: "attention", in: ns)
     }
 
     private func row(_ app: GuideApp, section: GuideRow.Section, last: Bool = false) -> some View {
@@ -352,7 +352,7 @@ private struct GuideRow: View {
             if editing {
                 if section == .favorite {
                     Image(systemName: "minus.circle.fill").foregroundStyle(.white, .red)
-                } else if app == .opticShare {
+                } else if app == .attention {
                     Image(systemName: "plus.circle.fill").foregroundStyle(.white, .green)
                         .guideTarget(.add)
                 } else {
@@ -404,11 +404,11 @@ private struct GuideAppCell: View {
 }
 
 private enum GuideApp {
-    case opticShare, messages, mail, wechat, more, airdrop, notes, reminders
+    case attention, messages, mail, wechat, more, airdrop, notes, reminders
 
     var name: String {
         switch self {
-        case .opticShare: Brand.name
+        case .attention: Brand.name
         case .messages: String(localized: "Messages")
         case .mail: String(localized: "Mail")
         case .wechat: String(localized: "WeChat")
@@ -421,7 +421,7 @@ private enum GuideApp {
 
     @ViewBuilder func icon(size: CGFloat) -> some View {
         switch self {
-        case .opticShare: OpticShareGlyph(size: size)
+        case .attention: AttentionGlyph(size: size)
         case .messages: tile("message.fill", .green, size)
         case .mail: tile("envelope.fill", .blue, size)
         case .wechat: tile("bubble.left.and.bubble.right.fill", Color(red: 0.03, green: 0.76, blue: 0.38), size)
@@ -447,7 +447,7 @@ private enum GuideApp {
 }
 
 /// A SwiftUI rendition of the app icon for use inside mock system UI.
-struct OpticShareGlyph: View {
+struct AttentionGlyph: View {
     let size: CGFloat
 
     var body: some View {

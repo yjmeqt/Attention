@@ -7,21 +7,21 @@ import AppKit
 let captions: [String: [String: (title: String, subtitle: String)]] = [
     "zh-Hans": [
         "1-appstore": ("微信里也能看到链接预览", "任何链接一键变成带封面和二维码的卡片"),
-        "2-extension": ("在任何 App 里直接分享", "在 Safari 里点分享，选择 OpticShare"),
+        "2-extension": ("在任何 App 里直接分享", "在 Safari 里点分享，选择 Attention"),
         "3-music": ("长按二维码，直接打开原链接", "链接已自动复制，发完图片就能粘贴"),
         "4-maps": ("地点、文章、视频都可以", "自动读取标题、预览图和网站图标"),
         "5-history": ("做过的卡片随时找回", "历史记录只保存在你的设备上"),
         "6-style": ("多种模板，多种比例", "自动挑选最合适的样式，也可以自己换"),
-        "7-empty": ("复制链接就能开始", "粘贴链接，或从任意 App 分享到 OpticShare"),
+        "7-empty": ("复制链接就能开始", "粘贴链接，或从任意 App 分享到 Attention"),
     ],
     "en-US": [
         "1-appstore": ("Link previews, right in WeChat", "Turn any link into a card with a cover and QR code"),
-        "2-extension": ("Share from any app", "Tap Share in Safari and pick OpticShare"),
+        "2-extension": ("Share from any app", "Tap Share in Safari and pick Attention"),
         "3-music": ("Scan the QR to open the link", "The link is copied, ready to paste after the image"),
         "4-maps": ("Places, articles, videos", "Title, preview image and site icon, read for you"),
         "5-history": ("Every card, kept in History", "History stays on your device"),
         "6-style": ("Templates and sizes", "The best style is picked for you, or choose your own"),
-        "7-empty": ("Copy a link to start", "Paste it, or share it to OpticShare from any app"),
+        "7-empty": ("Copy a link to start", "Paste it, or share it to Attention from any app"),
     ],
     "ko": [
         "1-appstore": ("WeChat에서도 링크 미리보기", "어떤 링크든 커버와 QR 코드가 담긴 카드로"),
@@ -29,7 +29,7 @@ let captions: [String: [String: (title: String, subtitle: String)]] = [
         "4-maps": ("장소, 글, 동영상 모두", "제목, 미리보기 이미지, 사이트 아이콘을 자동으로"),
         "5-history": ("만든 카드는 기록에", "기록은 기기에만 저장됩니다"),
         "6-style": ("다양한 템플릿과 비율", "알맞은 스타일을 자동으로, 직접 고를 수도 있어요"),
-        "7-empty": ("링크를 복사하면 시작", "붙여넣거나 아무 앱에서나 OpticShare로 공유"),
+        "7-empty": ("링크를 복사하면 시작", "붙여넣거나 아무 앱에서나 Attention로 공유"),
     ],
     "ja": [
         "1-appstore": ("WeChat でもリンクをプレビュー", "どんなリンクもカバーと QR コード入りのカードに"),
@@ -61,7 +61,7 @@ let captions: [String: [String: (title: String, subtitle: String)]] = [
         "4-maps": ("أماكن ومقالات وفيديوهات", "العنوان وصورة المعاينة وأيقونة الموقع تلقائيًا"),
         "5-history": ("كل بطاقاتك في السجل", "يبقى السجل على جهازك فقط"),
         "6-style": ("قوالب ونسب متعددة", "يُختار النمط الأنسب تلقائيًا، أو اختر بنفسك"),
-        "7-empty": ("انسخ رابطًا للبدء", "الصقه، أو شاركه مع OpticShare من أي تطبيق"),
+        "7-empty": ("انسخ رابطًا للبدء", "الصقه، أو شاركه مع Attention من أي تطبيق"),
     ],
     "fr-FR": [
         "1-appstore": ("Des aperçus dans WeChat", "Chaque lien devient une carte avec couverture et QR"),
@@ -77,7 +77,7 @@ let captions: [String: [String: (title: String, subtitle: String)]] = [
         "4-maps": ("Orte, Artikel, Videos", "Titel, Vorschaubild und Symbol – automatisch"),
         "5-history": ("Alle Karten im Verlauf", "Der Verlauf bleibt auf deinem Gerät"),
         "6-style": ("Vorlagen und Formate", "Der passende Stil wird gewählt – oder du wählst selbst"),
-        "7-empty": ("Link kopieren und loslegen", "Einfügen oder aus jeder App mit OpticShare teilen"),
+        "7-empty": ("Link kopieren und loslegen", "Einfügen oder aus jeder App mit Attention teilen"),
     ],
     "es-ES": [
         "1-appstore": ("Vistas previas en WeChat", "Cualquier enlace, en una tarjeta con portada y QR"),

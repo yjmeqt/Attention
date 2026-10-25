@@ -1,13 +1,13 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/icon-dark.png">
-    <img src="docs/images/icon-default.png" alt="OpticShare app icon" width="128" height="128">
+    <img src="docs/images/icon-default.png" alt="Attention app icon" width="128" height="128">
   </picture>
 </p>
 
-# OpticShare
+# Attention
 
-Links from YouTube, X and many other sites show up in WeChat as a bare URL, with no title and no thumbnail. OpticShare unfurls the link on the device, renders a card image with the title, cover, site icon and a QR code, copies the cleaned link, and hands both to the system share sheet.
+Links from YouTube, X and many other sites show up in WeChat as a bare URL, with no title and no thumbnail. Attention unfurls the link on the device, renders a card image with the title, cover, site icon and a QR code, copies the cleaned link, and hands both to the system share sheet.
 
 中文：让微信也能"预览"链接。把 YouTube、X、B 站和各类网页链接变成带标题、封面和二维码的图片卡片。
 
@@ -36,32 +36,32 @@ Requirements: Xcode 27.1, [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```sh
 cd ios
-xcodegen generate          # regenerate OpticShare.xcodeproj after changing project.yml or adding files
-open OpticShare.xcodeproj
+xcodegen generate          # regenerate Attention.xcodeproj after changing project.yml or adding files
+open Attention.xcodeproj
 ```
 
 Command-line builds put their output in the repo-level `build/` folder, which is git-ignored:
 
 ```sh
-xcodebuild -project OpticShare.xcodeproj -scheme OpticShare \
+xcodebuild -project Attention.xcodeproj -scheme Attention \
   -destination 'generic/platform=iOS Simulator' -derivedDataPath ../build/ios build
 ```
 
 | Target | What it is |
 |---|---|
-| `OpticShare` | The app (`App/`, plus everything in `Shared/`) |
-| `OpticShareExtension` | Share extension, so links can be shared from Safari, YouTube, X, etc. (`ShareExtension/`) |
-| `OpticShareTests` | Swift Testing suites (`Tests/`) |
+| `Attention` | The app (`App/`, plus everything in `Shared/`) |
+| `AttentionExtension` | Share extension, so links can be shared from Safari, YouTube, X, etc. (`ShareExtension/`) |
+| `AttentionTests` | Swift Testing suites (`Tests/`) |
 
-- Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.com.yijiang.opticshare`.
+- Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.com.yijiang.attention`.
 - Signing uses automatic provisioning with team `5AT3UN98GQ`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and the bundle ID prefix in `project.yml`.
-- UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/OpticShare.icon`), so iOS derives the dark, tinted and clear appearances itself.
+- UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/Attention.icon`), so iOS derives the dark, tinted and clear appearances itself.
 
 Tests: the `UnfurlTests` suite fetches about 30 real Chinese and US sites, so it needs network access and is slow. Run everything else with:
 
 ```sh
-xcodebuild test -project OpticShare.xcodeproj -scheme OpticShare -destination 'platform=iOS Simulator,name=<simulator>' \
-  -derivedDataPath ../build/ios -skip-testing:OpticShareTests/UnfurlTests
+xcodebuild test -project Attention.xcodeproj -scheme Attention -destination 'platform=iOS Simulator,name=<simulator>' \
+  -derivedDataPath ../build/ios -skip-testing:AttentionTests/UnfurlTests
 ```
 
 ## Android
@@ -74,7 +74,7 @@ cd android
 ./gradlew installDebug     # to a running emulator or device
 ```
 
-Package and application ID: `com.yijiang.opticshare`. The launcher icon is an adaptive icon with a monochrome layer for themed icons.
+Package and application ID: `com.yijiang.attention`. The launcher icon is an adaptive icon with a monochrome layer for themed icons.
 
 ## Docs
 

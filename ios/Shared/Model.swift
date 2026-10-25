@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppGroup {
-    static let id = "group.com.yijiang.opticshare"
+    static let id = "group.com.yijiang.attention"
     static let defaults = UserDefaults(suiteName: id) ?? .standard
     static var container: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id)
@@ -10,8 +10,8 @@ enum AppGroup {
 }
 
 enum Brand {
-    static let name = "OpticShare"
-    /// Apple Music stands in until OpticShare has its own App Store page.
+    static let name = "Attention"
+    /// Apple Music stands in until Attention has its own App Store page.
     static let appStoreURL = URL(string: "https://apps.apple.com/app/apple-music/id1108187390")!
 }
 

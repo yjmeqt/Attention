@@ -1,10 +1,10 @@
-# OpticShare 隐私政策 / Privacy Policy
+# Attention 隐私政策 / Privacy Policy
 
 生效日期 / Effective date: 2026-10-25
 
 ## 中文
 
-OpticShare（以下简称“本应用”）尊重并保护你的隐私。
+Attention（以下简称“本应用”）尊重并保护你的隐私。
 
 **我们不收集任何个人数据。** 本应用没有账号系统，不包含广告或第三方统计 SDK，也不会追踪你在其他应用或网站上的行为。
 
@@ -29,7 +29,7 @@ OpticShare（以下简称“本应用”）尊重并保护你的隐私。
 
 ## English
 
-OpticShare ("the app") respects your privacy.
+Attention ("the app") respects your privacy.
 
 **We don't collect personal data.** The app has no accounts, no ads and no third-party analytics, and it doesn't track you across other apps or websites.
 

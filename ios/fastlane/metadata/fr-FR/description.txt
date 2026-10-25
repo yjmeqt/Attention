@@ -1,7 +1,7 @@
-Dans WeChat, les liens YouTube, X et de nombreux autres sites s’affichent comme une simple adresse, sans titre ni miniature. OpticShare transforme n’importe quel lien en une carte image soignée, pour que vos contacts voient tout de suite de quoi il s’agit.
+Dans WeChat, les liens YouTube, X et de nombreux autres sites s’affichent comme une simple adresse, sans titre ni miniature. Attention transforme n’importe quel lien en une carte image soignée, pour que vos contacts voient tout de suite de quoi il s’agit.
 
 COMMENT ÇA MARCHE
-1. Copiez un lien, ou touchez Partager dans Safari ou une autre app et choisissez OpticShare
+1. Copiez un lien, ou touchez Partager dans Safari ou une autre app et choisissez Attention
 2. Obtenez une carte avec le titre, l’image de couverture, l’auteur et un code QR
 3. Envoyez l’image dans WeChat, puis collez le lien — il est déjà dans le presse-papiers
 

@@ -1,7 +1,7 @@
-Liên kết từ YouTube, X và nhiều trang web khác chỉ hiện trên WeChat dưới dạng một địa chỉ trần, không có tiêu đề hay ảnh thu nhỏ. OpticShare biến mọi liên kết thành một thẻ ảnh gọn gàng để người nhận hiểu ngay bạn đang chia sẻ gì.
+Liên kết từ YouTube, X và nhiều trang web khác chỉ hiện trên WeChat dưới dạng một địa chỉ trần, không có tiêu đề hay ảnh thu nhỏ. Attention biến mọi liên kết thành một thẻ ảnh gọn gàng để người nhận hiểu ngay bạn đang chia sẻ gì.
 
 CÁCH DÙNG
-1. Sao chép liên kết, hoặc chạm Chia sẻ trong Safari hay ứng dụng khác rồi chọn OpticShare
+1. Sao chép liên kết, hoặc chạm Chia sẻ trong Safari hay ứng dụng khác rồi chọn Attention
 2. Nhận thẻ có tiêu đề, ảnh bìa, tác giả và mã QR
 3. Gửi ảnh trong WeChat rồi dán liên kết — liên kết đã có sẵn trong bộ nhớ tạm
 

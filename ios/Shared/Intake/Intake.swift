@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import UniformTypeIdentifiers
 
-/// Something shared into or pasted into OpticShare, before it's saved.
+/// Something shared into or pasted into Attention, before it's saved.
 enum Capture: Equatable {
     /// A link; `image` is the shared image it was read from, if any.
     case link(URL, image: Data?)

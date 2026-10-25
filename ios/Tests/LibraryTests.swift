@@ -1,7 +1,7 @@
 import Testing
 import UIKit
 import CoreImage.CIFilterBuiltins
-@testable import OpticShare
+@testable import Attention
 
 @MainActor
 @Suite("Library")

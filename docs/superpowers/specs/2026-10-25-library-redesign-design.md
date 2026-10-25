@@ -1,6 +1,6 @@
 # Library redesign (iOS)
 
-OpticShare becomes a link library that also makes share cards. Everything shared in or pasted is
+Attention becomes a link library that also makes share cards. Everything shared in or pasted is
 saved first; sharing is an explicit action.
 
 ## Items
