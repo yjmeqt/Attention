@@ -23,7 +23,6 @@
 		1DDF87389813C94D729712F3 /* ItemProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46736B2D6210E236010432C4 /* ItemProviders.swift */; };
 		1FE2BA74494548C936FBE027 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13DCB3DAE71878D65C76C77 /* CardView.swift */; };
 		201D3941CE3539E2222A1623 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E653538474654DA1B3B3A04E /* InfoPlist.strings */; };
-		2079AF5E997CF0C7FB7E08B6 /* HeroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3550742CDCAE7198C7E76ED0 /* HeroTemplate.swift */; };
 		2985DF963EBFE7DEEE439485 /* FeedFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370075CD22DCAED23F786BF1 /* FeedFilter.swift */; };
 		2BADF59A44312F571BABBB4A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 557D97726DE27F59DEEC1306 /* InfoPlist.strings */; };
 		2CD99F088DBF0BEC9995073D /* ItemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D373591C6BA544F936EDDC /* ItemActions.swift */; };
@@ -39,7 +38,6 @@
 		487047200BFADE0F62C5D539 /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */; };
 		4A147951327CDDD66F9CB3D8 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE3A99FD286CA9E07E0085B /* HomeView.swift */; };
 		4D16D85E982747D60AE4DBCB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BA181F2D79A532BBC91F6014 /* InfoPlist.strings */; };
-		4F25E57DD676A43413AB85AD /* HeroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3550742CDCAE7198C7E76ED0 /* HeroTemplate.swift */; };
 		53B2FB75D80D00595A30E94A /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928DD4E2EC98DA34C218E7C4 /* Library.swift */; };
 		54AF54C1ED74471A1245D6E3 /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257256ECFF03867390921EC /* LibraryTests.swift */; };
 		56A6BE57AF8E2BD8E7EB7F13 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A3FADEEC30FFD8606052 /* QRTemplate.swift */; };
@@ -82,10 +80,8 @@
 		D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA25D6EE15580CAF8E3954D /* EmptyState.swift */; };
 		DA1230E1AAFAE2E539A7D6A0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A2F728FC507EA853909873C /* InfoPlist.strings */; };
 		DEAB54B27CFB6902EEA2059F /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79265311867F9A8EC6A1D66 /* CardComponents.swift */; };
-		DECA47BC4FEBEAB164F396FE /* PostTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B5EFB21BC0376230DA2FD /* PostTemplate.swift */; };
 		DFA500B0F32CE3438A11A2FB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */; };
 		DFE3ABA248C12587DD05833F /* Vision.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB62E4296F1EED134B56DB97 /* Vision.swift */; };
-		DFEBB40C29C33F5DCFD3EA00 /* PostTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B5EFB21BC0376230DA2FD /* PostTemplate.swift */; };
 		E1A7C12C637E8B4F8B69AF6C /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA25D6EE15580CAF8E3954D /* EmptyState.swift */; };
 		E70F88BB0121EA0F95E614F8 /* ItemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D373591C6BA544F936EDDC /* ItemActions.swift */; };
 		E797D91F4F92909D30F82D1D /* Vision.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB62E4296F1EED134B56DB97 /* Vision.swift */; };
@@ -138,7 +134,6 @@
 		1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTemplate.swift; sourceTree = "<group>"; };
 		236301C39C52D5FA004AD1CA /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		3550742CDCAE7198C7E76ED0 /* HeroTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroTemplate.swift; sourceTree = "<group>"; };
 		370075CD22DCAED23F786BF1 /* FeedFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFilter.swift; sourceTree = "<group>"; };
 		3C7A42650D73081334C9072A /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3CE1DECE6EE590D686514363 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -146,7 +141,6 @@
 		425A626D3D87F1F26F642921 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		46736B2D6210E236010432C4 /* ItemProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemProviders.swift; sourceTree = "<group>"; };
 		4C2727A28BE0D218D5ED70BD /* UnfurlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfurlTests.swift; sourceTree = "<group>"; };
-		4D5B5EFB21BC0376230DA2FD /* PostTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostTemplate.swift; sourceTree = "<group>"; };
 		52C124B6E5A25B69451C95D9 /* ImageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageData.swift; sourceTree = "<group>"; };
 		5337444CD9E33BADFDAE4840 /* HistoryImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryImport.swift; sourceTree = "<group>"; };
 		557D97726DE27F59DEEC1306 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -267,9 +261,7 @@
 		8F35A9A1882E2DC19313BD73 /* Templates */ = {
 			isa = PBXGroup;
 			children = (
-				3550742CDCAE7198C7E76ED0 /* HeroTemplate.swift */,
 				1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */,
-				4D5B5EFB21BC0376230DA2FD /* PostTemplate.swift */,
 				D604A3FADEEC30FFD8606052 /* QRTemplate.swift */,
 				E1D003FB4E59849062A3EBCC /* TileTemplate.swift */,
 			);
@@ -523,7 +515,6 @@
 				E1A7C12C637E8B4F8B69AF6C /* EmptyState.swift in Sources */,
 				782D9C1D58D0DEEFC73FF533 /* Feed.swift in Sources */,
 				2985DF963EBFE7DEEE439485 /* FeedFilter.swift in Sources */,
-				4F25E57DD676A43413AB85AD /* HeroTemplate.swift in Sources */,
 				F5D4C661341667503905444D /* HistoryImport.swift in Sources */,
 				4A147951327CDDD66F9CB3D8 /* HomeView.swift in Sources */,
 				BBED5C940A08071869D8F70F /* ImageData.swift in Sources */,
@@ -537,7 +528,6 @@
 				5BD688763B6A959DB738414A /* MinimalTemplate.swift in Sources */,
 				B916B315BD6DAA839C2E3D3B /* Model.swift in Sources */,
 				672E63EDA9C47EFF75BF2D12 /* Opening.swift in Sources */,
-				DFEBB40C29C33F5DCFD3EA00 /* PostTemplate.swift in Sources */,
 				5E92145300F60B3BA2D03F70 /* QRScanner.swift in Sources */,
 				11439DAF98CE599F18B38FD3 /* QRTemplate.swift in Sources */,
 				0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */,
@@ -561,7 +551,6 @@
 				D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */,
 				39EEFA7B42B6DD7B7E90676F /* Feed.swift in Sources */,
 				8729AF82AA28471921EA3CD1 /* FeedFilter.swift in Sources */,
-				2079AF5E997CF0C7FB7E08B6 /* HeroTemplate.swift in Sources */,
 				1949F1BC4A05FF4D657E30D6 /* HistoryImport.swift in Sources */,
 				3014AF63ECA35121E78C993E /* HomeView.swift in Sources */,
 				70CCC1F0F58333DCE052E9CA /* ImageData.swift in Sources */,
@@ -575,7 +564,6 @@
 				CF9F399EDAF960BB79C971A2 /* MinimalTemplate.swift in Sources */,
 				8382A285996778C8E1F95B05 /* Model.swift in Sources */,
 				9A22F77D2E35010E3C499BEB /* Opening.swift in Sources */,
-				DECA47BC4FEBEAB164F396FE /* PostTemplate.swift in Sources */,
 				410391E562DD9663730B1638 /* QRScanner.swift in Sources */,
 				56A6BE57AF8E2BD8E7EB7F13 /* QRTemplate.swift in Sources */,
 				027200EC7E80BC55E51E5F82 /* ShareSheetGuide.swift in Sources */,

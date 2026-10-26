@@ -72,28 +72,33 @@ struct CardRenderingTests {
         title: "just setting up my twttr — 这是一段很长的中文文本，用来测试换行和排版效果。",
         authorName: "jack", authorHandle: "jack")
 
-    @Test(arguments: CardTemplate.allCases, CardAspect.allCases)
-    func renders(_ template: CardTemplate, _ aspect: CardAspect) async throws {
-        let style = CardStyle(template: template, aspect: aspect)
+    @Test(arguments: CardTemplate.allCases)
+    func renders(_ template: CardTemplate) async throws {
+        let style = CardStyle(template: template)
         let card = try #require(CardRenderer.render(Self.sample, style: style))
         #expect(card.size.width * card.scale == 1080)
         #expect(card.size.height * card.scale == CardView.size(for: Self.sample, style: style).height * 3)
-        try card.pngData()?.write(to: UnfurlTests.output.appending(path: "template-\(template)-\(aspect).png"))
+        try card.pngData()?.write(to: UnfurlTests.output.appending(path: "template-\(template).png"))
+    }
+
+    @Test(arguments: ["hero", "post"])
+    func removedTemplatesDecodeAsAuto(_ raw: String) throws {
+        let json = Data(#"{"template":"\#(raw)","aspect":"story"}"#.utf8)
+        #expect(try JSONDecoder().decode(CardStyle.self, from: json) == CardStyle())
     }
 }
 
 @Suite("QR codes stay scannable")
 struct QRScanTests {
-    @Test(arguments: CardAspect.allCases)
-    func logoQRDecodes(_ aspect: CardAspect) async throws {
+    @Test func logoQRDecodes() async throws {
         let logo = UIGraphicsImageRenderer(size: CGSize(width: 180, height: 180)).image { context in
             UIColor.systemOrange.setFill()
             context.fill(CGRect(x: 0, y: 0, width: 180, height: 180))
         }
         let url = "https://www.zhihu.com/question/19550225"
         let meta = LinkMeta(url: URL(string: url)!, site: "zhihu.com", title: "", iconData: logo.pngData())
-        let card = try #require(CardRenderer.render(meta, style: CardStyle(aspect: aspect)))
-        try card.pngData()?.write(to: UnfurlTests.output.appending(path: "qr-logo-\(aspect).png"))
+        let card = try #require(CardRenderer.render(meta, style: CardStyle()))
+        try card.pngData()?.write(to: UnfurlTests.output.appending(path: "qr-logo.png"))
         let detector = try #require(CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
                                                options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]))
         let messages = detector.features(in: CIImage(cgImage: try #require(card.cgImage)))
