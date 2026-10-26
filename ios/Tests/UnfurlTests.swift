@@ -77,7 +77,7 @@ struct CardRenderingTests {
         let style = CardStyle(template: template, aspect: aspect)
         let card = try #require(CardRenderer.render(Self.sample, style: style))
         #expect(card.size.width * card.scale == 1080)
-        #expect(card.size.height * card.scale == aspect.size.height * 3)
+        #expect(card.size.height * card.scale == CardView.size(for: Self.sample, style: style).height * 3)
         try card.pngData()?.write(to: UnfurlTests.output.appending(path: "template-\(template)-\(aspect).png"))
     }
 }
@@ -119,21 +119,24 @@ struct ImageShapeTests {
     }
 
     @Test(arguments: [
-        (1200, 630, CardTemplate.hero),
-        (1280, 720, .hero),
-        (1080, 1440, .hero),
-        (1024, 1024, .hero),
-        (300, 300, .minimal),
-        (600, 600, .minimal),
-        (360, 200, .minimal),
-    ])
-    func picksTemplate(_ width: Int, _ height: Int, _ expected: CardTemplate) async throws {
+        (1200, 630, 9.0 / 16),
+        (1280, 720, 9.0 / 16),
+        (1024, 1024, 1),
+        (1080, 1440, 4.0 / 3),
+        (600, 1800, 16.0 / 9),
+        (300, 300, nil),
+        (600, 600, nil),
+        (360, 200, nil),
+    ] as [(Int, Int, Double?)])
+    func tileKeepsPhotoShape(_ width: Int, _ height: Int, _ expected: Double?) async throws {
         let meta = Self.meta(width: width, height: height)
-        #expect(CardTemplate.auto.resolved(for: meta) == expected)
-        for aspect in CardAspect.allCases {
-            let card = try #require(CardRenderer.render(meta, style: CardStyle(aspect: aspect)))
-            try card.pngData()?.write(to: UnfurlTests.output.appending(path: "shape-\(width)x\(height)-\(aspect).png"))
-        }
+        #expect(CardTemplate.auto.resolved(for: meta) == .tile)
+        let ratio = TileTemplate.imageRatio(meta).map(Double.init)
+        #expect((ratio == nil) == (expected == nil))
+        if let ratio, let expected { #expect(abs(ratio - expected) < 0.001) }
+        let card = try #require(CardRenderer.render(meta, style: CardStyle()))
+        #expect(card.size.width == TileTemplate.width)
+        try card.pngData()?.write(to: UnfurlTests.output.appending(path: "tile-\(width)x\(height).png"))
     }
 }
 

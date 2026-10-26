@@ -119,7 +119,7 @@ struct SampleCard: View {
     var scale: CGFloat = 0.42
 
     var body: some View {
-        let size = CardAspect.portrait.size
+        let size = CardView.size(for: Self.meta, style: CardStyle())
         CardView(meta: Self.meta, style: CardStyle())
             .scaleEffect(scale)
             .frame(width: size.width * scale, height: size.height * scale)

@@ -25,9 +25,9 @@ struct SiteChip: View {
 
     private var label: String {
         switch meta.kind {
-        case .youtube: "YouTube · 视频"
-        case .bilibili: "哔哩哔哩 · 视频"
-        case .x: "X · 帖子"
+        case .youtube: String(localized: "YouTube · Video")
+        case .bilibili: String(localized: "Bilibili · Video")
+        case .x: String(localized: "X · Post")
         case .web: meta.site.count > 18 ? String(meta.site.prefix(17)) + "…" : meta.site
         }
     }
@@ -64,7 +64,7 @@ struct QRBadge: View {
     let url: URL
     let size: CGFloat
     let palette: CardPalette
-    var caption = "长按识别"
+    var caption = String(localized: "Scan to open")
     var logo: UIImage?
 
     var body: some View {
@@ -96,7 +96,7 @@ struct BrandMark: View {
     let palette: CardPalette
 
     var body: some View {
-        Text(verbatim: "由 \(Brand.name) 生成")
+        Text("Made with \(Brand.name)")
             .font(.system(size: 11))
             .foregroundStyle(palette.tertiary)
     }

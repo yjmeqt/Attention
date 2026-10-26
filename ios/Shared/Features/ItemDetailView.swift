@@ -119,11 +119,13 @@ struct ItemDetailView: View {
                     }
                     Text("Template").font(.headline)
                     TemplatePicker(meta: meta, style: styleBinding)
-                    Text("Aspect ratio").font(.headline)
-                    Picker("Aspect ratio", selection: styleBinding.aspect) {
-                        ForEach(CardAspect.allCases) { Text($0.label) }
+                    if item.style.template.resolved(for: meta) != .tile {
+                        Text("Aspect ratio").font(.headline)
+                        Picker("Aspect ratio", selection: styleBinding.aspect) {
+                            ForEach(CardAspect.allCases) { Text($0.label) }
+                        }
+                        .pickerStyle(.segmented)
                     }
-                    .pickerStyle(.segmented)
                     if !isLoading { SourceImageInfo(meta: meta) }
                 }
             }
