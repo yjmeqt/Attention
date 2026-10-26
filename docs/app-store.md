@@ -6,10 +6,10 @@ Everything needed to create the App Store listing lives in the repo. Pricing and
 
 | Item | Value |
 |---|---|
-| App bundle ID | `com.yijiang.attention` |
-| Share extension | `com.yijiang.attention.share` |
-| App Group | `group.com.yijiang.attention` |
-| Team | `5AT3UN98GQ` (set in `ios/project.yml`) |
+| App bundle ID | `com.yjmeqt.attn` (Release; Debug builds use `com.yjmeqt.attn.dev`) |
+| Share extension | `com.yjmeqt.attn.share` |
+| App Group | `group.com.yjmeqt.attn.shared` |
+| Team | `M3V5P234X3` (set in `ios/project.yml`) |
 | Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/project.yml` |
 
 Bundle IDs are permanent once the app is created in App Store Connect.
