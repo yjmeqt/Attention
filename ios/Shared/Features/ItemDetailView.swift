@@ -57,7 +57,7 @@ struct ItemDetailView: View {
                 : nil
         }
         .onAppear {
-            actions.linkCopied = false
+            actions.copied = nil
             actions.onDeleted = { deleted in
                 guard deleted.contains(where: { $0.id == item.id }) else { return }
                 if let onDone { onDone() } else { dismiss() }
@@ -177,10 +177,15 @@ struct ItemDetailView: View {
     private var bottomBar: some View {
         VStack(spacing: 8) {
             Group {
-                if actions.linkCopied {
+                switch actions.copied {
+                case .link:
+                    Label("Link copied", systemImage: "doc.on.clipboard")
+                case .linkForImage:
                     Label("Link copied — paste it after the image.", systemImage: "doc.on.clipboard")
-                } else if onDone != nil {
-                    Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
+                case nil:
+                    if onDone != nil {
+                        Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
+                    }
                 }
             }
             .font(.footnote)
@@ -189,14 +194,8 @@ struct ItemDetailView: View {
             .padding(.vertical, 6)
             .background(.regularMaterial, in: .capsule)
             HStack(spacing: 12) {
-                Button {
-                    actions.share(item)
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.glassProminent)
-                .disabled(image == nil)
                 if let onDone {
+                    share.buttonStyle(.glassProminent)
                     Button(action: onDone) {
                         Text("Done").frame(maxWidth: .infinity)
                     }
@@ -207,7 +206,10 @@ struct ItemDetailView: View {
                     } label: {
                         Label("Open", systemImage: "arrow.up.forward.app").frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.glassProminent)
+                    share.buttonStyle(.glass)
+                } else {
+                    share.buttonStyle(.glassProminent)
                 }
             }
             .controlSize(.large)
@@ -215,6 +217,13 @@ struct ItemDetailView: View {
         .frame(maxWidth: 520)
         .padding(.horizontal)
         .padding(.bottom, 8)
+    }
+
+    private var share: some View {
+        ShareMenu(item: item, actions: actions) {
+            Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
+        }
+        .disabled(item.isImage && image == nil)
     }
 }
 
