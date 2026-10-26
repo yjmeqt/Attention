@@ -107,7 +107,7 @@ private struct StepRow: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Step \(number): ") + Text(text))
+        .accessibilityLabel(Text("Step \(number): \(Text(text))"))
     }
 }
 
