@@ -25,7 +25,7 @@ Attention（以下简称“本应用”）尊重并保护你的隐私。
 
 **变更。** 如本政策有更新，我们会在此页面公布。
 
-**联系我们。** 如有任何问题，请通过 App Store 页面上的支持链接联系我们。
+**联系我们。** 如有任何问题，请通过[支持页面](support.html)联系我们。
 
 ## English
 
@@ -50,4 +50,4 @@ These requests contain only the link and are handled by those services under the
 
 **Changes.** Updates to this policy will be posted on this page.
 
-**Contact.** Use the support link on the App Store page.
+**Contact.** See the [support page](support.html).
