@@ -55,7 +55,7 @@ struct TemplatePicker: View {
     private func thumbnail(_ template: CardTemplate) -> some View {
         var thumbStyle = style
         thumbStyle.template = template
-        let size = style.aspect.size
+        let size = CardView.size(for: meta, style: thumbStyle)
         let selected = style.template == template
         return CardView(meta: meta, style: thumbStyle)
             .scaleEffect(scale, anchor: .topLeading)

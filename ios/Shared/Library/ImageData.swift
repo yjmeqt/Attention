@@ -30,14 +30,18 @@ nonisolated enum ImageData {
     /// The average color of the image's bottom strip, so a band below it reads as a continuation.
     static func bottomEdgeColor(_ image: CGImage) -> (red: Double, green: Double, blue: Double)? {
         let strip = max(1, image.height / 8)
-        guard let edge = image.cropping(to: CGRect(x: 0, y: image.height - strip, width: image.width, height: strip)),
-              let context = CGContext(data: nil, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
+        guard let edge = image.cropping(to: CGRect(x: 0, y: image.height - strip, width: image.width, height: strip)) else { return nil }
+        return averageColor(edge)
+    }
+
+    static func averageColor(_ image: CGImage) -> (red: Double, green: Double, blue: Double)? {
+        guard let context = CGContext(data: nil, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
                                       space: CGColorSpaceCreateDeviceRGB(),
                                       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
               let pixel = context.data?.assumingMemoryBound(to: UInt8.self)
         else { return nil }
         context.interpolationQuality = .medium
-        context.draw(edge, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        context.draw(image, in: CGRect(x: 0, y: 0, width: 1, height: 1))
         return (Double(pixel[0]) / 255, Double(pixel[1]) / 255, Double(pixel[2]) / 255)
     }
 

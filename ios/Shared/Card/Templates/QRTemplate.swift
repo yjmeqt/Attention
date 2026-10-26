@@ -12,7 +12,7 @@ struct QRTemplate: View {
                 Spacer(minLength: 0)
             }
             Spacer(minLength: 0)
-            QRBadge(url: meta.shareURL, size: metrics.bigQRSize, palette: palette, caption: "长按识别二维码打开",
+            QRBadge(url: meta.shareURL, size: metrics.bigQRSize, palette: palette, caption: String(localized: "Scan the QR code to open"),
                     logo: meta.largeIcon)
             Text(meta.hasPreview ? meta.title : meta.displayURL)
                 .font(.system(size: 18, weight: .semibold))
@@ -20,7 +20,7 @@ struct QRTemplate: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
             if !meta.hasPreview {
-                Text(verbatim: "无法获取预览，可识别二维码或粘贴链接打开")
+                Text("No preview available. Scan the QR code or paste the link to open it.")
                     .font(.system(size: 13))
                     .foregroundStyle(palette.secondary)
                     .multilineTextAlignment(.center)

@@ -68,6 +68,7 @@
 		9A22F77D2E35010E3C499BEB /* Opening.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4A0053B5A944F84E96744AC /* Opening.swift */; };
 		9E73CAEC81970B4F0B643024 /* TagEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71243223C1A41C8631BC1363 /* TagEditor.swift */; };
 		9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9792D39565DE3A1F9C1B3188 /* Sharing.swift */; };
+		AF256F2DD5F9D18473D735FC /* TileTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D003FB4E59849062A3EBCC /* TileTemplate.swift */; };
 		B53E9B5C9D4672829D874EF6 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13DCB3DAE71878D65C76C77 /* CardView.swift */; };
 		B85D02B2BE317AB5EF3DE03D /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7465AC0D67046C8C505116 /* CardPalette.swift */; };
 		B916B315BD6DAA839C2E3D3B /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFA6F5B10F5569D29192E86 /* Model.swift */; };
@@ -75,6 +76,7 @@
 		C0A56CB704FF2B96B432D8A4 /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9792D39565DE3A1F9C1B3188 /* Sharing.swift */; };
 		C27D6022DCF7F60622EA3702 /* CardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430B9788D92BAB15EA6BD2A /* CardControls.swift */; };
 		C40CFDD1928CD57B886A894A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCFF55CD82E091EAF41124A4 /* InfoPlist.strings */; };
+		CF9DAC93A8787A8F641A6802 /* TileTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D003FB4E59849062A3EBCC /* TileTemplate.swift */; };
 		CF9F399EDAF960BB79C971A2 /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */; };
 		D502EDB2B1BFC869C8E65252 /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */; };
 		D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA25D6EE15580CAF8E3954D /* EmptyState.swift */; };
@@ -184,6 +186,7 @@
 		D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailView.swift; sourceTree = "<group>"; };
 		D604A3FADEEC30FFD8606052 /* QRTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTemplate.swift; sourceTree = "<group>"; };
 		E13DCB3DAE71878D65C76C77 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		E1D003FB4E59849062A3EBCC /* TileTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTemplate.swift; sourceTree = "<group>"; };
 		E50AE3F00A589DE5E00A2F1B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E653538474654DA1B3B3A04E /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		EB7999EE2EA02C8F8C667D81 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -268,6 +271,7 @@
 				1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */,
 				4D5B5EFB21BC0376230DA2FD /* PostTemplate.swift */,
 				D604A3FADEEC30FFD8606052 /* QRTemplate.swift */,
+				E1D003FB4E59849062A3EBCC /* TileTemplate.swift */,
 			);
 			path = Templates;
 			sourceTree = "<group>";
@@ -539,6 +543,7 @@
 				0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */,
 				9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */,
 				9E73CAEC81970B4F0B643024 /* TagEditor.swift in Sources */,
+				AF256F2DD5F9D18473D735FC /* TileTemplate.swift in Sources */,
 				487047200BFADE0F62C5D539 /* Unfurler.swift in Sources */,
 				E797D91F4F92909D30F82D1D /* Vision.swift in Sources */,
 			);
@@ -577,6 +582,7 @@
 				ECE8D2F82106875E9609C88E /* ShareViewController.swift in Sources */,
 				C0A56CB704FF2B96B432D8A4 /* Sharing.swift in Sources */,
 				093824F18D2FC574C9FBC3DF /* TagEditor.swift in Sources */,
+				CF9DAC93A8787A8F641A6802 /* TileTemplate.swift in Sources */,
 				EDDB62F70856BE9CFE664AE1 /* Unfurler.swift in Sources */,
 				DFE3ABA248C12587DD05833F /* Vision.swift in Sources */,
 			);

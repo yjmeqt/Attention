@@ -99,13 +99,14 @@ struct LinkMeta: Codable {
 }
 
 enum CardTemplate: String, Codable, CaseIterable, Identifiable {
-    case auto, hero, post, minimal, qr
+    case auto, tile, hero, post, minimal, qr
 
     var id: Self { self }
 
     var label: String {
         switch self {
         case .auto: String(localized: "Auto")
+        case .tile: String(localized: "Card")
         case .hero: String(localized: "Image")
         case .post: String(localized: "Post")
         case .minimal: String(localized: "Text")
@@ -115,12 +116,7 @@ enum CardTemplate: String, Codable, CaseIterable, Identifiable {
 
     func resolved(for meta: LinkMeta) -> CardTemplate {
         guard self == .auto else { return self }
-        guard meta.hasPreview else { return .qr }
-        switch meta.kind {
-        case .youtube, .bilibili: return .hero
-        case .x: return .post
-        case .web: return meta.imageData == nil || meta.imageIsIcon ? .minimal : .hero
-        }
+        return meta.hasPreview ? .tile : .qr
     }
 }
 
