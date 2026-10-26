@@ -296,12 +296,9 @@ struct HomeView: View {
                 Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
             }
             ToolbarItem(placement: .bottomBar) {
-                PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
-                    .labelStyle(.iconOnly)
-                    .buttonBorderShape(.circle)
-                    .tint(.accentColor)
+                ToolbarPasteButton(paste: paste)
+                    .accessibilityLabel("Paste")
             }
-            .sharedBackgroundVisibility(.hidden)
             ToolbarSpacer(.flexible, placement: .bottomBar)
             // Unconditional: without it the system moves search up next to More.
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
