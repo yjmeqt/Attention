@@ -51,6 +51,8 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         AppGroupID: $(APP_GROUP_ID)
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSCameraUsageDescription: Scan a QR code to get its link.
@@ -98,6 +100,8 @@ targets:
       path: ShareExtension/Info.plist
       properties:
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         AppGroupID: $(APP_GROUP_ID)
         NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
         NSFaceIDUsageDescription: Unlock your private items.
