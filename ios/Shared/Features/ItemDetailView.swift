@@ -227,7 +227,10 @@ private struct TagRow: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
-                TagChip(text: item.domainLabel, systemImage: item.isImage ? "photo" : "globe", isSelected: false)
+                TagChip(text: item.domainLabel,
+                        systemImage: item.isImage ? "photo" : "globe",
+                        icon: item.isImage ? nil : actions.library.favicon(item),
+                        isSelected: false)
                 if item.isPrivate {
                     TagChip(text: String(localized: "Private"), systemImage: "lock.fill", isSelected: false)
                 }
@@ -274,11 +277,20 @@ private struct RecognizedText: View {
 struct TagChip: View {
     let text: String
     var systemImage: String?
+    var icon: UIImage?
     let isSelected: Bool
 
     var body: some View {
         HStack(spacing: 4) {
-            if let systemImage { Image(systemName: systemImage).imageScale(.small) }
+            if let icon {
+                Image(uiImage: icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .clipShape(.rect(cornerRadius: 4, style: .continuous))
+            } else if let systemImage {
+                Image(systemName: systemImage).imageScale(.small)
+            }
             Text(text).lineLimit(1)
         }
         .font(.subheadline)
