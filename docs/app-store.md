@@ -54,7 +54,7 @@ How to rebuild the pipeline:
 ## Design decisions
 
 - **App icon**: keep the current one.
-- **Paste button**: keep the system `PasteButton`, which pastes without the "Allow Paste" prompt. Its size is fixed, so it is an icon-only circle next to Scan on the left. On iPhone Duo the toolbar moves to a column on the right and the paste button can't go there, so it floats at the bottom left.
+- **Paste button**: the system paste control, which pastes without the "Allow Paste" prompt. SwiftUI's `PasteButton` always fills its background, so it is UIKit's `UIPasteControl` instead, colored like the toolbar glass and sharing it with Scan. A clear background disables the control.
 - **Filters**: Archived and Private are toggles at the top right. Site and tag chips show only while searching, or while one of them is on.
 
 ## Privacy
