@@ -15,6 +15,7 @@ final class LibraryItem {
     var authorHandle: String?
     var ocrText: String?
     var templateRaw: String
+    /// Unused since cards dropped aspect ratios; kept so the store needs no migration.
     var aspectRaw: String
     var tags: [String]
     var isPrivate: Bool
@@ -35,10 +36,10 @@ final class LibraryItem {
         self.site = site
         self.title = title
         templateRaw = style.template.rawValue
-        aspectRaw = style.aspect.rawValue
+        aspectRaw = "portrait"
         tags = []
         isPrivate = false
-        thumbnailAspect = Double(style.aspect.size.width / style.aspect.size.height)
+        thumbnailAspect = 0.8
     }
 }
 
@@ -48,14 +49,8 @@ extension LibraryItem {
     var isImage: Bool { url == nil }
 
     var style: CardStyle {
-        get {
-            CardStyle(template: CardTemplate(rawValue: templateRaw) ?? .auto,
-                      aspect: CardAspect(rawValue: aspectRaw) ?? .portrait)
-        }
-        set {
-            templateRaw = newValue.template.rawValue
-            aspectRaw = newValue.aspect.rawValue
-        }
+        get { CardStyle(template: CardTemplate(rawValue: templateRaw) ?? .auto) }
+        set { templateRaw = newValue.template.rawValue }
     }
 
     /// The automatic tag: the normalized domain, or "Images" for image items.
