@@ -1,6 +1,9 @@
 .DS_Store
 build/
 
+# Local design notes
+docs/superpowers/
+
 # iOS
 xcuserdata/
 *.xcuserstate
