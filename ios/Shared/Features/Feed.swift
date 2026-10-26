@@ -197,33 +197,38 @@ struct PressableStyle: ButtonStyle {
 struct FilterBar: View {
     @Bindable var filter: FeedFilter
     let items: [LibraryItem]
-    let onPrivate: () -> Void
+    let library: Library
 
     var body: some View {
         let section = filter.section(items)
+        let byDomain = Dictionary(section.map { ($0.domain, $0) }, uniquingKeysWith: { first, _ in first })
         ScrollView(.horizontal) {
             GlassEffectContainer(spacing: 8) {
                 HStack(spacing: 8) {
-                    chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty && !filter.showsArchived) {
+                    chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty) {
+                        Image(systemName: "square.grid.2x2")
+                    } action: {
                         filter.clearFilters()
-                        filter.showsArchived = false
                     }
                     ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
                         chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
+                            if let item = byDomain[domain], let icon = library.favicon(item) {
+                                Image(uiImage: icon).resizable().scaledToFit()
+                                    .frame(width: 16, height: 16)
+                                    .clipShape(.rect(cornerRadius: 4, style: .continuous))
+                            } else {
+                                Image(systemName: domain == DomainTag.images ? "photo" : "globe")
+                            }
+                        } action: {
                             toggle(domain, in: \.domains)
                         }
                     }
                     ForEach(Self.ranked(section.flatMap(\.tags)), id: \.self) { tag in
-                        chip("#\(tag)", selected: filter.tags.contains(tag)) {
+                        chip(tag, selected: filter.tags.contains(tag)) {
+                            Image(systemName: "number")
+                        } action: {
                             toggle(tag, in: \.tags)
                         }
-                    }
-                    chip(String(localized: "Archived"), systemImage: "archivebox", selected: filter.showsArchived) {
-                        filter.clearFilters()
-                        filter.showsArchived.toggle()
-                    }
-                    chip(String(localized: "Private"), systemImage: "lock.fill", selected: filter.showsPrivate) {
-                        if filter.showsPrivate { filter.reset() } else { onPrivate() }
                     }
                 }
                 .padding(.horizontal)
@@ -234,10 +239,11 @@ struct FilterBar: View {
         .scrollClipDisabled()
     }
 
-    private func chip(_ text: String, systemImage: String? = nil, selected: Bool, action: @escaping () -> Void) -> some View {
+    private func chip(_ text: String, selected: Bool, @ViewBuilder icon: () -> some View,
+                      action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 4) {
-                if let systemImage { Image(systemName: systemImage).imageScale(.small) }
+            HStack(spacing: 6) {
+                icon().imageScale(.small)
                 Text(text).lineLimit(1)
             }
             .font(.subheadline.weight(selected ? .semibold : .regular))
