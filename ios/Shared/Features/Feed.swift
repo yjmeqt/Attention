@@ -93,7 +93,7 @@ struct FeedTile: View {
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                 }
-                footer
+                footerRow
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -131,21 +131,26 @@ struct FeedTile: View {
                         .multilineTextAlignment(.leading)
                 }
             }
-            HStack {
-                footer
-                Spacer(minLength: 4)
-                if let onOpen, !item.isImage {
-                    Button("Open", action: onOpen)
-                        .font(.caption.weight(.bold))
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                        .controlSize(.small)
-                }
-            }
+            footerRow
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
+    }
+
+    /// Time on the left; links get an Open button on the right, like the App Store's Get button.
+    private var footerRow: some View {
+        HStack {
+            footer
+            Spacer(minLength: 4)
+            if let onOpen, item.url != nil {
+                Button("Open", action: onOpen)
+                    .font(.caption.weight(.bold))
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.small)
+            }
+        }
     }
 
     private var footer: some View {
