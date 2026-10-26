@@ -8,7 +8,7 @@ final class ItemActions {
     var browser: BrowserLink?
     var tagTargets: [LibraryItem]?
     var pendingDelete: [LibraryItem]?
-    var linkCopied = false
+    var copied: CopiedNotice?
     /// While Private is unlocked, removing items from it doesn't ask for Face ID again.
     var privateUnlocked = false
     var showsPasscodeRequired = false
@@ -17,13 +17,30 @@ final class ItemActions {
 
     init(library: Library) { self.library = library }
 
-    func share(_ item: LibraryItem) {
+    enum CopiedNotice { case link, linkForImage }
+
+    func shareLink(_ item: LibraryItem) {
+        guard let url = shareURL(item) else { return }
+        presenter.present([url])
+    }
+
+    func copyLink(_ item: LibraryItem) {
+        guard let url = shareURL(item) else { return }
+        Clipboard.copy(url)
+        copied = .link
+    }
+
+    func shareImage(_ item: LibraryItem) {
         guard let image = library.fullImage(item) else { return }
-        if let meta = library.meta(for: item) {
-            Clipboard.copy(meta.shareURL)
-            linkCopied = true
+        if let url = shareURL(item) {
+            Clipboard.copy(url)
+            copied = .linkForImage
         }
         presenter.present([image])
+    }
+
+    private func shareURL(_ item: LibraryItem) -> URL? {
+        library.meta(for: item)?.shareURL ?? item.url
     }
 
     func openInBrowser(_ item: LibraryItem) {
@@ -81,7 +98,7 @@ struct ItemMenu: View {
                 Button("Open in Browser", systemImage: "safari") { actions.openInBrowser(item) }
             }
         }
-        Button("Share", systemImage: "square.and.arrow.up") { actions.share(item) }
+        ShareMenu(item: item, actions: actions)
         if let filter {
             Menu("Filter", systemImage: "line.3.horizontal.decrease") {
                 Button(String(localized: "Only \(item.domainLabel)")) { filter.only(domain: item.domain) }
@@ -109,6 +126,33 @@ struct ItemMenu: View {
             }
             Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
         }
+    }
+}
+
+/// Share Link, Copy Link and Share as Image; a single Share button for image items, which have no link.
+struct ShareMenu<MenuLabel: View>: View {
+    let item: LibraryItem
+    let actions: ItemActions
+    @ViewBuilder var label: () -> MenuLabel
+
+    var body: some View {
+        if item.url == nil {
+            Button { actions.shareImage(item) } label: { label() }
+        } else {
+            Menu {
+                Button("Share Link", systemImage: "link") { actions.shareLink(item) }
+                Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
+                Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
+            } label: {
+                label()
+            }
+        }
+    }
+}
+
+extension ShareMenu where MenuLabel == Label<Text, Image> {
+    init(item: LibraryItem, actions: ItemActions) {
+        self.init(item: item, actions: actions) { Label("Share", systemImage: "square.and.arrow.up") }
     }
 }
 
