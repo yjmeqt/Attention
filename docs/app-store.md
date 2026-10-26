@@ -32,6 +32,32 @@ Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_ca
 
 Upload with `fastlane deliver --skip_binary_upload --skip_screenshots` from `ios/`, or paste the text into App Store Connect by hand.
 
+## TestFlight
+
+Internal testing needs nothing beyond an uploaded build. External testing needs the fields below in **TestFlight → Test Information**, and the first build of each version goes through Beta App Review (usually under a day).
+
+| Field | Value |
+|---|---|
+| Beta App Description | below |
+| Feedback Email | the address testers' screenshots and comments go to |
+| Privacy Policy URL | `https://yjmeqt.github.io/Attention/privacy-policy.html` |
+| Marketing URL | leave empty |
+| Beta App Review contact | name, phone and email of whoever Apple should call |
+| Sign-in required | No |
+| Review notes | `ios/fastlane/metadata/review_information/notes.txt` |
+
+Beta App Description (English is the primary language; add Simplified Chinese as a second localization):
+
+> Attention keeps the links you care about. Share a page from Safari, YouTube, X or any app, or paste a link, and it's saved with its title and cover. Any saved link can be sent as an image card with a QR code, so it previews properly in WeChat.
+
+> Attention 帮你收藏想留下的链接。在 Safari、YouTube、X 等 App 里点分享，或直接粘贴链接，就会连同标题和封面一起保存下来。任何一条链接都能生成带二维码的图片卡片，发到微信里也能看到预览。
+
+What to Test (per build):
+
+> Save links by sharing from other apps and by pasting. Check that titles and covers look right, especially for sites you use often, and that shared cards open the right page when the QR code is scanned. Report links that show no preview.
+
+> 通过其他 App 的分享菜单和粘贴两种方式保存链接，看看标题和封面是否正确，尤其是你常用的网站；分享出去的卡片扫码后能否打开正确的页面。没有预览的链接请反馈给我们。
+
 ## Screenshots
 
 **Status: to be redone before the first submission.** The scenes, captions and scripts below still describe the old card-maker app. Redo them once the library UI stops changing.
@@ -61,7 +87,7 @@ How to rebuild the pipeline:
 
 - **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking, no collected data; UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
 - **App Privacy questionnaire**: answer **Data Not Collected**. Links are fetched from the device and never sent to the developer.
-- **Privacy policy**: `docs/privacy-policy.md` (Chinese and English). It must be published at a public URL and that URL put in `privacy_url.txt`. The repo is public, so GitHub Pages from this repo works, as does a Gist or any static host.
+- **Privacy policy and support page**: `docs/privacy-policy.md` and `docs/support.md` (Chinese and English), published by GitHub Pages from `docs/` on `main` at `https://yjmeqt.github.io/Attention/privacy-policy.html` and `https://yjmeqt.github.io/Attention/support.html`. `docs/_config.yml` keeps the other docs off the site.
 - **Permission prompts**: camera (QR scanning) and adding to Photos, in all listed languages (`InfoPlist.strings`).
 
 ## Age rating and export compliance
@@ -71,9 +97,10 @@ How to rebuild the pipeline:
 
 ## Before the first submission
 
-- [ ] Publish the privacy policy and a support page; fill in the URLs
-- [ ] Create the app in App Store Connect with the bundle ID above (primary language: Simplified Chinese)
+- [x] Publish the privacy policy and a support page; fill in the URLs
+- [x] Create the app in App Store Connect with the bundle ID above (primary language: English)
+- [ ] China mainland availability needs an ICP filing number (App 备案)
 - [ ] Redo the screenshots and store text (see Screenshots) and review the output
-- [ ] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`)
+- [x] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`); 1.0 (1) is on TestFlight. Bump `CURRENT_PROJECT_VERSION` for every new upload
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [ ] Pricing and availability (not decided yet)
