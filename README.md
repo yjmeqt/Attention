@@ -53,8 +53,9 @@ xcodebuild -project Attention.xcodeproj -scheme Attention \
 | `AttentionExtension` | Share extension, so links can be shared from Safari, YouTube, X, etc. (`ShareExtension/`) |
 | `AttentionTests` | Swift Testing suites (`Tests/`) |
 
-- Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.com.yijiang.attention`.
-- Signing uses automatic provisioning with team `5AT3UN98GQ`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and the bundle ID prefix in `project.yml`.
+- Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.<bundle ID>.shared`.
+- Debug and Release install side by side: Debug is `com.yjmeqt.attn.dev` ("Attention Dev"), Release is `com.yjmeqt.attn` ("Attention"). The extension and tests append `.share` and `.tests`.
+- Signing uses automatic provisioning with team `M3V5P234X3`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and `APP_BUNDLE_ID` in `project.yml`.
 - UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/Attention.icon`), so iOS derives the dark, tinted and clear appearances itself.
 
 Tests: the `UnfurlTests` suite fetches about 30 real Chinese and US sites, so it needs network access and is slow. Run everything else with:
