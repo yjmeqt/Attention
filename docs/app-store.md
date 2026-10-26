@@ -54,7 +54,7 @@ How to rebuild the pipeline:
 ## Design decisions
 
 - **App icon**: keep the current one.
-- **Paste button**: the system paste control, which pastes without the "Allow Paste" prompt. SwiftUI's `PasteButton` always fills its background, so it is UIKit's `UIPasteControl` instead, colored like the toolbar glass and sharing it with Scan. A clear background disables the control.
+- **Paste button**: a plain toolbar button next to Scan, so the two look the same. The system paste control pastes without the "Allow Paste" prompt, but it forces a solid background that can't match the glass, so it was dropped; iOS asks before each paste unless the user allows pasting in Settings.
 - **Filters**: Archived and Private are in the More menu; while one is open, a prominent button for it sits beside More and closes it. Site and tag chips sit just above the search field, only while searching or while one of them is on.
 
 ## Privacy
