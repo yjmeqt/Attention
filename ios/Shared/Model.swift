@@ -99,7 +99,7 @@ struct LinkMeta: Codable {
 }
 
 enum CardTemplate: String, Codable, CaseIterable, Identifiable {
-    case auto, tile, hero, post, minimal, qr
+    case auto, tile, minimal, qr
 
     var id: Self { self }
 
@@ -107,8 +107,6 @@ enum CardTemplate: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .auto: String(localized: "Auto")
         case .tile: String(localized: "Card")
-        case .hero: String(localized: "Image")
-        case .post: String(localized: "Post")
         case .minimal: String(localized: "Text")
         case .qr: String(localized: "QR")
         }
@@ -120,32 +118,8 @@ enum CardTemplate: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-enum CardAspect: String, Codable, CaseIterable, Identifiable {
-    case portrait, square, story
-
-    var id: Self { self }
-
-    var label: String {
-        switch self {
-        case .portrait: "4:5"
-        case .square: "1:1"
-        case .story: "9:16"
-        }
-    }
-
-    /// Points; rendered at 3x (1080 px wide).
-    var size: CGSize {
-        switch self {
-        case .portrait: CGSize(width: 360, height: 450)
-        case .square: CGSize(width: 360, height: 360)
-        case .story: CGSize(width: 360, height: 640)
-        }
-    }
-}
-
 struct CardStyle: Codable, Equatable {
     var template: CardTemplate = .auto
-    var aspect: CardAspect = .portrait
 
     private static let key = "cardStyle"
 
@@ -162,8 +136,8 @@ struct CardStyle: Codable, Equatable {
 extension CardStyle {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        template = try container.decodeIfPresent(CardTemplate.self, forKey: .template) ?? .auto
-        aspect = try container.decodeIfPresent(CardAspect.self, forKey: .aspect) ?? .portrait
+        let raw = try container.decodeIfPresent(String.self, forKey: .template)
+        template = raw.flatMap(CardTemplate.init(rawValue:)) ?? .auto
     }
 }
 

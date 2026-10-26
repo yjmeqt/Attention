@@ -3,7 +3,6 @@ import SwiftUI
 struct MinimalTemplate: View {
     let meta: LinkMeta
     let palette: CardPalette
-    let metrics: CardMetrics
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -25,18 +24,19 @@ struct MinimalTemplate: View {
                 .font(.system(size: 26, weight: .bold))
                 .foregroundStyle(palette.primary)
                 .lineSpacing(3)
-                .lineLimit(metrics.minimalLines)
+                .lineLimit(CardMetrics.minimalLines)
+                .fixedSize(horizontal: false, vertical: true)
             if let byline = meta.byline {
                 Text(byline)
                     .font(.system(size: 15))
                     .foregroundStyle(palette.secondary)
                     .lineLimit(1)
             }
-            Spacer(minLength: 0)
-            CardFooter(meta: meta, palette: palette, qrSize: metrics.footerQRSize)
+            CardFooter(meta: meta, palette: palette, qrSize: CardMetrics.footerQRSize)
+                .padding(.top, 18)
         }
         .padding(22)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .background {
             LinearGradient(colors: [palette.accent.opacity(0.14), .clear],
                            startPoint: .topLeading, endPoint: .center)
