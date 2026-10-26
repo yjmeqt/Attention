@@ -1,29 +1,10 @@
 import SwiftUI
 import TipKit
 
-/// Lives outside `HomeView` so scrolling only redraws the header glyph and the filter bar,
-/// not the feed.
+/// Lives outside `HomeView` so scrolling only redraws the header glyph, not the feed.
 @Observable
 private final class HomeScroll {
     var scrolled = false
-    /// How far the hidden filter bar has been pulled into view, 0...1.
-    var pull: CGFloat = 0
-    /// Pulled all the way out: the bar stays above the feed until scrolled away.
-    var revealsFilters = false
-    @ObservationIgnored var dragging = false
-
-    /// `offset` is 0 when the feed rests at its top, negative while pulled past it.
-    func update(offset: CGFloat, barHeight: CGFloat) {
-        let scrolled = offset > barHeight + 12
-        if self.scrolled != scrolled { self.scrolled = scrolled }
-        if revealsFilters {
-            if offset > barHeight + 24 { revealsFilters = false }
-        } else {
-            let pull = min(max(-offset / barHeight, 0), 1)
-            if self.pull != pull { self.pull = pull }
-            if dragging && pull >= 1 { revealsFilters = true }
-        }
-    }
 }
 
 private struct HeaderGlyph: View {
@@ -35,16 +16,6 @@ private struct HeaderGlyph: View {
             .animation(.easeInOut(duration: 0.2), value: scroll.scrolled)
             .accessibilityLabel(Brand.name)
             .accessibilityAddTraits(.isHeader)
-    }
-}
-/// Fades in as it is pulled into view, so it never shows behind the navigation bar at rest.
-private struct PulledFilters<Bar: View>: View {
-    let scroll: HomeScroll
-    let pinned: Bool
-    @ViewBuilder let bar: () -> Bar
-
-    var body: some View {
-        bar().opacity(pinned || scroll.revealsFilters ? 1 : scroll.pull)
     }
 }
 
@@ -64,7 +35,7 @@ struct HomeView: View {
     @State private var showsLinkEntry = false
     @State private var typedLink = ""
     @State private var scroll = HomeScroll()
-    @State private var barHeight: CGFloat = 48
+    @State private var searching = false
     private let longPressTip = LongPressTip()
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
@@ -76,42 +47,38 @@ struct HomeView: View {
     }
 
     private var visible: [LibraryItem] { filter.apply(library.items) }
-    /// While a filter is on, the bar stays so it can be changed or cleared.
-    private var filterBarHidden: Bool { !library.items.isEmpty && !scroll.revealsFilters && filter.isAll }
+    /// While a site or tag filter is on, the bar stays so it can be changed or cleared.
+    private var showsFilterBar: Bool {
+        !library.items.isEmpty && (searching || !filter.domains.isEmpty || !filter.tags.isEmpty)
+    }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
 
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-                VStack(spacing: 0) {
-                    if !library.items.isEmpty {
-                        PulledFilters(scroll: scroll, pinned: !filter.isAll) {
-                            FilterBar(filter: filter, items: library.items, onPrivate: unlockPrivate)
-                        }
-                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { barHeight = $0 }
+                VStack(spacing: 16) {
+                    if showsFilterBar {
+                        FilterBar(filter: filter, items: library.items, library: library)
+                            .transition(.opacity)
                     }
-                    VStack(spacing: 16) {
-                        if library.items.isEmpty {
-                            EmptyState(showsPaste: false, paste: paste, onSample: openSample)
-                                .frame(maxWidth: 520)
-                                .padding(.horizontal)
-                        } else {
-                            feed
-                        }
+                    if library.items.isEmpty {
+                        EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+                            .frame(maxWidth: 520)
+                            .padding(.horizontal)
+                    } else {
+                        feed
                     }
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity)
                 }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .animation(.snappy, value: showsFilterBar)
             }
-            // The filter bar sits just above the top, out of view until pulled down.
-            .contentMargins(.top, filterBarHidden ? -barHeight : 0, for: .scrollContent)
             .scrollEdgeEffectHidden(true, for: .vertical)
-            .onScrollPhaseChange { [scroll] _, phase in scroll.dragging = phase == .interacting }
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
-            .onScrollGeometryChange(for: CGFloat.self) {
-                $0.contentOffset.y + $0.contentInsets.top
-            } action: { [scroll, barHeight] _, offset in
-                scroll.update(offset: offset, barHeight: barHeight)
+            .onScrollGeometryChange(for: Bool.self) {
+                $0.contentOffset.y + $0.contentInsets.top > 12
+            } action: { [scroll] _, scrolled in
+                scroll.scrolled = scrolled
             }
             .overlay(alignment: .bottom) {
                 if let notice {
@@ -129,7 +96,7 @@ struct HomeView: View {
                 }
             }
             .animation(.snappy, value: notice)
-            .searchable(text: $filter.search, placement: .toolbar)
+            .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
             .searchToolbarBehavior(.minimize)
             .navigationTitle(Brand.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -294,6 +261,24 @@ struct HomeView: View {
             ToolbarItem(placement: .principal) {
                 HeaderGlyph(scroll: scroll)
             }
+            if !library.items.isEmpty {
+                ToolbarItem(placement: .primaryAction) {
+                    sectionButton("Archived", systemImage: "archivebox", selected: filter.showsArchived) {
+                        if filter.showsArchived {
+                            filter.showsArchived = false
+                        } else {
+                            filter.clearFilters()
+                            filter.showsArchived = true
+                        }
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    sectionButton("Private", systemImage: "lock", selected: filter.showsPrivate) {
+                        if filter.showsPrivate { filter.reset() } else { unlockPrivate() }
+                    }
+                }
+                ToolbarSpacer(.fixed, placement: .primaryAction)
+            }
             ToolbarItem(placement: .primaryAction) {
                 Menu("More", systemImage: "ellipsis") {
                     Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
@@ -310,17 +295,30 @@ struct HomeView: View {
             ToolbarItem(placement: .bottomBar) {
                 Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
             }
-            ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
-                    .labelStyle(.titleAndIcon)
-                    .buttonBorderShape(.capsule)
+                    .labelStyle(.iconOnly)
+                    .buttonBorderShape(.circle)
                     .tint(.accentColor)
             }
             .sharedBackgroundVisibility(.hidden)
             ToolbarSpacer(.flexible, placement: .bottomBar)
             // Unconditional: without it the system moves search up next to More.
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        }
+    }
+
+    @ViewBuilder
+    private func sectionButton(_ title: LocalizedStringKey, systemImage: String, selected: Bool,
+                               action: @escaping () -> Void) -> some View {
+        // Toolbars draw icons in one color, so only a prominent style can show which section is open.
+        if selected {
+            Button(title, systemImage: systemImage + ".fill", action: action)
+                .buttonStyle(.glassProminent)
+                .tint(.accentColor)
+                .accessibilityAddTraits(.isSelected)
+        } else {
+            Button(title, systemImage: systemImage, action: action)
         }
     }
 
