@@ -82,25 +82,20 @@ struct TileTemplate: View {
     private var textOnly: some View {
         let tint = meta.icon.flatMap(CardTint.init(favicon:)) ?? .neutral
         return VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                favicon(size: 48)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: meta.kind == .x ? "X" : meta.site)
-                        .font(.system(size: 15, weight: .semibold))
-                    if let byline = meta.byline {
-                        Text(verbatim: byline)
-                            .font(.system(size: 13))
-                            .foregroundStyle(tint.secondary)
-                    }
-                }
-                .lineLimit(1)
-            }
+            eyebrow(tint, iconSize: 16)
             Text(verbatim: meta.title)
                 .font(.system(size: titleSize(lines: 2), weight: meta.kind == .x ? .medium : .bold))
                 .lineSpacing(3)
                 .lineLimit(12)
                 .minimumScaleFactor(0.8)
-                .padding(.top, 20)
+                .padding(.top, 10)
+            if let byline = meta.byline {
+                Text(verbatim: byline)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(tint.secondary)
+                    .lineLimit(1)
+                    .padding(.top, 8)
+            }
             Spacer(minLength: 28)
             footer(tint)
         }
