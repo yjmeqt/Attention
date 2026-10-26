@@ -261,26 +261,32 @@ struct HomeView: View {
             ToolbarItem(placement: .principal) {
                 HeaderGlyph(scroll: scroll)
             }
-            if !library.items.isEmpty {
+            // Shown only while a section is open, so it's clear where you are and one tap gets you out.
+            if filter.showsArchived {
                 ToolbarItem(placement: .primaryAction) {
-                    sectionButton("Archived", systemImage: "archivebox", selected: filter.showsArchived) {
-                        if filter.showsArchived {
-                            filter.showsArchived = false
-                        } else {
-                            filter.clearFilters()
-                            filter.showsArchived = true
-                        }
-                    }
+                    sectionButton("Archived", systemImage: "archivebox.fill", action: toggleArchived)
                 }
+            }
+            if filter.showsPrivate {
                 ToolbarItem(placement: .primaryAction) {
-                    sectionButton("Private", systemImage: "lock", selected: filter.showsPrivate) {
-                        if filter.showsPrivate { filter.reset() } else { unlockPrivate() }
-                    }
+                    sectionButton("Private", systemImage: "lock.fill", action: togglePrivate)
                 }
+            }
+            if filter.showsArchived || filter.showsPrivate {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
             ToolbarItem(placement: .primaryAction) {
                 Menu("More", systemImage: "ellipsis") {
+                    if !library.items.isEmpty {
+                        Section {
+                            Toggle(isOn: Binding(get: { filter.showsArchived }, set: { _ in toggleArchived() })) {
+                                Label("Archived", systemImage: "archivebox")
+                            }
+                            Toggle(isOn: Binding(get: { filter.showsPrivate }, set: { _ in togglePrivate() })) {
+                                Label("Private", systemImage: "lock")
+                            }
+                        }
+                    }
                     Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
                     if !library.items.isEmpty {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
@@ -305,18 +311,24 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private func sectionButton(_ title: LocalizedStringKey, systemImage: String, selected: Bool,
-                               action: @escaping () -> Void) -> some View {
-        // Toolbars draw icons in one color, so only a prominent style can show which section is open.
-        if selected {
-            Button(title, systemImage: systemImage + ".fill", action: action)
-                .buttonStyle(.glassProminent)
-                .tint(.accentColor)
-                .accessibilityAddTraits(.isSelected)
+    private func sectionButton(_ title: LocalizedStringKey, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(title, systemImage: systemImage, action: action)
+            .buttonStyle(.glassProminent)
+            .tint(.accentColor)
+            .accessibilityAddTraits(.isSelected)
+    }
+
+    private func toggleArchived() {
+        if filter.showsArchived {
+            filter.showsArchived = false
         } else {
-            Button(title, systemImage: systemImage, action: action)
+            filter.clearFilters()
+            filter.showsArchived = true
         }
+    }
+
+    private func togglePrivate() {
+        if filter.showsPrivate { filter.reset() } else { unlockPrivate() }
     }
 
     // MARK: - Intake

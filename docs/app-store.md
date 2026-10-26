@@ -55,7 +55,7 @@ How to rebuild the pipeline:
 
 - **App icon**: keep the current one.
 - **Paste button**: the system paste control, which pastes without the "Allow Paste" prompt. SwiftUI's `PasteButton` always fills its background, so it is UIKit's `UIPasteControl` instead, colored like the toolbar glass and sharing it with Scan. A clear background disables the control.
-- **Filters**: Archived and Private are toggles at the top right. Site and tag chips show only while searching, or while one of them is on.
+- **Filters**: Archived and Private are in the More menu; while one is open, a prominent button for it sits beside More and closes it. Site and tag chips show only while searching, or while one of them is on.
 
 ## Privacy
 
