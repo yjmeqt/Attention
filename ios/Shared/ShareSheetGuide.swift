@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Animated walkthrough of pinning Attention in the system share sheet.
 struct ShareSheetGuide: View {
+    var onWatched: (() -> Void)? = nil
     @State private var phase: Phase = .home
     @State private var target: GuideTarget?
     @State private var pressing = false
@@ -117,6 +118,7 @@ struct ShareSheetGuide: View {
                     phase = next
                     if next == .finished { target = nil }
                 }
+                if next == .finished { onWatched?() }
                 guard await pause(1.3) else { return }
             }
             guard await pause(2.4) else { return }
