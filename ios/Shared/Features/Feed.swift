@@ -102,38 +102,17 @@ struct FeedTile: View {
         }
     }
 
-    /// Links without a photo look like an App Store app row: icon, name and an Open button.
+    /// Links without a photo: the same text as under a photo, on a plain band.
     private var lockup: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 10) {
-                Group {
-                    if let icon = library.favicon(item) {
-                        Image(uiImage: icon).resizable().scaledToFill()
-                    } else {
-                        Image(systemName: item.isImage ? "photo" : "globe")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.fill.tertiary)
-                    }
-                }
-                .frame(width: 44, height: 44)
-                .clipShape(.rect(cornerRadius: 10, style: .continuous))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.platformName)
-                        .font(.caption2.weight(.semibold))
-                        .textCase(.uppercase)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Text(item.displayTitle)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(4)
-                        .multilineTextAlignment(.leading)
-                }
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Eyebrow(item: item, library: library)
+            Text(item.displayTitle)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(6)
+                .multilineTextAlignment(.leading)
             footerRow
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
     }
