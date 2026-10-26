@@ -5414,60 +5414,60 @@
         }
       }
     },
-    "Step %lld: " : {
+    "Step %lld: %@" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الخطوة %lld: "
+            "value" : "الخطوة %lld: %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schritt %lld: "
+            "value" : "Schritt %lld: %@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paso %lld: "
+            "value" : "Paso %lld: %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Étape %lld : "
+            "value" : "Étape %lld : %@"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ステップ %lld:"
+            "value" : "ステップ %lld:%@"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld단계: "
+            "value" : "%lld단계: %@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Шаг %lld: "
+            "value" : "Шаг %lld: %@"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bước %lld: "
+            "value" : "Bước %lld: %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "第 %lld 步："
+            "value" : "第 %lld 步：%@"
           }
         }
       }
