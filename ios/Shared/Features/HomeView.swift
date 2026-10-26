@@ -306,8 +306,8 @@ struct HomeView: View {
                 Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
             }
             ToolbarItem(placement: .bottomBar) {
-                ToolbarPasteButton(paste: paste)
-                    .accessibilityLabel("Paste")
+                // A plain button so it matches Scan; reading the clipboard asks the user each time.
+                Button("Paste", systemImage: "clipboard") { paste(UIPasteboard.general.itemProviders) }
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             // Unconditional: without it the system moves search up next to More.
