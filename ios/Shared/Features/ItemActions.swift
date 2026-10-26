@@ -107,7 +107,9 @@ struct ItemMenu: View {
             } else {
                 Button("Archive", systemImage: "archivebox") { actions.setArchived(true, [item]) }
             }
-            Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
+            Menu("More", systemImage: "ellipsis.circle") {
+                Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
+            }
         }
     }
 }
