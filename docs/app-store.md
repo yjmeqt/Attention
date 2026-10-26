@@ -54,9 +54,9 @@ Beta App Description (English is the primary language; add Simplified Chinese as
 
 What to Test (per build):
 
-> Save links by sharing from other apps and by pasting. Check that titles and covers look right, especially for sites you use often, and that shared cards open the right page when the QR code is scanned. Report links that show no preview.
+> Save links by sharing from other apps and by pasting. Open an item: Open is the main button, and Share offers Share Link, Copy Link and Share as Image. Try the Card, Text and QR templates. On a fresh install the share-sheet guide plays through once before it can be closed. Report links that show no preview.
 
-> 通过其他 App 的分享菜单和粘贴两种方式保存链接，看看标题和封面是否正确，尤其是你常用的网站；分享出去的卡片扫码后能否打开正确的页面。没有预览的链接请反馈给我们。
+> 通过其他 App 的分享菜单和粘贴保存链接。打开一条：主按钮是“打开”，“分享”里有分享链接、复制链接和分享为图片。试试卡片、文字和二维码三种模板。首次安装时，分享菜单引导要看完一遍才能关掉。没有预览的链接请反馈给我们。
 
 ## Screenshots
 
@@ -101,6 +101,6 @@ How to rebuild the pipeline:
 - [x] Create the app in App Store Connect with the bundle ID above (primary language: English)
 - [ ] China mainland availability needs an ICP filing number (App 备案)
 - [ ] Redo the screenshots and store text (see Screenshots) and review the output
-- [x] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`); 1.0 (1) is on TestFlight. Bump `CURRENT_PROJECT_VERSION` for every new upload
+- [x] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`); 1.0 (2) is the build for the public TestFlight link. Bump `CURRENT_PROJECT_VERSION` for every new upload
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [ ] Pricing and availability (not decided yet)
