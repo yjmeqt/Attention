@@ -57,10 +57,6 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 16) {
-                    if showsFilterBar {
-                        FilterBar(filter: filter, items: library.items, library: library)
-                            .transition(.opacity)
-                    }
                     if library.items.isEmpty {
                         EmptyState(showsPaste: false, paste: paste, onSample: openSample)
                             .frame(maxWidth: 520)
@@ -71,8 +67,16 @@ struct HomeView: View {
                 }
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .animation(.snappy, value: showsFilterBar)
             }
+            // Right above the search field, which lives in the bottom bar.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if showsFilterBar {
+                    FilterBar(filter: filter, items: library.items, library: library)
+                        .padding(.bottom, 4)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: showsFilterBar)
             .scrollEdgeEffectHidden(true, for: .vertical)
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
             .onScrollGeometryChange(for: Bool.self) {
