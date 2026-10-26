@@ -31,6 +31,7 @@ struct HomeView: View {
     @State private var selecting = false
     @State private var selection: Set<UUID> = []
     @State private var showsGuide = false
+    @State private var guideWatched = false
     @State private var showsScanner = false
     @State private var showsLinkEntry = false
     @State private var typedLink = ""
@@ -136,14 +137,16 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showsGuide, onDismiss: { seenShareGuide = true }) {
             NavigationStack {
-                ShareSheetGuide()
+                ShareSheetGuide(onWatched: { guideWatched = true })
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") { showsGuide = false }
+                                .disabled(!guideWatched)
                         }
                     }
             }
             .presentationSizing(.page)
+            .interactiveDismissDisabled(!guideWatched)
         }
         .sheet(isPresented: $showsScanner) {
             QRScanSheet(onLink: scanned)
