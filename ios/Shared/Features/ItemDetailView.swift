@@ -49,7 +49,7 @@ struct ItemDetailView: View {
         .toolbar { toolbar }
         .safeAreaInset(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
-        .task(id: "\(library.revision)-\(item.templateRaw)-\(item.aspectRaw)") {
+        .task(id: "\(library.revision)-\(item.templateRaw)") {
             image = library.fullImage(item)
             covers = library.hasCoverChoice(item)
                 ? (library.data(.cover, of: item).flatMap(Self.coverThumbnail),
@@ -76,7 +76,7 @@ struct ItemDetailView: View {
                     .accessibilityLabel(item.displayTitle)
             } else {
                 RoundedRectangle(cornerRadius: 16).fill(.fill.tertiary)
-                    .aspectRatio(item.style.aspect.size.width / item.style.aspect.size.height, contentMode: .fit)
+                    .aspectRatio(0.8, contentMode: .fit)
             }
             if isLoading {
                 ProgressView()
@@ -119,13 +119,6 @@ struct ItemDetailView: View {
                     }
                     Text("Template").font(.headline)
                     TemplatePicker(meta: meta, style: styleBinding)
-                    if item.style.template.resolved(for: meta) != .tile {
-                        Text("Aspect ratio").font(.headline)
-                        Picker("Aspect ratio", selection: styleBinding.aspect) {
-                            ForEach(CardAspect.allCases) { Text($0.label) }
-                        }
-                        .pickerStyle(.segmented)
-                    }
                     if !isLoading { SourceImageInfo(meta: meta) }
                 }
             }

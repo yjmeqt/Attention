@@ -125,56 +125,6 @@ struct CardFooter: View {
     }
 }
 
-struct HeroImage: View {
-    let meta: LinkMeta
-    let palette: CardPalette
-    let size: CGSize
-
-    /// Images much narrower than the banner (logos, portrait photos) are shown whole over a blurred fill instead of being cropped.
-    private var fitsInside: Bool {
-        guard let ratio = meta.imageAspectRatio, size.height > 0 else { return false }
-        return ratio < size.width / size.height * 0.75
-    }
-
-    var body: some View {
-        if let image = meta.image {
-            if fitsInside {
-                ZStack {
-                    Image(uiImage: image).resizable().scaledToFill()
-                        .blur(radius: 24, opaque: true)
-                        .overlay(.black.opacity(0.15))
-                    Image(uiImage: image).resizable().scaledToFit()
-                }
-                .frame(width: size.width, height: size.height)
-                .clipped()
-            } else {
-                Image(uiImage: image).resizable().scaledToFill()
-            }
-        } else {
-            ZStack {
-                LinearGradient(colors: [palette.accent, palette.accent.opacity(0.55)],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-                VStack(spacing: 10) {
-                    if let icon = meta.largeIcon {
-                        Image(uiImage: icon)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64, height: 64)
-                            .padding(8)
-                            .background(.white, in: .rect(cornerRadius: 18))
-                    }
-                    Text(verbatim: meta.site)
-                        .font(.system(size: meta.largeIcon == nil ? 40 : 24, weight: .bold))
-                        .foregroundStyle(palette.onAccent)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.4)
-                }
-                .padding()
-            }
-        }
-    }
-}
-
 /// Site icon for in-app lists, with a link glyph when there's no favicon.
 struct FaviconView: View {
     let meta: LinkMeta
@@ -201,22 +151,5 @@ struct PlayGlyph: View {
             .foregroundStyle(.white)
             .frame(width: 60, height: 60)
             .background(.black.opacity(0.55), in: .circle)
-    }
-}
-
-struct Avatar: View {
-    let meta: LinkMeta
-    let palette: CardPalette
-
-    var body: some View {
-        if let avatar = meta.avatar {
-            Image(uiImage: avatar).resizable().scaledToFill().clipShape(.circle)
-        } else {
-            Circle().fill(palette.accent).overlay {
-                Text(verbatim: String((meta.authorName ?? meta.site).prefix(1)).uppercased())
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(palette.onAccent)
-            }
-        }
     }
 }
