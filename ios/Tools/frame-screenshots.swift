@@ -13,9 +13,9 @@ let captions: [String: [String: String]] = [
         "4-private": "**Private, behind Face ID.** No account, no tracking. It stays on your device.",
     ],
     "zh-Hans": [
-        "1-feed": "**想看的，都在这里。**各个 App 里存下的链接，汇成一条安静的信息流。",
-        "2-share": "**任何 App 都能存。**点分享，再点 Attention。",
-        "3-detail": "**分享成一张卡片。**也可以是简洁的文字卡，发到哪儿都好看。",
+        "1-feed": "**想看的，都在这里。**X、YouTube、Instagram 里存下的链接，汇成一条安静的信息流。",
+        "2-share": "**任何 App 都能存。**在 X、YouTube 或 Safari 里点分享，再点 Attention。",
+        "3-detail": "**发到微信，也一目了然。**链接变成带标题、封面和二维码的图片卡片。",
         "4-private": "**私密内容，面容 ID 锁住。**无需账号，没有追踪，只存在你的设备上。",
     ],
     "ko": [
