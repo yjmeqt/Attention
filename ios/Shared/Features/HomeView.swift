@@ -37,6 +37,7 @@ struct HomeView: View {
     @State private var typedLink = ""
     @State private var scroll = HomeScroll()
     @State private var searching = false
+    @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
@@ -102,6 +103,7 @@ struct HomeView: View {
             }
             .animation(.snappy, value: notice)
             .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
+            .searchFocused($searchFocused)
             .searchToolbarBehavior(.minimize)
             .navigationTitle(Brand.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -168,6 +170,24 @@ struct HomeView: View {
             HistoryImport.run(into: library)
             #if DEBUG
             await DemoLibrary.run(into: library)
+            if DemoLibrary.unlocksPrivate {
+                filter.showsPrivate = true
+                // The first Face ID request after a boot can time out before its UI comes up; ask again.
+                Task {
+                    for _ in 0..<3 {
+                        guard await DeviceOwner.authenticate(reason: String(localized: "Show your private items")) == .failed else { break }
+                    }
+                }
+            }
+            if let tag = DemoLibrary.tagFilter { filter.tags = [Library.normalizedTag(tag)] }
+            if let text = DemoLibrary.search {
+                searching = true
+                filter.search = text
+                // Results, not the keyboard, are what the screenshot shows.
+                try? await Task.sleep(for: .seconds(1))
+                searchFocused = false
+            }
+            if let index = DemoLibrary.open, library.items.indices.contains(index) { path = [library.items[index].id] }
             #endif
             Task { await library.retryMissingPreviews() }
             clipboardHasLink = await Clipboard.hasNewLink()

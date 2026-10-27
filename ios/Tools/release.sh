@@ -22,8 +22,10 @@ OUT=../build/release
 FASTLANE=fastlane
 # App Store Connect is sometimes slower than asc's default request timeout.
 export ASC_TIMEOUT=${ASC_TIMEOUT:-90s}
-# Screenshot file prefix|asc device type. iPhone shots are 1320x2868 (6.9"), iPad 2064x2752 (13").
-SCREENSHOT_SETS=("iphone|IPHONE_69" "ipad|IPAD_PRO_3GEN_129")
+# Screenshot file prefix|asc device type: iPhone 1320x2868 (6.9") and 1206x2622 (6.3"), iPad 2752x2064 (13"),
+# and iPhone Duo, whose one set holds the inner (duo-*, 2007x2853) and then the outer (duo-cover-*,
+# 1398x2034) display. IPHONE_DUO needs asc 5.12 or later.
+SCREENSHOT_SETS=("iphone|IPHONE_69" "iphone63|IPHONE_61" "ipad|IPAD_PRO_3GEN_129" "duo|IPHONE_DUO")
 
 die() { print -u2 "error: $*"; exit 1 }
 step() { print -P "%F{cyan}==>%f $*" }

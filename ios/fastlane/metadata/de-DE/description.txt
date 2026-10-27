@@ -1,26 +1,11 @@
-Links von YouTube, X und vielen anderen Websites erscheinen in WeChat nur als nackte Adresse – ohne Titel und ohne Vorschaubild. Attention macht aus jedem Link eine saubere Bildkarte, damit deine Kontakte auf einen Blick sehen, worum es geht.
+Attention bewahrt Links und Bilder auf, die du später wiederfinden möchtest.
 
-SO FUNKTIONIERT’S
-1. Kopiere einen Link oder tippe in Safari oder einer anderen App auf „Teilen“ und wähle Attention
-2. Du erhältst eine Karte mit Titel, Coverbild, Autor und QR-Code
-3. Sende das Bild in WeChat und füge dann den Link ein – er ist schon in der Zwischenablage
+Speichere Inhalte über das Teilen-Menü in Safari oder anderen Apps oder füge einen Link ein. Wenn verfügbar, erscheinen Titel und Vorschaubild. Websites mit Anmeldung oder Zugriffsbeschränkungen bieten möglicherweise nur eingeschränkte Vorschauen.
 
-FUNKTIONIERT MIT
-• YouTube-Videos: Vorschaubild, Titel und Kanal
-• X-Posts: Text, Autor und Medien
-• Bilibili-Videos: Cover, Titel und Uploader
-• Jeder Webseite: Titel, Vorschaubild und Website-Symbol
+Ordne Einträge mit Tags und filtere nach Website oder Tag. Durchsuche Titel und erkannten Text in gespeicherten Bildern. Archiviere Einträge oder verschiebe sie in den privaten Bereich, der eine Geräteauthentifizierung erfordert.
 
-KARTENSTILE
-• Die passende Vorlage wird für jeden Link automatisch gewählt: Bild, Beitrag, Text oder QR
-• Seitenverhältnisse 4:5, 1:1 und 9:16 für Chats, Momente und Storys
-• Den QR-Code auf der Karte scannen, um den Original-Link zu öffnen
-• Tracking-Parameter werden aus geteilten Links entfernt
+Öffne, teile oder kopiere den ursprünglichen Link. Erstelle Bildkarten mit QR-Code mit den Vorlagen Karte, Text oder QR, die sich dem Inhalt anpassen. Beim Teilen als Bild wird auch der Link kopiert.
 
-AUSSERDEM
-• QR-Codes mit der Kamera oder aus einem Foto scannen
-• Verlauf, um jede Karte erneut zu teilen
-• iPhone und iPad, heller und dunkler Modus
+Scanne QR-Codes mit der Kamera oder aus einem ausgewählten Foto. Für iPhone und iPad, mit Dunkelmodus.
 
-DATENSCHUTZ
-Links werden auf deinem Gerät verarbeitet. Kein Konto, kein Tracking, keine Datenerhebung.
+Kein Konto erforderlich. Sammlung, Texterkennung und Kartenerstellung bleiben auf dem Gerät. Für Vorschauen werden Websites und teilweise öffentliche Dienste Dritter aufgerufen. Details findest du in der Datenschutzerklärung.

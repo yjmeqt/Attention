@@ -186,41 +186,48 @@ struct FilterBar: View {
     var body: some View {
         let section = filter.section(items)
         let byDomain = Dictionary(section.map { ($0.domain, $0) }, uniquingKeysWith: { first, _ in first })
-        ScrollView(.horizontal) {
-            GlassEffectContainer(spacing: 8) {
-                HStack(spacing: 8) {
-                    chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty) {
-                        Image(systemName: "square.grid.2x2")
-                    } action: {
-                        filter.clearFilters()
-                    }
-                    ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
-                        chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
-                            if let item = byDomain[domain], let icon = library.favicon(item) {
-                                Image(uiImage: icon).resizable().scaledToFit()
-                                    .frame(width: 16, height: 16)
-                                    .clipShape(.rect(cornerRadius: 4, style: .continuous))
-                            } else {
-                                Image(systemName: domain == DomainTag.images ? "photo" : "globe")
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                GlassEffectContainer(spacing: 8) {
+                    HStack(spacing: 8) {
+                        chip(String(localized: "All"), selected: filter.domains.isEmpty && filter.tags.isEmpty) {
+                            Image(systemName: "square.grid.2x2")
+                        } action: {
+                            filter.clearFilters()
+                        }
+                        ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
+                            chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
+                                if let item = byDomain[domain], let icon = library.favicon(item) {
+                                    Image(uiImage: icon).resizable().scaledToFit()
+                                        .frame(width: 16, height: 16)
+                                        .clipShape(.rect(cornerRadius: 4, style: .continuous))
+                                } else {
+                                    Image(systemName: domain == DomainTag.images ? "photo" : "globe")
+                                }
+                            } action: {
+                                toggle(domain, in: \.domains)
                             }
-                        } action: {
-                            toggle(domain, in: \.domains)
+                        }
+                        ForEach(Self.ranked(section.flatMap(\.tags)), id: \.self) { tag in
+                            chip(tag, selected: filter.tags.contains(tag)) {
+                                Image(systemName: "number")
+                            } action: {
+                                toggle(tag, in: \.tags)
+                            }
+                            .id(tag)
                         }
                     }
-                    ForEach(Self.ranked(section.flatMap(\.tags)), id: \.self) { tag in
-                        chip(tag, selected: filter.tags.contains(tag)) {
-                            Image(systemName: "number")
-                        } action: {
-                            toggle(tag, in: \.tags)
-                        }
-                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 6)
+            }
+            .scrollIndicators(.hidden)
+            .scrollClipDisabled()
+            // Tags come after every site, so bring a selected one into view when the bar appears.
+            .onAppear {
+                if let tag = filter.tags.first { proxy.scrollTo(tag, anchor: .center) }
             }
         }
-        .scrollIndicators(.hidden)
-        .scrollClipDisabled()
     }
 
     private func chip(_ text: String, selected: Bool, @ViewBuilder icon: () -> some View,

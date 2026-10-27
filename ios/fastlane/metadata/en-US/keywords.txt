@@ -1,1 +1,1 @@
-wechat,link preview,share,card,qr code,youtube,twitter,unfurl,thumbnail,poster,url,bilibili
+bookmarks,read later,link organizer,image search,qr scanner,saved pages,collection,tags,clipboard
