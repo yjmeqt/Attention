@@ -26,11 +26,25 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 | `description.txt` | 4000 characters |
 | `keywords.txt` | 100 characters, comma-separated, no app name |
 | `release_notes.txt` | What's New |
-| `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | **Empty — fill in before submitting** |
+| `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
 
 Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_category.txt` (Productivity), and `review_information/notes.txt` (instructions for App Review).
 
-Upload with `fastlane deliver --skip_binary_upload --skip_screenshots` from `ios/`, or paste the text into App Store Connect by hand.
+Push the text and screenshots with `Tools/release.sh metadata` (see Releasing).
+
+## Releasing
+
+`ios/Tools/release.sh` wraps the [asc](https://github.com/rorkai/App-Store-Connect-CLI) CLI (`brew install asc`). It needs an App Store Connect API key once per Mac: create one under **Users and Access → Integrations → App Store Connect API** (App Manager role), then run `asc auth login` with its key ID, issuer ID and `.p8` file. The key lives in the keychain, not the repo.
+
+| Command (from `ios/`) | What it does |
+|---|---|
+| `Tools/release.sh beta` | Sets `CURRENT_PROJECT_VERSION` to the next free build number, archives Release, exports an IPA to `build/release/` and uploads it to TestFlight, waiting for processing. Commit the bump afterwards |
+| `Tools/release.sh beta --group "Public" --notes "…"` | Same, then adds the build to that beta group, sets What to Test (en-US) and notifies testers |
+| `Tools/release.sh beta --no-upload` | Archive and export only, keeping the local build number |
+| `Tools/release.sh metadata` | Plan only: validates `fastlane/metadata`, then shows what the text import and screenshot upload would change on the App Store version matching `MARKETING_VERSION` |
+| `Tools/release.sh metadata --apply` | Pushes it. Screenshots replace each locale's iPhone 6.9" (`iphone-*`) and iPad 13" (`ipad-*`) sets |
+
+The App Store version itself (for example 1.0) has to exist in App Store Connect before `metadata` can target it. Locales that have no version localization yet are created by the text import, so a first `--apply` may need a second run to upload their screenshots.
 
 ## TestFlight
 
@@ -101,6 +115,6 @@ How to rebuild the pipeline:
 - [x] Create the app in App Store Connect with the bundle ID above (primary language: English)
 - [ ] China mainland availability needs an ICP filing number (App 备案)
 - [ ] Redo the screenshots and store text (see Screenshots) and review the output
-- [x] Archive with the Release configuration and upload (Xcode Organizer or `xcodebuild -exportArchive`); 1.0 (2) is the build for the public TestFlight link. Bump `CURRENT_PROJECT_VERSION` for every new upload
+- [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [ ] Pricing and availability (not decided yet)
