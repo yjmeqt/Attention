@@ -28,6 +28,8 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 | `release_notes.txt` | What's New |
 | `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
 
+The Simplified Chinese listing (text and screenshot captions) also pitches sharing X, YouTube and Instagram links to WeChat as image cards; the other locales don't mention it. Every locale uses the registered name, "Attention – Save & Share Links", since plain "Attention" belongs to another developer.
+
 Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_category.txt` (Productivity), and `review_information/notes.txt` (instructions for App Review).
 
 Push the text and screenshots with `Tools/release.sh metadata` (see Releasing).
