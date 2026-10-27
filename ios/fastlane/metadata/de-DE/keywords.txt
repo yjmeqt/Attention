@@ -1,1 +1,1 @@
-wechat,linkvorschau,teilen,karte,qr-code,youtube,twitter,vorschaubild,poster,url
+Lesezeichen,Links,später lesen,Bildsuche,Tags,QR-Scanner,Sammlung,Organizer,Webseiten

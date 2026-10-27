@@ -47,7 +47,7 @@ struct ItemDetailView: View {
         .navigationTitle(item.isImage ? String(localized: "Image") : item.domainLabel)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbar }
-        .safeAreaInset(edge: .bottom) { bottomBar }
+        .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
         .task(id: "\(library.revision)-\(item.templateRaw)") {
             image = library.fullImage(item)
@@ -74,6 +74,7 @@ struct ItemDetailView: View {
                     .clipShape(.rect(cornerRadius: 16))
                     .shadow(radius: 4)
                     .accessibilityLabel(item.displayTitle)
+                    .accessibilityIdentifier("CardPreview")
             } else {
                 RoundedRectangle(cornerRadius: 16).fill(.fill.tertiary)
                     .aspectRatio(0.8, contentMode: .fit)

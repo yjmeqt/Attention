@@ -1,26 +1,11 @@
-Dans WeChat, les liens YouTube, X et de nombreux autres sites s’affichent comme une simple adresse, sans titre ni miniature. Attention transforme n’importe quel lien en une carte image soignée, pour que vos contacts voient tout de suite de quoi il s’agit.
+Attention garde les liens et les images que vous souhaitez retrouver.
 
-COMMENT ÇA MARCHE
-1. Copiez un lien, ou touchez Partager dans Safari ou une autre app et choisissez Attention
-2. Obtenez une carte avec le titre, l’image de couverture, l’auteur et un code QR
-3. Envoyez l’image dans WeChat, puis collez le lien — il est déjà dans le presse-papiers
+Enregistrez depuis le menu de partage de Safari ou d’autres apps, ou collez un lien. Les aperçus affichent le titre et la couverture lorsqu’ils sont disponibles. Certains sites restreignent les aperçus ou exigent une connexion.
 
-COMPATIBLE AVEC
-• Vidéos YouTube : miniature, titre et chaîne
-• Publications X : texte, auteur et médias
-• Vidéos Bilibili : couverture, titre et auteur
-• Toute page web : titre, image d’aperçu et icône du site
+Classez vos éléments avec des tags et filtrez par site ou tag. Recherchez les titres et le texte reconnu dans les images enregistrées. Archivez des éléments ou déplacez-les dans l’espace privé, dont l’accès nécessite l’authentification de l’appareil.
 
-STYLES DE CARTE
-• Le meilleur modèle est choisi automatiquement pour chaque lien : image, publication, texte ou QR
-• Formats 4:5, 1:1 et 9:16 pour les discussions, les Moments et les stories
-• Scannez le code QR de la carte pour ouvrir le lien d’origine
-• Les paramètres de suivi sont retirés des liens partagés
+Ouvrez, partagez ou copiez le lien original. Créez aussi une carte avec un QR code grâce aux modèles Carte, Texte et QR, qui s’adaptent au contenu. Le partage sous forme d’image copie également le lien.
 
-AUSSI
-• Scan de code QR avec l’appareil photo ou depuis une photo
-• Historique pour repartager n’importe quelle carte
-• iPhone et iPad, modes clair et sombre
+Scannez un QR code avec la caméra ou depuis une photo sélectionnée. Compatible avec iPhone, iPad et le mode sombre.
 
-CONFIDENTIALITÉ
-Les liens sont traités sur votre appareil. Pas de compte, pas de suivi, aucune donnée collectée.
+Aucun compte requis. Votre bibliothèque, la reconnaissance de texte et la création des cartes restent sur l’appareil. Les aperçus nécessitent des connexions aux sites et, dans certains cas, à des services publics tiers. Consultez la politique de confidentialité.

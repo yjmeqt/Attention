@@ -1,26 +1,16 @@
-Links from YouTube, X and many other sites show up in WeChat as a bare URL, with no title and no thumbnail. Attention turns any link into a clean image card, so the people you share with can see what it is at a glance.
+Attention keeps the links and images you want to come back to.
 
-HOW IT WORKS
-1. Copy a link, or tap Share in Safari or another app and choose Attention
-2. Get a card with the title, cover image, author and a QR code
-3. Send the image in WeChat, then paste the link — it's already on your clipboard
+SAVE AS YOU GO
+Save links and images from the share sheet in Safari or other apps, or paste a link. Previews bring together page titles, covers and site details when available. Sites that require a login or restrict access may have limited previews.
 
-WORKS WITH
-• YouTube videos: thumbnail, title and channel
-• X posts: text, author and media
-• Bilibili videos: cover, title and uploader
-• Any web page: title, preview image and site icon
+ORGANIZE AND FIND
+Add tags and filter by site or tag. Search titles and text recognized in saved images. Archive items for later, or move them to Private, where viewing requires device authentication.
 
-CARD STYLES
-• Picks the best template for each link automatically: image, post, text or QR
-• 4:5, 1:1 and 9:16 aspect ratios for chats, Moments and stories
-• Scan the QR code on the card to open the original link
-• Tracking parameters are removed from shared links
+SHARE WITH CONTEXT
+Open the original link, share it or copy it. Turn links into image cards with a QR code, using Card, Text or QR templates that size themselves to the content. Sharing as an image also copies the link so you can paste it after sending the card.
 
-ALSO
-• Scan a QR code with the camera or from a photo
-• History, so you can reshare any card
-• iPhone and iPad, light and dark mode
+SCAN AND SAVE
+Scan QR codes with the camera or find links in a selected photo. Made for iPhone and iPad, with dark mode support.
 
-PRIVACY
-Links are processed on your device. No account, no tracking, no data collected.
+KEPT ON YOUR DEVICE
+No account required. Your library, image text recognition and card rendering stay on your device. Loading previews contacts websites and, for some previews, third-party public services. See the privacy policy for details.

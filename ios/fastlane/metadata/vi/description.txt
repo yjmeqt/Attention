@@ -1,26 +1,11 @@
-Liên kết từ YouTube, X và nhiều trang web khác chỉ hiện trên WeChat dưới dạng một địa chỉ trần, không có tiêu đề hay ảnh thu nhỏ. Attention biến mọi liên kết thành một thẻ ảnh gọn gàng để người nhận hiểu ngay bạn đang chia sẻ gì.
+Attention lưu những liên kết và hình ảnh bạn muốn xem lại.
 
-CÁCH DÙNG
-1. Sao chép liên kết, hoặc chạm Chia sẻ trong Safari hay ứng dụng khác rồi chọn Attention
-2. Nhận thẻ có tiêu đề, ảnh bìa, tác giả và mã QR
-3. Gửi ảnh trong WeChat rồi dán liên kết — liên kết đã có sẵn trong bộ nhớ tạm
+Lưu từ bảng chia sẻ của Safari hoặc ứng dụng khác, hay dán một liên kết. Tiêu đề và ảnh bìa sẽ xuất hiện khi có sẵn. Trang yêu cầu đăng nhập hoặc hạn chế truy cập có thể không có bản xem trước đầy đủ.
 
-HỖ TRỢ
-• Video YouTube: ảnh thu nhỏ, tiêu đề và kênh
-• Bài đăng X: nội dung, tác giả và ảnh/video
-• Video Bilibili: ảnh bìa, tiêu đề và người đăng
-• Mọi trang web: tiêu đề, ảnh xem trước và biểu tượng trang
+Sắp xếp bằng thẻ và lọc theo trang web hoặc thẻ. Tìm theo tiêu đề và chữ được nhận dạng trong ảnh đã lưu. Lưu trữ các mục hoặc chuyển vào khu vực riêng tư, cần xác thực thiết bị để xem.
 
-KIỂU THẺ
-• Tự chọn mẫu phù hợp nhất cho từng liên kết: ảnh lớn, bài đăng, văn bản hoặc QR
-• Tỷ lệ 4:5, 1:1 và 9:16 cho trò chuyện, Khoảnh khắc và tin
-• Quét mã QR trên thẻ để mở liên kết gốc
-• Loại bỏ tham số theo dõi khỏi liên kết được chia sẻ
+Mở, chia sẻ hoặc sao chép liên kết gốc. Tạo thẻ hình ảnh có mã QR với mẫu Thẻ, Văn bản hoặc QR, tự điều chỉnh theo nội dung. Khi chia sẻ dưới dạng ảnh, liên kết cũng được sao chép.
 
-NGOÀI RA
-• Quét mã QR bằng camera hoặc từ ảnh
-• Lịch sử để chia sẻ lại bất kỳ thẻ nào
-• iPhone và iPad, chế độ sáng và tối
+Quét mã QR bằng camera hoặc từ ảnh đã chọn. Hỗ trợ iPhone, iPad và chế độ tối.
 
-QUYỀN RIÊNG TƯ
-Liên kết được xử lý trên thiết bị. Không cần tài khoản, không theo dõi, không thu thập dữ liệu.
+Không cần tài khoản. Thư viện, nhận dạng chữ và tạo thẻ được xử lý trên thiết bị. Việc tải bản xem trước cần kết nối đến trang web và một số dịch vụ công khai của bên thứ ba. Xem chính sách quyền riêng tư để biết thêm.

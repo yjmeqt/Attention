@@ -1,1 +1,1 @@
-Convierte enlaces de YouTube, X y la web en tarjetas con título, portada y código QR para que luzcan bien en WeChat.
+Guarda enlaces e imágenes, organízalos con etiquetas y busca texto en las imágenes. Comparte tus enlaces como tarjetas con código QR.
