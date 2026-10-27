@@ -46,6 +46,18 @@ Push the text and screenshots with `Tools/release.sh metadata` (see Releasing).
 
 The App Store version itself (for example 1.0) has to exist in App Store Connect before `metadata` can target it. Locales that have no version localization yet are created by the text import, so a first `--apply` may need a second run to upload their screenshots.
 
+### Xcode Cloud
+
+TestFlight builds can also come from Xcode Cloud, which signs with the team's cloud-managed certificates, so nothing is stored in the repo or on a Mac. `ios/ci_scripts/ci_pre_xcodebuild.sh` sets `CURRENT_PROJECT_VERSION` to Xcode Cloud's build number before each archive.
+
+One-time setup:
+
+1. In Xcode, **Product → Xcode Cloud → Create Workflow**, pick the `Attention` product, and grant Xcode Cloud access to `yjmeqt/Attention` on GitHub when asked.
+2. Edit the default workflow: start condition **Branch Changes** on `main` (or **Manual** only), action **Archive** with platform iOS, scheme `Attention`, deployment preparation **TestFlight and App Store** (Internal Testing Only builds can't go to the public link), and a post-action **TestFlight Internal Testing** to the internal group, plus **TestFlight External Testing** if builds should reach the public link.
+3. In App Store Connect, **Xcode Cloud → Settings → Build Number**, set the next build number above the latest upload (3 or higher after 1.0 (2)).
+
+After that, merging to `main` produces a TestFlight build. To start one from the terminal: `asc xcode-cloud run --app 6827156660 --workflow "<workflow name>" --branch main --wait`. `MARKETING_VERSION` still comes from `project.yml`; `Tools/release.sh metadata` is unchanged.
+
 ## TestFlight
 
 Internal testing needs nothing beyond an uploaded build. External testing needs the fields below in **TestFlight → Test Information**, and the first build of each version goes through Beta App Review (usually under a day).
