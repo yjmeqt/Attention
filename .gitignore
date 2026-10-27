@@ -11,6 +11,8 @@ ios/fastlane/raw/
 ios/fastlane/bezels/
 # Framed screenshots are generated locally by Tools/frame-screenshots.swift.
 ios/fastlane/screenshots/
+# asc upload reports.
+ios/.asc/
 
 # Android
 .gradle/
