@@ -10,7 +10,7 @@
 #   Tools/release.sh metadata [--apply]
 #       Pushes fastlane/metadata (listing text and copyright) and fastlane/screenshots to the
 #       App Store version matching MARKETING_VERSION. Without --apply it only prints the plan.
-#       ONLY="zh-Hans ja" limits the screenshot upload to those locales.
+#       --screenshots-only skips the text; ONLY="zh-Hans ja" limits screenshots to those locales.
 #
 # Needs an App Store Connect API key stored once with `asc auth login`.
 set -euo pipefail
@@ -94,26 +94,30 @@ beta() {
 }
 
 metadata() {
-  local apply=0
+  local apply=0 text_too=1
   while (( $# )); do
     case $1 in
       --apply) apply=1; shift ;;
+      --screenshots-only) text_too=0; shift ;;
       *) die "unknown metadata option: $1" ;;
     esac
   done
   require_auth
 
+  if (( text_too )); then
   step "Validate fastlane metadata"
   asc migrate validate --fastlane-dir $FASTLANE --output json | jq -e '.valid' >/dev/null \
     || { asc migrate validate --fastlane-dir $FASTLANE --pretty; die "metadata is invalid" }
   local f empty=()
   for f in $FASTLANE/metadata/*/(support|privacy)_url.txt; do [[ -n ${"$(<$f)"//[[:space:]]/} ]] || empty+=(${f#$FASTLANE/metadata/}); done
   (( ${#empty} )) && print -P "%F{yellow}warning:%f empty URL files (App Review needs them): $empty"
+  fi
 
   local version=$(setting MARKETING_VERSION)
   local version_id=$(asc versions list --app $APP_ID --platform IOS --version $version --output json | jq -r '.data[0].id // empty')
   [[ -n $version_id ]] || die "no App Store version $version in App Store Connect; create it there first"
 
+  if (( text_too )); then
   step "Listing text for $version"
   local mode=(--dry-run); (( apply )) && mode=(--confirm)
   # An app's first version has no What's New; App Store Connect rejects release notes on it.
@@ -133,6 +137,7 @@ metadata() {
     asc versions update --version-id $version_id --copyright $copyright --output json >/dev/null
   fi
   print "  copyright: $copyright"
+  fi
 
   step "Screenshots"
   local localizations=$(asc localizations list --version $version_id --paginate --output json)
