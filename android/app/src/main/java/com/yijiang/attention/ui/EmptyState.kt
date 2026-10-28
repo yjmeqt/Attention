@@ -3,7 +3,6 @@ package com.yijiang.attention.ui
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +20,13 @@ import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material3.Button
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,12 +44,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yijiang.attention.R
 import com.yijiang.attention.card.CardMetrics
 import com.yijiang.attention.card.CardRenderer
-import com.yijiang.attention.data.HistoryEntry
 import com.yijiang.attention.model.BRAND_NAME
 import com.yijiang.attention.model.CardStyle
 import com.yijiang.attention.model.LinkMeta
@@ -54,15 +55,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private val sampleMeta = LinkMeta(
-    url = "https://youtu.be/dQw4w9WgXcQ",
+    url = "https://youtu.be/0_DjDdfqtUE",
     site = "YouTube",
-    title = "Rick Astley - Never Gonna Give You Up (Official Video)",
-    authorName = "Rick Astley",
+    title = "WWDC 2025 — June 9 | Apple",
+    authorName = "Apple",
 )
 
 @Composable
-fun EmptyState(entries: List<HistoryEntry>, onPaste: () -> Unit, onOpen: (HistoryEntry) -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+fun EmptyState(
+    onPaste: () -> Unit,
+    onSample: () -> Unit,
+    showsPinGuide: () -> Unit,
+    seenShareGuide: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        if (!seenShareGuide) PinGuideLink(seenShareGuide, showsPinGuide)
         SampleCard()
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
@@ -94,7 +102,49 @@ fun EmptyState(entries: List<HistoryEntry>, onPaste: () -> Unit, onOpen: (Histor
                 StepRow(Icons.Default.Forum, stringResource(R.string.step_send))
             }
         }
-        RecentList(entries.take(3), onOpen)
+        if (seenShareGuide) PinGuideLink(seenShareGuide, showsPinGuide)
+        SampleLink(onSample)
+    }
+}
+
+/** A first link to save, so the library is never a dead end. */
+@Composable
+private fun SampleLink(onAdd: () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(
+                modifier = Modifier.size(44.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFFF2EDE4)),
+                contentAlignment = Alignment.Center,
+            ) { Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(80.dp)) }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(BRAND_NAME, style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.try_saving), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Button(onClick = onAdd) { Text(stringResource(R.string.add), fontWeight = FontWeight.Bold) }
+        }
+    }
+}
+
+/** Prominent until the guide has been seen, then a quiet row at the bottom. */
+@Composable
+private fun PinGuideLink(seen: Boolean, onClick: () -> Unit) {
+    Surface(
+        color = if (seen) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(12.dp),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(if (seen) Icons.Outlined.Lightbulb else Icons.Default.PushPin, contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary)
+            Text(
+                stringResource(R.string.pin_guide_link, BRAND_NAME),
+                style = if (seen) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
+                fontWeight = if (seen) FontWeight.Normal else FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+        }
     }
 }
 
@@ -135,40 +185,3 @@ private fun StepRow(icon: ImageVector, text: String) {
     }
 }
 
-@Composable
-private fun RecentList(entries: List<HistoryEntry>, onOpen: (HistoryEntry) -> Unit) {
-    if (entries.isEmpty()) return
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            stringResource(R.string.recent),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
-        entries.forEachIndexed { index, entry ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable { onOpen(entry) }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                FaviconView(entry.meta)
-                Text(entry.meta.listTitle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Text(
-                    entry.meta.site,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                )
-                Icon(
-                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                )
-            }
-            if (index != entries.lastIndex) HorizontalDivider()
-        }
-    }
-}

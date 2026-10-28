@@ -3,6 +3,7 @@ package com.yijiang.attention.ui
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,25 +11,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -37,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yijiang.attention.R
@@ -51,35 +45,8 @@ import kotlinx.coroutines.withContext
 
 private const val THUMBNAIL_SCALE = 0.2f
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StyleSheet(vm: MakerViewModel, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(stringResource(R.string.style), style = MaterialTheme.typography.titleLarge)
-            val meta = vm.meta
-            val images = vm.images
-            if (meta != null && images != null) {
-                Text(stringResource(R.string.template), style = MaterialTheme.typography.titleSmall)
-                TemplatePicker(meta, images, vm.style, onSelect = { vm.updateStyle(vm.style.copy(template = it)) })
-            }
-            meta?.let { SourceImageInfo(it) }
-            if (vm.style != CardStyle()) {
-                TextButton(onClick = { vm.updateStyle(CardStyle()) }, contentPadding = ButtonDefaults.TextButtonWithIconContentPadding) {
-                    Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
-                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                    Text(stringResource(R.string.restore_default))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle, onSelect: (CardTemplate) -> Unit) {
+fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle, onSelect: (CardTemplate) -> Unit) {
     val thumbnails by produceState<Map<CardTemplate, Bitmap>>(emptyMap(), meta, images) {
         value = withContext(Dispatchers.Default) {
             CardTemplate.entries.associateWith { template ->
@@ -133,7 +100,7 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
 }
 
 @Composable
-private fun SourceImageInfo(meta: LinkMeta) {
+fun SourceImageInfo(meta: LinkMeta) {
     val size = meta.imageSize
     val (icon, text, color) = when {
         size != null && size.width < 800 -> Triple(
@@ -152,5 +119,45 @@ private fun SourceImageInfo(meta: LinkMeta) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
         Text(text, style = MaterialTheme.typography.bodySmall, color = color)
+    }
+}
+
+/** For links shared as an image: the link's preview image or the shared image. */
+@Composable
+fun CoverPicker(preview: Bitmap?, shared: Bitmap?, usesShared: Boolean, onSelect: (Boolean) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        CoverOption(stringResource(R.string.link_preview), preview, selected = !usesShared) { onSelect(false) }
+        CoverOption(stringResource(R.string.shared_image), shared, selected = usesShared) { onSelect(true) }
+    }
+}
+
+@Composable
+private fun CoverOption(title: String, image: Bitmap?, selected: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(6.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable(onClick = onClick).padding(2.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp, 72.dp)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                .border(
+                    if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                    else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    shape,
+                ),
+        ) {
+            image?.let {
+                Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(96.dp, 72.dp))
+            }
+        }
+        Text(
+            title,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

@@ -56,6 +56,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.zxing.core)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.text.chinese)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

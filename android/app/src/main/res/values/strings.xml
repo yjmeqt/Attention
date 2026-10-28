@@ -1,41 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Attention</string>
-    <string name="paste_link">Paste a link</string>
     <string name="paste">Paste</string>
-    <string name="clear">Clear</string>
-    <string name="generate">Generate</string>
-    <string name="history">History</string>
-    <string name="history_empty">No history yet</string>
-    <string name="just_now">Just now</string>
     <string name="delete">Delete</string>
-    <string name="recent">Recent</string>
 
     <string name="empty_title">Links WeChat can preview</string>
     <string name="empty_body">YouTube, X and many sites show up in WeChat as a bare link. Turn them into an image card with the title, cover and a QR code.</string>
     <string name="step_copy">Copy a link, or share it to %1$s from any app</string>
     <string name="step_card">Get a card with the title, cover and QR code</string>
     <string name="step_send">Send the image in WeChat, then paste the link — it\'s already copied</string>
-
-    <string name="card_preview">Card preview</string>
     <string name="share">Share</string>
     <string name="share_link">Share Link</string>
     <string name="copy_link">Copy Link</string>
     <string name="share_as_image">Share as Image</string>
     <string name="copied">Link copied</string>
     <string name="share_title">Share card</string>
-    <string name="save">Save</string>
-    <string name="saved_to_gallery">Saved to gallery</string>
-    <string name="save_failed">Couldn\'t save the image</string>
     <string name="link_copied">Link copied — paste it after the image</string>
 
     <string name="notice_no_link">No link found in that text.</string>
     <string name="notice_no_clipboard_link">No link found on the clipboard.</string>
     <string name="notice_fallback">Couldn\'t load a preview, so this is a basic card.</string>
-
-    <string name="style">Style</string>
     <string name="template">Template</string>
-    <string name="restore_default">Restore default</string>
     <string name="template_auto">Auto</string>
     <string name="template_auto_resolved">Auto · %1$s</string>
     <string name="template_tile">Card</string>
@@ -44,4 +29,78 @@
     <string name="source_image">Source image %1$d × %2$d</string>
     <string name="source_image_low">Source image %1$d × %2$d · low resolution</string>
     <string name="no_source_image">No source image</string>
+
+    <!-- Library -->
+    <string name="open">Open</string>
+    <string name="open_in_app">Open in App</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="only">Only %1$s</string>
+    <string name="edit_tags">Edit Tags…</string>
+    <string name="move_to_private">Move to Private</string>
+    <string name="remove_from_private">Remove from Private</string>
+    <string name="select">Select</string>
+    <string name="archive">Archive</string>
+    <string name="unarchive">Unarchive</string>
+    <string name="delete_one">Delete this item?</string>
+    <string name="passcode_required_title">Set a screen lock first</string>
+    <string name="passcode_required_body">Private items are protected by your fingerprint, face or screen lock. Set a screen lock in Settings to use Private.</string>
+    <string name="show_private_items">Show your private items</string>
+    <string name="remove_items_from_private">Remove items from Private</string>
+    <string name="already_private">Already saved in Private.</string>
+    <string name="nothing_to_save">No link or image was shared.</string>
+    <string name="private_locked">Private is locked</string>
+    <string name="no_archived_items">No archived items</string>
+    <string name="no_private_items">No private items</string>
+    <string name="nothing_here">Nothing here</string>
+    <string name="no_results">No results for “%1$s”</string>
+    <string name="all">All</string>
+    <string name="images">Images</string>
+    <string name="archived">Archived</string>
+    <string name="private_section">Private</string>
+    <string name="enter_link">Enter Link</string>
+    <string name="enter_link_ellipsis">Enter Link…</string>
+    <string name="go">Go</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="tag">Tag</string>
+    <string name="tags">Tags</string>
+    <string name="new_tag">New tag</string>
+    <string name="add">Add</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="more">More</string>
+    <string name="search">Search</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="tip_title">Touch and hold a link</string>
+    <string name="tip_body">Tag it, archive it, move it to Private, or delete it.</string>
+    <string name="try_saving">Try saving this link</string>
+    <string name="image">Image</string>
+    <string name="cover">Cover</string>
+    <string name="link_preview">Link Preview</string>
+    <string name="shared_image">Shared Image</string>
+    <string name="text_in_image">Text in Image</string>
+    <string name="copy">Copy</string>
+    <string name="show_all">Show All</string>
+    <string name="camera_unavailable">Camera unavailable</string>
+    <string name="camera_unavailable_body">Choose a photo with a QR code instead.</string>
+    <string name="choose_from_photos">Choose from Photos</string>
+    <string name="qr_not_found">No QR code found in that photo.</string>
+    <string name="qr_no_link">That QR code doesn\'t contain a link.</string>
+    <string name="guide_title">Pin to Share Sheet</string>
+    <string name="pin_guide_link">Pin %1$s to the front of the share sheet</string>
+    <string name="guide_tap_share">Tap Share in any app</string>
+    <string name="guide_hold_app">Find %1$s in the app row, then touch and hold it</string>
+    <string name="guide_tap_pin">Tap Pin</string>
+    <string name="guide_pin_item">Pin %1$s</string>
+    <string name="guide_finished">%1$s now shows up first in the share sheet</string>
+    <string name="replay">Replay</string>
+    <plurals name="delete_many">
+        <item quantity="one">Delete %1$d item?</item>
+        <item quantity="other">Delete %1$d items?</item>
+    </plurals>
+    <plurals name="tag_items">
+        <item quantity="one">Tag %1$d Item</item>
+        <item quantity="other">Tag %1$d Items</item>
+    </plurals>
 </resources>

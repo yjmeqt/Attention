@@ -1,40 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="paste_link">粘贴链接</string>
     <string name="paste">粘贴</string>
-    <string name="clear">清除</string>
-    <string name="generate">生成</string>
-    <string name="history">历史记录</string>
-    <string name="history_empty">暂无历史记录</string>
-    <string name="just_now">刚刚</string>
     <string name="delete">删除</string>
-    <string name="recent">最近</string>
 
     <string name="empty_title">让微信也能预览的链接</string>
     <string name="empty_body">YouTube、X 等很多网站的链接在微信里只显示一串网址。把它们变成带标题、封面和二维码的图片卡片。</string>
     <string name="step_copy">复制链接，或在任意 App 中分享到 %1$s</string>
     <string name="step_card">生成带标题、封面和二维码的卡片</string>
     <string name="step_send">在微信中发送图片，再粘贴链接——链接已自动复制</string>
-
-    <string name="card_preview">卡片预览</string>
     <string name="share">分享</string>
     <string name="share_link">分享链接</string>
     <string name="copy_link">复制链接</string>
     <string name="share_as_image">分享为图片</string>
     <string name="copied">链接已复制</string>
     <string name="share_title">分享卡片</string>
-    <string name="save">保存</string>
-    <string name="saved_to_gallery">已保存到相册</string>
-    <string name="save_failed">无法保存图片</string>
     <string name="link_copied">链接已复制——发送图片后粘贴即可</string>
 
     <string name="notice_no_link">这段文字里没有找到链接。</string>
     <string name="notice_no_clipboard_link">剪贴板里没有链接。</string>
     <string name="notice_fallback">无法获取预览，已生成基础卡片。</string>
-
-    <string name="style">样式</string>
     <string name="template">模板</string>
-    <string name="restore_default">恢复默认</string>
     <string name="template_auto">自动</string>
     <string name="template_auto_resolved">自动 · %1$s</string>
     <string name="template_tile">卡片</string>
@@ -43,4 +28,76 @@
     <string name="source_image">原图 %1$d × %2$d</string>
     <string name="source_image_low">原图 %1$d × %2$d · 分辨率较低</string>
     <string name="no_source_image">没有原图</string>
+
+    <!-- Library -->
+    <string name="open">打开</string>
+    <string name="open_in_app">在 App 中打开</string>
+    <string name="open_in_browser">在浏览器中打开</string>
+    <string name="only">只看 %1$s</string>
+    <string name="edit_tags">编辑标签…</string>
+    <string name="move_to_private">移到私密</string>
+    <string name="remove_from_private">移出私密</string>
+    <string name="select">选择</string>
+    <string name="archive">归档</string>
+    <string name="unarchive">取消归档</string>
+    <string name="delete_one">删除此项？</string>
+    <string name="passcode_required_title">请先设置屏幕锁</string>
+    <string name="passcode_required_body">私密内容由指纹、人脸或屏幕锁保护。请先在“设置”中设置屏幕锁，才能使用私密。</string>
+    <string name="show_private_items">显示你的私密内容</string>
+    <string name="remove_items_from_private">将项目移出私密</string>
+    <string name="already_private">已保存在私密中。</string>
+    <string name="nothing_to_save">没有分享链接或图片。</string>
+    <string name="private_locked">私密已锁定</string>
+    <string name="no_archived_items">没有归档内容</string>
+    <string name="no_private_items">没有私密内容</string>
+    <string name="nothing_here">这里还没有内容</string>
+    <string name="no_results">没有“%1$s”的结果</string>
+    <string name="all">全部</string>
+    <string name="images">图片</string>
+    <string name="archived">归档</string>
+    <string name="private_section">私密</string>
+    <string name="enter_link">输入链接</string>
+    <string name="enter_link_ellipsis">输入链接…</string>
+    <string name="go">前往</string>
+    <string name="cancel">取消</string>
+    <string name="done">完成</string>
+    <string name="close">关闭</string>
+    <string name="back">返回</string>
+    <string name="tag">标签</string>
+    <string name="tags">标签</string>
+    <string name="new_tag">新标签</string>
+    <string name="add">添加</string>
+    <string name="add_tag">添加标签</string>
+    <string name="more">更多</string>
+    <string name="search">搜索</string>
+    <string name="scan_qr_code">扫描二维码</string>
+    <string name="tip_title">长按链接</string>
+    <string name="tip_body">可以加标签、归档、设为私密或删除。</string>
+    <string name="try_saving">试着保存这条链接</string>
+    <string name="image">图片</string>
+    <string name="cover">封面</string>
+    <string name="link_preview">链接预览图</string>
+    <string name="shared_image">分享的原图</string>
+    <string name="text_in_image">图片中的文字</string>
+    <string name="copy">拷贝</string>
+    <string name="show_all">显示全部</string>
+    <string name="camera_unavailable">无法使用相机</string>
+    <string name="camera_unavailable_body">可以改为选择一张带二维码的照片。</string>
+    <string name="choose_from_photos">从相册选择</string>
+    <string name="qr_not_found">这张照片里没有找到二维码。</string>
+    <string name="qr_no_link">这个二维码里没有链接。</string>
+    <string name="guide_title">固定到分享面板</string>
+    <string name="pin_guide_link">把 %1$s 固定到分享面板最前面</string>
+    <string name="guide_tap_share">在任意 App 中点击分享</string>
+    <string name="guide_hold_app">在 App 一栏找到 %1$s，然后长按它</string>
+    <string name="guide_tap_pin">点击“固定”</string>
+    <string name="guide_pin_item">固定 %1$s</string>
+    <string name="guide_finished">以后 %1$s 会出现在分享面板最前面</string>
+    <string name="replay">重新播放</string>
+    <plurals name="delete_many">
+        <item quantity="other">删除 %1$d 项？</item>
+    </plurals>
+    <plurals name="tag_items">
+        <item quantity="other">为 %1$d 项添加标签</item>
+    </plurals>
 </resources>
