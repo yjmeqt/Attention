@@ -8,8 +8,9 @@
 #       the IPA, keeping the local build number.
 #
 #   Tools/release.sh metadata [--apply]
-#       Pushes fastlane/metadata (listing text) and fastlane/screenshots to the App Store
-#       version matching MARKETING_VERSION. Without --apply it only prints the plan.
+#       Pushes fastlane/metadata (listing text and copyright) and fastlane/screenshots to the
+#       App Store version matching MARKETING_VERSION. Without --apply it only prints the plan.
+#       --screenshots-only skips the text; ONLY="zh-Hans ja" limits screenshots to those locales.
 #
 # Needs an App Store Connect API key stored once with `asc auth login`.
 set -euo pipefail
@@ -22,8 +23,12 @@ OUT=../build/release
 FASTLANE=fastlane
 # App Store Connect is sometimes slower than asc's default request timeout.
 export ASC_TIMEOUT=${ASC_TIMEOUT:-90s}
-# Screenshot file prefix|asc device type. iPhone shots are 1320x2868 (6.9"), iPad 2064x2752 (13").
-SCREENSHOT_SETS=("iphone|IPHONE_69" "ipad|IPAD_PRO_3GEN_129")
+# Uploads wait for Apple to process each screenshot, which can take minutes.
+export ASC_UPLOAD_TIMEOUT=${ASC_UPLOAD_TIMEOUT:-30m}
+# Screenshot file prefix|asc device type: iPhone 1320x2868 (6.9") and 1206x2622 (6.3"), iPad 2752x2064 (13"),
+# and iPhone Duo, whose one set holds the inner (duo-*, 2007x2853) and then the outer (duo-cover-*,
+# 1398x2034) display. IPHONE_DUO needs asc 5.12 or later.
+SCREENSHOT_SETS=("iphone|IPHONE_69" "iphone63|IPHONE_61" "ipad|IPAD_PRO_3GEN_129" "duo|IPHONE_DUO")
 
 die() { print -u2 "error: $*"; exit 1 }
 step() { print -P "%F{cyan}==>%f $*" }
@@ -89,36 +94,57 @@ beta() {
 }
 
 metadata() {
-  local apply=0
+  local apply=0 text_too=1
   while (( $# )); do
     case $1 in
       --apply) apply=1; shift ;;
+      --screenshots-only) text_too=0; shift ;;
       *) die "unknown metadata option: $1" ;;
     esac
   done
   require_auth
 
+  if (( text_too )); then
   step "Validate fastlane metadata"
   asc migrate validate --fastlane-dir $FASTLANE --output json | jq -e '.valid' >/dev/null \
     || { asc migrate validate --fastlane-dir $FASTLANE --pretty; die "metadata is invalid" }
   local f empty=()
   for f in $FASTLANE/metadata/*/(support|privacy)_url.txt; do [[ -n ${"$(<$f)"//[[:space:]]/} ]] || empty+=(${f#$FASTLANE/metadata/}); done
   (( ${#empty} )) && print -P "%F{yellow}warning:%f empty URL files (App Review needs them): $empty"
+  fi
 
   local version=$(setting MARKETING_VERSION)
   local version_id=$(asc versions list --app $APP_ID --platform IOS --version $version --output json | jq -r '.data[0].id // empty')
   [[ -n $version_id ]] || die "no App Store version $version in App Store Connect; create it there first"
 
+  if (( text_too )); then
   step "Listing text for $version"
   local mode=(--dry-run); (( apply )) && mode=(--confirm)
-  asc migrate import --app $APP_ID --version-id $version_id --fastlane-dir $FASTLANE \
+  # An app's first version has no What's New; App Store Connect rejects release notes on it.
+  local text=$FASTLANE
+  local versions=$(asc versions list --app $APP_ID --platform IOS --paginate --output json)
+  if jq -e --arg v $version '[.data[] | select(.attributes.versionString != $v)] | length == 0' <<< $versions >/dev/null; then
+    print "  first version: leaving out release_notes.txt"
+    text=$OUT/fastlane
+    rm -rf $text && mkdir -p $text
+    rsync -a --exclude release_notes.txt $FASTLANE/metadata $text/
+  fi
+  asc migrate import --app $APP_ID --version-id $version_id --fastlane-dir $text \
     --skip-screenshots $mode --output table
+  # The import leaves the version's copyright alone.
+  local copyright=$(<$FASTLANE/metadata/copyright.txt)
+  if (( apply )); then
+    asc versions update --version-id $version_id --copyright $copyright --output json >/dev/null
+  fi
+  print "  copyright: $copyright"
+  fi
 
   step "Screenshots"
   local localizations=$(asc localizations list --version $version_id --paginate --output json)
-  local dir locale loc_id set prefix type staging
+  local dir locale loc_id set prefix type staging failed=()
   for dir in $FASTLANE/screenshots/*(/); do
     locale=${dir:t}
+    [[ -n ${ONLY:-} && " $ONLY " != *" $locale "* ]] && continue
     loc_id=$(jq -r --arg l $locale '.data[] | select(.attributes.locale == $l) | .id' <<< $localizations)
     if [[ -z $loc_id ]]; then
       print -P "%F{yellow}skip $locale:%f no version localization yet (run with --apply to create it from the text)"
@@ -131,8 +157,9 @@ metadata() {
       cp $dir/$prefix-*.png $staging/ 2>/dev/null || continue
       print "  $locale $type: $(ls $staging | wc -l | tr -d ' ') files"
       if (( apply )); then
+        # One slow set shouldn't stop the rest; re-run with ONLY to retry the failures.
         asc screenshots upload --version-localization $loc_id --path $staging --device-type $type \
-          --replace --confirm --output table
+          --replace --confirm --output table || failed+=("$locale $type")
       else
         asc screenshots upload --version-localization $loc_id --path $staging --device-type $type \
           --replace --dry-run --output table
@@ -141,10 +168,12 @@ metadata() {
   done
 
   (( apply )) || step "Plan only. Re-run with --apply to push."
+  (( ${#failed} )) && die "screenshot sets not uploaded: ${(j:, :)failed}"
+  return 0
 }
 
 case ${1:-} in
   beta) shift; beta "$@" ;;
   metadata) shift; metadata "$@" ;;
-  *) sed -n '2,13p' $SELF | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,14p' $SELF | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

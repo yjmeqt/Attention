@@ -1,1 +1,1 @@
-wechat,vista previa,compartir,tarjeta,código qr,youtube,twitter,miniatura,póster,url
+marcadores,leer después,imágenes,etiquetas,búsqueda,lector QR,colección,organizar,favoritos,tarjeta

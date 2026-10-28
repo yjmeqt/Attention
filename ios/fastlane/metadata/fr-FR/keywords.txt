@@ -1,1 +1,1 @@
-wechat,aperçu de lien,partager,carte,code qr,youtube,twitter,miniature,affiche,url
+favoris,lecture différée,images,recherche,tags,scanner QR,collection,signets,pages web,partage

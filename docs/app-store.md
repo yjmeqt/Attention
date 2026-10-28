@@ -16,7 +16,7 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 
 ## Listing copy
 
-`ios/fastlane/metadata/` follows the [fastlane deliver](https://docs.fastlane.tools/actions/deliver/) layout, one folder per locale: Simplified Chinese (`zh-Hans`), English (`en-US`), Korean (`ko`), Japanese (`ja`), Russian (`ru`), Vietnamese (`vi`), Arabic (`ar-SA`), French (`fr-FR`), German (`de-DE`) and Spanish (`es-ES`, `es-MX`):
+`ios/fastlane/metadata/` follows the [fastlane deliver](https://docs.fastlane.tools/actions/deliver/) layout, one folder per locale: English (`en-US`, the primary language), Simplified Chinese (`zh-Hans`), Korean (`ko`), Japanese (`ja`), Russian (`ru`), Vietnamese (`vi`), Arabic (`ar-SA`), French (`fr-FR`), German (`de-DE`) and Spanish (`es-ES`, `es-MX`):
 
 | File | Limit |
 |---|---|
@@ -27,6 +27,8 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 | `keywords.txt` | 100 characters, comma-separated, no app name |
 | `release_notes.txt` | What's New |
 | `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
+
+The Simplified Chinese listing (text and screenshot captions) also pitches sharing X, YouTube and Instagram links to WeChat as image cards; the other locales don't mention it. Every locale uses the registered name, "Attention – Save & Share Links", since plain "Attention" belongs to another developer.
 
 Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_category.txt` (Productivity), and `review_information/notes.txt` (instructions for App Review).
 
@@ -42,7 +44,7 @@ Push the text and screenshots with `Tools/release.sh metadata` (see Releasing).
 | `Tools/release.sh beta --group "Public" --notes "…"` | Same, then adds the build to that beta group, sets What to Test (en-US) and notifies testers |
 | `Tools/release.sh beta --no-upload` | Archive and export only, keeping the local build number |
 | `Tools/release.sh metadata` | Plan only: validates `fastlane/metadata`, then shows what the text import and screenshot upload would change on the App Store version matching `MARKETING_VERSION` |
-| `Tools/release.sh metadata --apply` | Pushes it. Screenshots replace each locale's iPhone 6.9" (`iphone-*`) and iPad 13" (`ipad-*`) sets |
+| `Tools/release.sh metadata --apply` | Pushes it. Screenshots replace each locale's iPhone 6.9" (`iphone-*`), iPhone 6.3" (`iphone63-*`), iPad 13" (`ipad-*`) and iPhone Duo (`duo-*`, inner then outer display) sets. The Duo set needs asc 5.12 or later |
 
 The App Store version itself (for example 1.0) has to exist in App Store Connect before `metadata` can target it. Locales that have no version localization yet are created by the text import, so a first `--apply` may need a second run to upload their screenshots.
 
@@ -86,22 +88,37 @@ What to Test (per build):
 
 ## Screenshots
 
-**Status: to be redone before the first submission.** The scenes, captions and scripts below still describe the old card-maker app. Redo them once the library UI stops changing.
+Four scenes, positioned around "keep the links you care about":
 
-Plan, five scenes for iPhone (1320 × 2868) and iPad (2064 × 2752), positioned around "keep the links you care about":
+1. `1-feed`: home feed, the waterfall of link previews
+2. `2-share`: Safari's own share sheet on the locale's Wikipedia page, with Attention in the app row lifted out and enlarged, so people see where to find it
+3. `3-detail`: item detail with the card lifted off the screen, the templates, Open and Share
+4. `4-private`: the Private section, locked, with the Face ID (Touch ID on Duo) prompt over an empty screen
 
-1. Home feed, the waterfall of link previews
-2. Saving from any app through the share sheet (captured by hand from Safari)
-3. Item detail: the card with its templates and aspect ratios
-4. Tags, filters and search
-5. Private and Archived
+Search and tags are left out on purpose: they're secondary to saving and sharing.
 
-How to rebuild the pipeline:
+| Device | Size | App Store Connect slot |
+|---|---|---|
+| `iphone` (iPhone 17 Pro Max) | 1320 × 2868 | iPhone with Dynamic Island, large display |
+| `iphone63` (same frame, scaled) | 1206 × 2622 | iPhone with Dynamic Island, medium display (**required**) |
+| `ipad` (iPad Pro 13-inch, landscape) | 2752 × 2064 | iPad 13-inch display (required for iPad apps) |
+| `duo` (iPhone Duo, inner display) | 2007 × 2853 | iPhone Duo inner display (optional until April 2027; shows the "optimized for iPhone Duo" badge) |
+| `duo-cover` (iPhone Duo, outer display) | 1398 × 2034 | iPhone Duo outer display (same simulator, folded shut) |
 
-- Fill the library with the Debug-only `-demoLinks "https://a https://b"` launch argument (newest first, only when the library is empty, needs network access). Add `-seenShareGuide YES` to skip the first-launch guide. Avoid links that don't unfurl reliably, such as bilibili.
-- The simulators are `Attention-Shots-iPhone` (iPhone 17 Pro Max), `Attention-Shots-iPad` (iPad Pro 13-inch) and `Attention-Shots-Duo` (iPhone Duo). App Store Connect has no foldable size class, so Duo images are for marketing only (`ios/fastlane/extra/`).
-- Rewrite the scenes in `ios/Tools/capture-screenshots.sh` and the captions in `ios/Tools/frame-screenshots.swift` (10 locales; `es-MX` reuses `es-ES`). The old `-demoURL`, `-demoStyle`, `-demoHistory` and `-demoNoAutoShare` arguments no longer exist.
-- Update `description.txt`, `subtitle.txt`, `keywords.txt` and `promotional_text.txt` in every locale to the library positioning at the same time.
+Pipeline, run from `ios/`:
+
+```
+zsh Tools/capture-screenshots.sh        # raw shots into fastlane/raw (ONLY="en-US ko", DEVICES="ipad duo", SCENES="2-share" for a subset)
+swift Tools/frame-screenshots.swift     # framed shots into fastlane/screenshots
+```
+
+- The capture script reinstalls the Debug build for every scene and fills the library with the Debug-only launch arguments in `Shared/Library/DemoLibrary.swift`: `-demoLinks` (newest first, only when the library is empty, needs network access), `-demoTags "1=Music;2=Travel"`, `-demoPrivate "10 11"`, `-demoOpen 0` and `-demoUnlockPrivate YES` (Private, still locked, with Face ID scanning: the script enrolls Face ID on the simulator). The share scene isn't the app: the script boots the simulator in that locale's language (the share sheet is drawn by the system), opens the page in Safari, taps Share with the argent CLI, and saves the frame of Attention's cell next to the screenshot. The detail and Private scenes save the frames of the card and the Face ID label the same way. `-seenShareGuide YES` skips the first-launch guide. The demo library uses Apple and Wikipedia pages only, so no third-party content appears in the screenshots.
+- The iPad is rotated to landscape with the argent CLI (`argent run rotate`), since iPadOS ignores an app's own orientation request. The Duo is unfolded (`argent run fold --posture open`) for the inner display and folded shut for the outer one; both are shot with argent, since `simctl` doesn't capture a folded device's panel.
+- Captions live in `Tools/frame-screenshots.swift` (10 locales; `es-MX` reuses `es-ES`). The framed PNGs have no alpha channel, as App Store Connect requires. Neither the raw nor the framed screenshots are in git: run the pipeline to regenerate them before uploading.
+- Design: product first, modeled on Things 3 (one brand color across the set, a top-left caption that is a bold lead and a plain rest, a large device running off the bottom) and Opal (one real element lifted out of the screen and enlarged). Scenes 1–3 are on the icon's coral (`#D64A33`, a little deeper so white text reads on it), Private on its ink. The lifted element is Attention's cell in Safari's share sheet, the card on the detail screen (lifted only slightly, so it breaks past the device's edges), and the Face ID prompt over the empty, locked Private screen in Dark Mode; the feed has none. The simulator draws the Face ID prompt without its glyph, so the frame script draws the `faceid` symbol where iOS puts it. The Duo unlocks with Touch ID, so its Private caption says Touch ID and shows the system prompt as captured. Captions mark the bold lead with `**…**`; Chinese and Japanese start the rest on its own line. Captions shrink to fit three lines (two on iPad).
+- Devices: Apple's product bezels from the [iOS and iPadOS 27 UI kit](https://www.figma.com/design/rIbzSxeU0qjqqaWd0ULzUU/iOS-and-iPadOS-27--Community-?node-id=507-24672) (Product Bezels page): iPhone 18 Pro Max (Black, and Silver on Private), iPad Pro 13" M4 landscape (Space Gray, Silver), iPhone Duo inner display portrait and outer display closed portrait (Night Sky, Star White). Export each bezel image at full size (the image fill of the bezel layer, 3× for iPhone and Duo, 2× for iPad) into `ios/fastlane/bezels/` as `iphone.png`, `iphone-light.png`, `ipad.png`, `ipad-light.png`, `duo.png`, `duo-light.png`, `duo-cover.png`, `duo-cover-light.png`. The folder is gitignored, since Apple's license doesn't allow redistributing them; without it the script draws a plain bezel.
+- Upload with `Tools/release.sh metadata --apply` (see Releasing), or by hand in App Store Connect: drag each device's files into its slot, and both Duo displays into the one iPhone Duo slot.
+- Look through every framed image before uploading: a link that failed to unfurl shows as a bare tile.
 
 ## Design decisions
 
@@ -126,7 +143,8 @@ How to rebuild the pipeline:
 - [x] Publish the privacy policy and a support page; fill in the URLs
 - [x] Create the app in App Store Connect with the bundle ID above (primary language: English)
 - [ ] China mainland availability needs an ICP filing number (App 备案)
-- [ ] Redo the screenshots and store text (see Screenshots) and review the output
+- [x] Redo the store text for the library positioning
+- [ ] Review the regenerated screenshots (see Screenshots) and upload them (`Tools/release.sh metadata --apply`)
 - [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [ ] Pricing and availability (not decided yet)

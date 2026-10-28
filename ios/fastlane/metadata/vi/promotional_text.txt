@@ -1,1 +1,1 @@
-Biến liên kết YouTube, X và trang web thành thẻ ảnh có tiêu đề, ảnh bìa và mã QR để chia sẻ đẹp mắt trên WeChat.
+Lưu liên kết và hình ảnh, sắp xếp bằng thẻ, tìm chữ trong ảnh đã lưu và chia sẻ liên kết dưới dạng thẻ hình ảnh có mã QR.
