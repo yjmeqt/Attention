@@ -1,1 +1,1 @@
-dấu trang,liên kết,đọc sau,tìm ảnh,quét QR,bộ sưu tập,thẻ,lưu web,sắp xếp
+dấu trang,đọc sau,ảnh,quét QR,bộ sưu tập,thẻ,trang web,sắp xếp,yêu thích

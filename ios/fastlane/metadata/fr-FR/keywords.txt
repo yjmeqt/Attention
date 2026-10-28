@@ -1,1 +1,1 @@
-favoris,liens,lecture différée,images,recherche,tags,scanner QR,collection,signets,pages web
+favoris,lecture différée,images,recherche,tags,scanner QR,collection,signets,pages web,partage

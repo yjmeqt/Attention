@@ -1,1 +1,1 @@
-Lesezeichen,Links,später lesen,Bildsuche,Tags,QR-Scanner,Sammlung,Organizer,Webseiten
+Lesezeichen,später lesen,Bildsuche,Tags,QR-Scanner,Sammlung,Organizer,Webseiten,Merkliste,Karte
