@@ -1,8 +1,9 @@
 package com.yijiang.attention.card
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.graphics.ColorUtils
-import com.yijiang.attention.model.CardAspect
+import androidx.core.graphics.scale
 import com.yijiang.attention.model.LinkKind
 
 class CardPalette(kind: LinkKind) {
@@ -19,67 +20,58 @@ class CardPalette(kind: LinkKind) {
     val onAccent = Color.WHITE
 }
 
-class CardMetrics(val aspect: CardAspect) {
-    val width = aspect.width.toFloat()
-    val height = aspect.height.toFloat()
-    val padding = 18f
+/** Sizes in dp. Every card is [WIDTH] wide and as tall as its content. */
+object CardMetrics {
+    const val WIDTH = 360f
+    const val MINIMAL_LINES = 6
+    const val FOOTER_QR_SIZE = 80f
+    const val BIG_QR_SIZE = 180f
+}
 
-    /** Banner height that shows the whole image when possible, within limits that keep room for the text. */
-    fun heroImageHeight(ratio: Float?): Float {
-        val range = when (aspect) {
-            CardAspect.PORTRAIT -> 150f..250f
-            CardAspect.SQUARE -> 110f..140f
-            CardAspect.STORY -> 200f..400f
+/** A tile card's band color and the text colors that read on it. */
+class CardTint(val color: Int, val isDark: Boolean) {
+    val primary = if (isDark) Color.WHITE else Color.rgb(18, 18, 20)
+    val secondary = ColorUtils.setAlphaComponent(primary, ((if (isDark) 0.72f else 0.6f) * 255).toInt())
+
+    companion object {
+        val neutral = CardTint(Color.rgb(242, 242, 245), isDark = false)
+
+        /** From the image's bottom edge, like the iOS feed. */
+        fun fromImage(image: Bitmap): CardTint {
+            val strip = maxOf(1, image.height / 8)
+            val edge = Bitmap.createBitmap(image, 0, image.height - strip, image.width, strip)
+            return of(averageColor(edge))
         }
-        val middle = (range.start + range.endInclusive) / 2
-        if (ratio == null || ratio <= 0) return middle
-        val natural = width / ratio
-        // Too tall to show whole; the hero letterboxes it, so a medium banner leaves more room for the title.
-        if (natural > range.endInclusive) return middle
-        return maxOf(natural, range.start)
+
+        /** Colorful favicons tint the card; black, white and gray ones would make it a slab, so they don't. */
+        fun fromFavicon(icon: Bitmap): CardTint? {
+            val color = averageColor(icon)
+            val high = maxOf(Color.red(color), Color.green(color), Color.blue(color)) / 255f
+            val low = minOf(Color.red(color), Color.green(color), Color.blue(color)) / 255f
+            if (high <= 0.15f || (high - low) / high <= 0.35f) return null
+            return of(color)
+        }
+
+        private fun of(color: Int): CardTint {
+            val luma = (0.299f * Color.red(color) + 0.587f * Color.green(color) + 0.114f * Color.blue(color)) / 255f
+            return CardTint(color, isDark = luma < 0.6f)
+        }
+
+        private fun averageColor(bitmap: Bitmap): Int {
+            // A bilinear scale straight to 1×1 samples only a few pixels, so average a 16×16 copy.
+            val small = bitmap.scale(16, 16, filter = true)
+            val pixels = IntArray(16 * 16).also { small.getPixels(it, 0, 16, 0, 0, 16, 16) }
+            var red = 0L
+            var green = 0L
+            var blue = 0L
+            // Premultiplied like iOS, so transparent favicon pixels count as black.
+            for (pixel in pixels) {
+                val alpha = Color.alpha(pixel)
+                red += Color.red(pixel) * alpha / 255
+                green += Color.green(pixel) * alpha / 255
+                blue += Color.blue(pixel) * alpha / 255
+            }
+            return Color.rgb((red / pixels.size).toInt(), (green / pixels.size).toInt(), (blue / pixels.size).toInt())
+        }
     }
-
-    fun heroTitleLines(imageHeight: Float, hasByline: Boolean): Int {
-        val body = height - imageHeight - padding * 2
-        val footer = footerQrSize + 33
-        val byline = if (hasByline) 24 else 0
-        return ((body - footer - byline - 14) / 28).toInt().coerceIn(1, 8)
-    }
-
-    fun postMediaHeight(ratio: Float?): Float {
-        val maxHeight = when (aspect) {
-            CardAspect.PORTRAIT -> 150f
-            CardAspect.SQUARE -> 0f
-            CardAspect.STORY -> 260f
-        }
-        if (maxHeight <= 0 || ratio == null || ratio <= 0) return 0f
-        return ((width - padding * 2) / ratio).coerceIn(100f, maxHeight)
-    }
-
-    fun postLines(withMedia: Boolean): Int = when (aspect) {
-        CardAspect.PORTRAIT -> if (withMedia) 3 else 8
-        CardAspect.SQUARE -> 5
-        CardAspect.STORY -> if (withMedia) 7 else 15
-    }
-
-    val minimalLines: Int
-        get() = when (aspect) {
-            CardAspect.PORTRAIT -> 6
-            CardAspect.SQUARE -> 3
-            CardAspect.STORY -> 10
-        }
-
-    val footerQrSize: Float
-        get() = when (aspect) {
-            CardAspect.PORTRAIT -> 80f
-            CardAspect.SQUARE -> 72f
-            CardAspect.STORY -> 112f
-        }
-
-    val bigQrSize: Float
-        get() = when (aspect) {
-            CardAspect.PORTRAIT -> 180f
-            CardAspect.SQUARE -> 130f
-            CardAspect.STORY -> 220f
-        }
 }

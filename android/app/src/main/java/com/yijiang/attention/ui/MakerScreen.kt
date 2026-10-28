@@ -21,14 +21,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -81,10 +86,23 @@ fun MakerScreen(vm: MakerViewModel) {
     var showStyle by rememberSaveable { mutableStateOf(false) }
 
     val linkCopied = stringResource(R.string.link_copied)
+    val copied = stringResource(R.string.copied)
     val saved = stringResource(R.string.saved_to_gallery)
     val saveFailed = stringResource(R.string.save_failed)
 
-    fun share() {
+    fun shareLink() {
+        val meta = vm.meta ?: return
+        Sharing.shareLink(context, meta.shareUrl.toString(), meta.listTitle)
+    }
+
+    fun copyLink() {
+        val meta = vm.meta ?: return
+        Sharing.copyLink(context, meta.shareUrl.toString())
+        scope.launch { snackbar.showSnackbar(copied) }
+    }
+
+    /** The card image to the share sheet, with the link on the clipboard to paste after it. */
+    fun shareImage() {
         val card = vm.card ?: return
         val meta = vm.meta ?: return
         Sharing.copyLink(context, meta.shareUrl.toString())
@@ -112,7 +130,7 @@ fun MakerScreen(vm: MakerViewModel) {
         if (vm.autoSharePending && vm.card != null) {
             vm.autoSharePending = false
             delay(300)
-            share()
+            shareImage()
         }
     }
 
@@ -158,7 +176,12 @@ fun MakerScreen(vm: MakerViewModel) {
                 if (isEmpty) {
                     EmptyState(entries = entries, onPaste = ::paste, onOpen = vm::show)
                 } else if (vm.meta != null) {
-                    CardPane(vm, onShare = ::share, onStyle = { showStyle = true }, onSave = ::save)
+                    CardPane(
+                        vm,
+                        onShareLink = ::shareLink,
+                        onCopyLink = ::copyLink,
+                        onShareImage = ::shareImage,
+                        onStyle = { showStyle = true }, onSave = ::save)
                 }
             }
         }
@@ -224,13 +247,20 @@ private fun InputRow(vm: MakerViewModel, showsPaste: Boolean, onPaste: () -> Uni
 }
 
 @Composable
-private fun CardPane(vm: MakerViewModel, onShare: () -> Unit, onStyle: () -> Unit, onSave: () -> Unit) {
+private fun CardPane(
+    vm: MakerViewModel,
+    onShareLink: () -> Unit,
+    onCopyLink: () -> Unit,
+    onShareImage: () -> Unit,
+    onStyle: () -> Unit,
+    onSave: () -> Unit,
+) {
     val card = vm.card
     val shape = RoundedCornerShape(16.dp)
-    val aspect = vm.style.aspect
+    // Cards are as tall as their content; 4:5 holds the place while one renders.
     val imageModifier = Modifier
         .fillMaxWidth()
-        .aspectRatio(aspect.width.toFloat() / aspect.height)
+        .aspectRatio(card?.let { it.width.toFloat() / it.height } ?: 0.8f)
         .shadow(4.dp, shape)
         .clip(shape)
     if (card != null) {
@@ -245,11 +275,7 @@ private fun CardPane(vm: MakerViewModel, onShare: () -> Unit, onStyle: () -> Uni
         Surface(modifier = imageModifier, color = MaterialTheme.colorScheme.surfaceContainer) {}
     }
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Button(onClick = onShare, enabled = card != null, contentPadding = ButtonDefaults.ButtonWithIconContentPadding) {
-            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-            Text(stringResource(R.string.share))
-        }
+        ShareMenu(imageReady = card != null, onShareLink = onShareLink, onCopyLink = onCopyLink, onShareImage = onShareImage)
         FilledTonalButton(onClick = onSave, enabled = card != null, contentPadding = ButtonDefaults.ButtonWithIconContentPadding) {
             Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
             Spacer(Modifier.width(ButtonDefaults.IconSpacing))
@@ -257,6 +283,46 @@ private fun CardPane(vm: MakerViewModel, onShare: () -> Unit, onStyle: () -> Uni
         }
         FilledTonalIconButton(onClick = onStyle) {
             Icon(Icons.Default.Tune, contentDescription = stringResource(R.string.style))
+        }
+    }
+}
+
+/** Share Link, Copy Link and Share as Image, like the iOS Share menu. */
+@Composable
+private fun ShareMenu(imageReady: Boolean, onShareLink: () -> Unit, onCopyLink: () -> Unit, onShareImage: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        Button(onClick = { expanded = true }, contentPadding = ButtonDefaults.ButtonWithIconContentPadding) {
+            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.share))
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_link)) },
+                leadingIcon = { Icon(Icons.Default.Link, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onShareLink()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.copy_link)) },
+                leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onCopyLink()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_as_image)) },
+                leadingIcon = { Icon(Icons.Default.Image, contentDescription = null) },
+                enabled = imageReady,
+                onClick = {
+                    expanded = false
+                    onShareImage()
+                },
+            )
         }
     }
 }

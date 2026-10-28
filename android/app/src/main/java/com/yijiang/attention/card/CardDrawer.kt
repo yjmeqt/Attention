@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
@@ -16,7 +15,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.scale
+import androidx.core.graphics.PathParser
 import androidx.core.graphics.withTranslation
 import com.yijiang.attention.model.BRAND_NAME
 import com.yijiang.attention.model.LinkKind
@@ -34,8 +33,9 @@ class CardDrawer(
     val meta: LinkMeta,
     val images: CardImages,
     val palette: CardPalette,
-    val metrics: CardMetrics,
 ) {
+    val width = CardMetrics.WIDTH
+
     // region Text
 
     fun paint(size: Float, weight: Weight, color: Int) =
@@ -74,6 +74,24 @@ class CardDrawer(
         if (layout.height <= maxHeight) return layout
         val fitting = (0 until layout.lineCount).count { layout.getLineBottom(it) - lineSpacing <= maxHeight }
         return build(max(fitting, 1))
+    }
+
+    /** Like SwiftUI's `minimumScaleFactor`: shrinks the text, down to [minScale], before it's cut off at [maxLines]. */
+    fun shrinkingLayout(
+        text: CharSequence,
+        paint: TextPaint,
+        width: Float,
+        maxLines: Int,
+        minScale: Float,
+        lineSpacing: Float = 0f,
+    ): StaticLayout {
+        val size = paint.textSize
+        while (true) {
+            val layout = layout(text, paint, width, maxLines, lineSpacing)
+            val truncated = layout.getEllipsisCount(layout.lineCount - 1) > 0
+            if (!truncated || paint.textSize - 0.5f < size * minScale) return layout
+            paint.textSize -= 0.5f
+        }
     }
 
     fun draw(layout: StaticLayout, x: Float, y: Float) = canvas.withTranslation(x, y) { layout.draw(this) }
@@ -124,10 +142,6 @@ class CardDrawer(
         canvas.drawBitmap(bitmap, null, target, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
     }
 
-    private fun blurred(bitmap: Bitmap): Bitmap {
-        val tiny = bitmap.scale(12, max(1, 12 * bitmap.height / bitmap.width))
-        return tiny.scale(120, max(1, 120 * bitmap.height / bitmap.width))
-    }
 
     fun withAlpha(color: Int, alpha: Float) = ColorUtils.setAlphaComponent(color, (alpha * Color.alpha(color)).roundToInt())
 
@@ -202,41 +216,30 @@ class CardDrawer(
         drawLine(meta.displayUrl, urlPaint, left, urlTop, textWidth, TextUtils.TruncateAt.MIDDLE)
     }
 
-    /** Images much narrower than the banner are shown whole over a blurred fill instead of being cropped. */
-    fun drawHeroImage(rect: RectF) {
-        val image = images.image
-        if (image != null) {
-            val ratio = image.width.toFloat() / image.height
-            if (ratio < rect.width() / rect.height() * 0.75f) {
-                drawFill(blurred(image), rect)
-                canvas.drawRect(rect, fill(withAlpha(Color.BLACK, 0.15f)))
-                drawFit(image, rect)
-            } else {
-                drawFill(image, rect)
+
+    /** The app icon at [size]: the launcher foreground's paths on its cream background. */
+    fun drawAppGlyph(x: Float, y: Float, size: Float) {
+        val rect = RectF(x, y, x + size, y + size)
+        roundRect(rect, size * 0.225f, Color.rgb(242, 237, 228))
+        canvas.drawRoundRect(RectF(x + 0.25f, y + 0.25f, x + size - 0.25f, y + size - 0.25f), size * 0.225f, size * 0.225f,
+            fill(withAlpha(Color.BLACK, 0.08f)).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 0.5f
+            })
+        // The foreground's ticket is 30 of its 108 viewport units wide; on iOS the glyph's is half the icon.
+        val viewport = size * 108 / 60
+        canvas.withTranslation(x + size / 2, y + size / 2) {
+            scale(viewport / 108, viewport / 108)
+            translate(-54f, -54f)
+            rotate(-8f, 54f, 54f)
+            for ((data, color) in GLYPH_FILLS) drawPath(PathParser.createPathFromPathData(data), fill(color))
+            rotate(-45f, 54f, 46f)
+            val stroke = fill(GLYPH_INK).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 1.6f
             }
-            return
+            for (data in GLYPH_LINK) drawPath(PathParser.createPathFromPathData(data), stroke)
         }
-        canvas.drawRect(rect, fill(palette.accent).apply {
-            shader = LinearGradient(
-                rect.left, rect.top, rect.right, rect.bottom,
-                palette.accent, withAlpha(palette.accent, 0.55f), Shader.TileMode.CLAMP,
-            )
-        })
-        val icon = images.icon?.takeIf { meta.hasLargeIcon }
-        val sitePaint = paint(if (icon == null) 40f else 24f, Weight.BOLD, palette.onAccent)
-        val maxWidth = rect.width() - 32
-        val minSize = sitePaint.textSize * 0.4f
-        while (sitePaint.measureText(meta.site) > maxWidth && sitePaint.textSize > minSize) sitePaint.textSize -= 1f
-        val textHeight = lineHeight(sitePaint)
-        val total = textHeight + if (icon != null) 80f + 10 else 0f
-        var y = rect.centerY() - total / 2
-        if (icon != null) {
-            val box = RectF(rect.centerX() - 40, y, rect.centerX() + 40, y + 80)
-            roundRect(box, 18f, Color.WHITE)
-            drawFit(icon, RectF(box.left + 8, box.top + 8, box.right - 8, box.bottom - 8))
-            y += 90
-        }
-        drawLine(meta.site, sitePaint, rect.left + 16, y, maxWidth, centered = true)
     }
 
     fun drawPlayGlyph(cx: Float, cy: Float) {
@@ -254,18 +257,19 @@ class CardDrawer(
         })
     }
 
-    fun drawAvatar(rect: RectF) {
-        val avatar = images.avatar
-        if (avatar != null) {
-            drawFill(avatar, rect, oval = true)
-            return
-        }
-        canvas.drawOval(rect, fill(palette.accent))
-        val initial = (meta.authorName ?: meta.site).take(1).uppercase()
-        val initialPaint = paint(20f, Weight.BOLD, palette.onAccent)
-        val baseline = rect.centerY() - (initialPaint.fontMetrics.ascent + initialPaint.fontMetrics.descent) / 2
-        canvas.drawText(initial, rect.centerX() - initialPaint.measureText(initial) / 2, baseline, initialPaint)
-    }
 
     // endregion
 }
+
+// Paths from res/drawable/ic_launcher_foreground.xml, in its 108-unit viewport.
+private val GLYPH_INK = Color.rgb(29, 29, 31)
+private val GLYPH_FILLS = listOf(
+    "M42.5,35.5h23a3.5,3.5 0 0 1 3.5,3.5v30a3.5,3.5 0 0 1 -3.5,3.5h-23a3.5,3.5 0 0 1 -3.5,-3.5v-30a3.5,3.5 0 0 1 3.5,-3.5z" to Color.rgb(168, 191, 166),
+    "M43.5,38h21a2,2 0 0 1 2,2v12a2,2 0 0 1 -2,2h-21a2,2 0 0 1 -2,-2v-12a2,2 0 0 1 2,-2z" to Color.rgb(232, 85, 61),
+    "M43,57.5h14a1,1 0 0 1 0,2h-14a1,1 0 0 1 0,-2zM43,61.5h9a1,1 0 0 1 0,2h-9a1,1 0 0 1 0,-2z" to Color.rgb(228, 234, 226),
+    "M59.5,58h3v3h-3zM63.5,58h3v3h-3zM59.5,62h3v3h-3zM63.5,63.5h1.5v1.5h-1.5zM61.5,66h5v1.5h-5z" to GLYPH_INK,
+)
+private val GLYPH_LINK = listOf(
+    "M48.3,43.2h4.4a2.8,2.8 0 0 1 0,5.6h-4.4a2.8,2.8 0 0 1 0,-5.6z",
+    "M55.3,43.2h4.4a2.8,2.8 0 0 1 0,5.6h-4.4a2.8,2.8 0 0 1 0,-5.6z",
+)

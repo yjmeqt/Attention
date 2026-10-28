@@ -26,9 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -45,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.yijiang.attention.R
 import com.yijiang.attention.card.CardImages
 import com.yijiang.attention.card.CardRenderer
-import com.yijiang.attention.model.CardAspect
+import com.yijiang.attention.card.CardMetrics
 import com.yijiang.attention.model.CardStyle
 import com.yijiang.attention.model.CardTemplate
 import com.yijiang.attention.model.LinkMeta
@@ -69,16 +66,6 @@ fun StyleSheet(vm: MakerViewModel, onDismiss: () -> Unit) {
                 Text(stringResource(R.string.template), style = MaterialTheme.typography.titleSmall)
                 TemplatePicker(meta, images, vm.style, onSelect = { vm.updateStyle(vm.style.copy(template = it)) })
             }
-            Text(stringResource(R.string.aspect_ratio), style = MaterialTheme.typography.titleSmall)
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                CardAspect.entries.forEachIndexed { index, aspect ->
-                    SegmentedButton(
-                        selected = vm.style.aspect == aspect,
-                        onClick = { vm.updateStyle(vm.style.copy(aspect = aspect)) },
-                        shape = SegmentedButtonDefaults.itemShape(index, CardAspect.entries.size),
-                    ) { Text(aspect.label) }
-                }
-            }
             meta?.let { SourceImageInfo(it) }
             if (vm.style != CardStyle()) {
                 TextButton(onClick = { vm.updateStyle(CardStyle()) }, contentPadding = ButtonDefaults.TextButtonWithIconContentPadding) {
@@ -93,15 +80,15 @@ fun StyleSheet(vm: MakerViewModel, onDismiss: () -> Unit) {
 
 @Composable
 private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle, onSelect: (CardTemplate) -> Unit) {
-    val thumbnails by produceState<Map<CardTemplate, Bitmap>>(emptyMap(), meta, images, style.aspect) {
+    val thumbnails by produceState<Map<CardTemplate, Bitmap>>(emptyMap(), meta, images) {
         value = withContext(Dispatchers.Default) {
             CardTemplate.entries.associateWith { template ->
                 CardRenderer.render(meta, style.copy(template = template), images, scale = 0.6f)
             }
         }
     }
-    val width = (style.aspect.width * THUMBNAIL_SCALE).dp
-    val height = (style.aspect.height * THUMBNAIL_SCALE).dp
+    // Cards are as tall as their content, so each thumbnail takes its card's shape.
+    val width = (CardMetrics.WIDTH * THUMBNAIL_SCALE).dp
     Row(
         modifier = Modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -114,6 +101,8 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable { onSelect(template) }.padding(2.dp),
             ) {
+                val thumbnail = thumbnails[template]
+                val height = thumbnail?.let { width * (it.height.toFloat() / it.width) } ?: width
                 Box(
                     modifier = Modifier
                         .size(width, height)
@@ -124,7 +113,7 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
                             shape,
                         ),
                 ) {
-                    thumbnails[template]?.let {
+                    thumbnail?.let {
                         Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(width, height))
                     }
                 }

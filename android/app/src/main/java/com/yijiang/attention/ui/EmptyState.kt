@@ -44,10 +44,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yijiang.attention.R
+import com.yijiang.attention.card.CardMetrics
 import com.yijiang.attention.card.CardRenderer
 import com.yijiang.attention.data.HistoryEntry
 import com.yijiang.attention.model.BRAND_NAME
-import com.yijiang.attention.model.CardAspect
 import com.yijiang.attention.model.CardStyle
 import com.yijiang.attention.model.LinkMeta
 import kotlinx.coroutines.Dispatchers
@@ -103,9 +103,9 @@ private fun SampleCard() {
     val sample by produceState<Bitmap?>(null) {
         value = withContext(Dispatchers.Default) { CardRenderer.render(sampleMeta, CardStyle(), scale = 1.5f) }
     }
-    val aspect = CardAspect.PORTRAIT
-    val width = (aspect.width * 0.42f).dp
-    val height = (aspect.height * 0.42f).dp
+    val width = (CardMetrics.WIDTH * 0.42f).dp
+    // A 4:5 placeholder until the sample has rendered and its height is known.
+    val height = sample?.let { width * (it.height.toFloat() / it.width) } ?: (width * 1.25f)
     val shape = RoundedCornerShape(10.dp)
     Box(
         modifier = Modifier

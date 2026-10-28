@@ -26,6 +26,15 @@ object Sharing {
             ?.takeIf { it.itemCount > 0 }
             ?.getItemAt(0)?.coerceToText(context)?.toString()
 
+    fun shareLink(context: Context, url: String, title: String?) {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, url)
+            title?.let { putExtra(Intent.EXTRA_TITLE, it) }
+        }
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.share_link)))
+    }
+
     suspend fun shareCard(context: Context, card: Bitmap, title: String?) {
         val file = withContext(Dispatchers.IO) {
             val directory = File(context.cacheDir, "cards").apply { mkdirs() }

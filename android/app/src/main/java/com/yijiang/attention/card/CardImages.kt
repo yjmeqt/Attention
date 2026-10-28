@@ -5,13 +5,12 @@ import android.graphics.BitmapFactory
 import com.yijiang.attention.model.LinkMeta
 
 /** Decoded once per link so restyling doesn't decode the cover again. */
-class CardImages(val image: Bitmap?, val avatar: Bitmap?, val icon: Bitmap?) {
+class CardImages(val image: Bitmap?, val icon: Bitmap?) {
     companion object {
         private const val MAX_IMAGE_WIDTH = 1600
 
         fun decode(meta: LinkMeta): CardImages = CardImages(
             image = meta.image?.let { decode(it, MAX_IMAGE_WIDTH) },
-            avatar = meta.avatar?.let { decode(it, 400) },
             icon = meta.icon?.let { decode(it, 400) },
         )
 
