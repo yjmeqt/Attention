@@ -3,9 +3,9 @@ No account or login is required.
 Attention is a library for links. Everything you share into it or paste is saved on the device, and any saved link can be shared as an image card with its title, cover and a QR code.
 
 To test:
-1. Copy a link (for example https://www.youtube.com/watch?v=0_DjDdfqtUE), open Attention and tap Paste in the toolbar. The link is saved and its preview appears in the feed.
+1. Copy a link (for example https://www.youtube.com/watch?v=0_DjDdfqtUE), open Attention and tap Paste in the toolbar. The link is saved and its preview appears in the library.
 2. Tap the item to open it, tap Share and choose Share as Image, then pick the Card, Text or QR template. The card image goes to the system share sheet and the cleaned link is copied to the clipboard.
 3. The share extension: in Safari, open any page, tap Share and choose Attention. The page is saved to the library.
 4. Long-press an item for Open, Share, tags, Private and Delete.
 
-The app reads public page metadata (title, preview image, icon) for the links the user saves. It uses public endpoints from YouTube (oEmbed), Bilibili and FxTwitter for richer previews of those sites. Text in shared images is recognized on the device. No user data is sent to the developer.
+The app reads public page metadata (title, preview image, icon) for the links the user saves. It uses public endpoints from YouTube (oEmbed), Bilibili and FxTwitter for richer previews of those sites, and Google's favicon service for site icons. Text in shared images is recognized on the device. No user data is sent to the developer.

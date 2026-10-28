@@ -1,1 +1,1 @@
-First release: save links and images, organize with tags and search, and share QR cards.
+A clearer welcome screen, and small fixes.

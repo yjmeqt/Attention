@@ -1,1 +1,1 @@
-Première version d’Attention.
+Un écran d’accueil plus clair et quelques corrections.

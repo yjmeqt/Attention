@@ -1,1 +1,1 @@
-marcadores,leer después,imágenes,etiquetas,búsqueda,lector QR,colección,organizar,favoritos,tarjeta
+guardar para después,lista de lectura,biblioteca,marcadores,favoritos,organizador,web,url,colección

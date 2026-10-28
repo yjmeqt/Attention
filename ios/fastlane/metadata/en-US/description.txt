@@ -1,4 +1,4 @@
-Attention keeps the links and images you want to come back to.
+Attention keeps all your links from every app and site in one place. No feed, no recommendations, no algorithm, just what you saved.
 
 SAVE AS YOU GO
 Save links and images from the share sheet in Safari or other apps, or paste a link. Previews bring together page titles, covers and site details when available. Sites that require a login or restrict access may have limited previews.

@@ -1,1 +1,1 @@
-Phiên bản đầu tiên của Attention.
+Màn hình chào mừng rõ ràng hơn và một số bản sửa lỗi.

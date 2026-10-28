@@ -28,7 +28,7 @@ Bundle IDs are permanent once the app is created in App Store Connect.
 | `release_notes.txt` | What's New |
 | `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
 
-The Simplified Chinese listing (text and screenshot captions) also pitches sharing X, YouTube and Instagram links to WeChat as image cards; the other locales don't mention it. Every locale uses the registered name, "Attention – Save & Share Links", since plain "Attention" belongs to another developer.
+The listing pitches one library per market. Every locale but Simplified Chinese leads with all your links from every app and site in one place, with no feed, no algorithm and no tracking; cards and QR codes come last. Simplified Chinese leads with sending YouTube and X links to WeChat, which shows them as a bare URL, as image cards with title, cover and QR code. The app's empty screen follows the same split. Keywords leave out third-party names (YouTube, X, WeChat), per guideline 2.3.7. Plain "Attention" belongs to another developer, so every name adds a localized tail: "Attention – All Your Links" in English and its equivalents, "Attention – 链接转图片卡片" in Simplified Chinese (1.0 shipped as "Attention – Save & Share Links" everywhere). Subtitles avoid repeating the name's words, since both are indexed.
 
 Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_category.txt` (Productivity), and `review_information/notes.txt` (instructions for App Review).
 
@@ -76,7 +76,7 @@ Internal testing needs nothing beyond an uploaded build. External testing needs 
 
 Beta App Description (English is the primary language; add Simplified Chinese as a second localization):
 
-> Attention keeps the links you care about. Share a page from Safari, YouTube, X or any app, or paste a link, and it's saved with its title and cover. Any saved link can be sent as an image card with a QR code, so it previews properly in WeChat.
+> Attention keeps all your links from every app and site in one place, with no feed, no algorithm and no tracking. Share a page from Safari, YouTube, X or any app, or paste a link, and it's saved with its title and cover. Any saved link can also be sent as an image card with a QR code.
 
 > Attention 帮你收藏想留下的链接。在 Safari、YouTube、X 等 App 里点分享，或直接粘贴链接，就会连同标题和封面一起保存下来。任何一条链接都能生成带二维码的图片卡片，发到微信里也能看到预览。
 
