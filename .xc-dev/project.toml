@@ -1,0 +1,23 @@
+# .xc-dev/project.toml — Attention's xc-dev project config.
+#
+# Committed, so every worktree (including the ones Claude creates under .claude/worktrees/)
+# gets the same tasks. Per-worktree state (DerivedData/, simulator.local.toml) is ignored by
+# .xc-dev/.gitignore.
+schema_version = 1
+
+[project]
+path          = "ios/Attention.xcodeproj"
+scheme        = "Attention"
+configuration = "Debug"
+
+[project.configurations.Debug]
+bundle_id    = "com.yjmeqt.attn.dev"
+product_name = "Attention"
+
+[project.configurations.Release]
+bundle_id    = "com.yjmeqt.attn"
+product_name = "Attention"
+
+[vars]
+# Pretty xcodebuild output when xcbeautify is installed (brew install xcbeautify), raw otherwise.
+xcb = "sh -c 'command -v xcbeautify >/dev/null && exec xcbeautify || exec cat'"
