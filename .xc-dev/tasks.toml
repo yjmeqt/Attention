@@ -1,0 +1,248 @@
+# .xc-dev/tasks.toml — Attention's xc-dev tasks. Run `xc-dev` to list them.
+#
+# `cmd` runs via `sh <tmpfile>`; `set -e` is NOT auto-injected. Add `set -o pipefail` where a
+# pipe's exit code matters, and avoid `set -e` in tasks that rely on a non-zero check (e.g. stop).
+
+# ── Generate (XcodeGen) ───────────────────────────────────────────────────────
+# ios/project.yml is the source of truth; Attention.xcodeproj is committed and regenerates
+# byte-for-byte, so regenerating when it's already current is harmless.
+[tasks.generate]
+args = ["mode=auto"]
+desc = "XcodeGen the project. mode=auto (default) only when project.yml is newer; mode=force always."
+cmd  = """
+cd {{project_root}}/ios
+STAMP=Attention.xcodeproj/project.pbxproj
+if [ "{{mode}}" != "force" ] && [ -f "$STAMP" ] && [ ! project.yml -nt "$STAMP" ]; then
+    echo "Project up to date — skipping generate"
+    exit 0
+fi
+command -v xcodegen >/dev/null || { echo "xcodegen not found — brew install xcodegen" >&2; exit 1; }
+xcodegen generate --quiet && echo "Generated Attention.xcodeproj"
+"""
+
+# ── Build ─────────────────────────────────────────────────────────────────────
+# Builds for the generic simulator so one build installs on any of this worktree's sims.
+# No -derivedDataPath: builds land in Xcode's own DerivedData folder for this worktree's project
+# path, which Xcode shares when it opens the same project. `xc-dev clean` deletes it, and
+# `prune` deletes the ones left by removed worktrees. The built app's path is written to
+# .xc-dev/app-path for the run tasks.
+[tasks.build]
+args    = ["config=Debug"]
+depends = ["generate"]
+desc    = "Build Attention for the simulator into Xcode's DerivedData for this worktree."
+cmd     = """
+set -o pipefail
+xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} \
+  -configuration {{config}} \
+  -destination 'generic/platform=iOS Simulator' \
+  build | {{xcb}} || exit 1
+PRODUCTS=$(xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} -configuration {{config}} \
+  -sdk iphonesimulator -showBuildSettings 2>/dev/null | awk -F' = ' '/^ *BUILT_PRODUCTS_DIR = /{print $2; exit}')
+echo "$PRODUCTS/{{product_name}}.app" > {{xc_dev_dir}}/app-path
+"""
+
+# ── Run ───────────────────────────────────────────────────────────────────────
+[tasks.run]
+depends = ["build", "sim-open", "sim-register"]
+desc    = "Build, boot this worktree's iPhone sim, install and launch."
+cmd     = """
+xcrun simctl boot {{sim_id}} 2>/dev/null || true
+# `boot` returns before the device is usable; launching into a half-booted device fails.
+xcrun simctl bootstatus {{sim_id}} -b >/dev/null 2>&1 || true
+xcrun simctl install {{sim_id}} "$(cat {{xc_dev_dir}}/app-path)" && xcrun simctl launch {{sim_id}} {{bundle_id}}
+"""
+
+[tasks.run-ipad]
+depends = ["build", "sim-open", "sim-register"]
+desc    = "Build, boot this worktree's iPad sim, install and launch."
+cmd     = """
+xcrun simctl boot {{sim.ipad.id}} 2>/dev/null || true
+xcrun simctl bootstatus {{sim.ipad.id}} -b >/dev/null 2>&1 || true
+xcrun simctl install {{sim.ipad.id}} "$(cat {{xc_dev_dir}}/app-path)" && xcrun simctl launch {{sim.ipad.id}} {{bundle_id}}
+"""
+
+[tasks.run-duo]
+depends = ["build", "sim-open", "sim-register"]
+desc    = "Build, boot this worktree's iPhone Duo sim, install and launch."
+cmd     = """
+xcrun simctl boot {{sim.duo.id}} 2>/dev/null || true
+xcrun simctl bootstatus {{sim.duo.id}} -b >/dev/null 2>&1 || true
+xcrun simctl install {{sim.duo.id}} "$(cat {{xc_dev_dir}}/app-path)" && xcrun simctl launch {{sim.duo.id}} {{bundle_id}}
+"""
+
+[tasks.sim-open]
+desc = "Open the simulator UI of the selected Xcode."
+cmd  = """
+# Xcode 27 replaced Contents/Developer/Applications/Simulator.app with
+# Contents/Applications/DeviceHub.app, and `open -a Simulator` can resolve to a stale Xcode.
+DEVELOPER_DIR=$(xcode-select -p)
+XCODE_APP=${DEVELOPER_DIR%/Contents/Developer}
+for UI in "$XCODE_APP/Contents/Applications/DeviceHub.app" "$DEVELOPER_DIR/Applications/Simulator.app"; do
+    if [ -d "$UI" ]; then
+        open -g "$UI"
+        exit 0
+    fi
+done
+echo "No simulator UI found under $XCODE_APP" >&2
+"""
+
+# ── Stop ──────────────────────────────────────────────────────────────────────
+# Matches this worktree's project path, so other worktrees' builds are left alone.
+# Reads the cached UDIDs rather than {{sim_id}} so it never creates a sim just to stop one.
+[tasks.stop]
+desc = "Kill this worktree's xcodebuild and terminate the app on its sims."
+cmd  = """
+if pkill -f "xcodebuild -project {{project_root}}/{{path}}"; then
+    echo "Killed xcodebuild for {{git_worktree_slug}}"
+else
+    echo "No xcodebuild running for {{git_worktree_slug}}"
+fi
+grep -oiE '[0-9a-f]{8}-[0-9a-f-]{27}' {{xc_dev_dir}}/simulator.local.toml 2>/dev/null | while read -r udid; do
+    xcrun simctl terminate "$udid" {{bundle_id}} 2>/dev/null && echo "Terminated {{bundle_id}} on $udid"
+done
+true
+"""
+
+# ── Device ────────────────────────────────────────────────────────────────────
+[tasks.devices-iphone]
+desc = "List connected iPhones (id, name, OS)."
+cmd  = """
+TMP=$(mktemp -t xc-dev-devices.XXXXXX)
+trap 'rm -f "$TMP"' EXIT
+xcrun devicectl list devices --json-output "$TMP" >/dev/null
+python3 - "$TMP" <<'PY'
+import json, sys
+rows = []
+for d in json.load(open(sys.argv[1])).get('result', {}).get('devices', []):
+    if d.get('hardwareProperties', {}).get('deviceType') != 'iPhone':
+        continue
+    if d.get('connectionProperties', {}).get('tunnelState') != 'connected':
+        continue
+    props = d.get('deviceProperties', {})
+    rows.append((d.get('identifier', '?'), props.get('name', '?'), props.get('osVersionNumber', '?')))
+if not rows:
+    print('No connected iPhones.')
+for udid, name, os_ in rows:
+    print(f'{udid}  {name}  (iOS {os_})')
+PY
+"""
+
+[tasks.run-device]
+args    = ["deviceId", "config=Debug"]
+depends = ["generate"]
+desc    = "Build, install and launch on a physical iPhone. Pass deviceId (see `xc-dev devices-iphone`)."
+cmd     = """
+set -o pipefail
+xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} \
+  -configuration {{config}} \
+  -destination 'generic/platform=iOS' \
+  -allowProvisioningUpdates \
+  build | {{xcb}} || exit 1
+PRODUCTS=$(xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} -configuration {{config}} \
+  -sdk iphoneos -showBuildSettings 2>/dev/null | awk -F' = ' '/^ *BUILT_PRODUCTS_DIR = /{print $2; exit}')
+APP="$PRODUCTS/{{product_name}}.app"
+xcrun devicectl device install app --device {{deviceId}} "$APP" \
+  && xcrun devicectl device process launch --device {{deviceId}} {{bundle_id}}
+"""
+
+# ── Clean / simulators ────────────────────────────────────────────────────────
+[tasks.clean]
+depends = ["sim-delete"]
+desc    = "Delete this worktree's sims, then the system DerivedData for its project path."
+cmd     = "xc-dev :clean --yes"
+
+[tasks.sim-bootstrap]
+depends = ["sim-register"]
+desc = "Show this worktree's iPhone sim (creates it on first reference)."
+cmd  = """
+echo "name:    {{sim_name}}"
+echo "udid:    {{sim_id}}"
+echo "runtime: {{sim_runtime}}"
+"""
+
+[tasks.sim-delete]
+desc = "Delete this worktree's sims and their XCTest clones, and clear the UDID cache."
+cmd  = """
+# Keep the suffixes in sync with simulator.toml.
+BASE="{{sim_name}}"
+for NAME in "$BASE" "$BASE-ipad" "$BASE-duo"; do
+    xcrun simctl shutdown "$NAME" 2>/dev/null || true
+    xcrun simctl delete "$NAME" 2>/dev/null && echo "Deleted $NAME" || echo "Not present: $NAME"
+done
+# Parallel-test clones live under XCTestDevices, often invisible to simctl.
+XCT="$HOME/Library/Developer/XCTestDevices"
+for pl in "$XCT"/*/device.plist; do
+    [ -f "$pl" ] || continue
+    dname=$(plutil -extract name raw "$pl" 2>/dev/null) || continue
+    for NAME in "$BASE" "$BASE-ipad" "$BASE-duo"; do
+        case "$dname" in
+            "Clone "*" of $NAME") rm -rf "$(dirname "$pl")" && echo "Deleted XCTestDevice: $dname" ;;
+        esac
+    done
+done
+rm -f {{xc_dev_dir}}/simulator.local.toml
+REG="$(cd {{project_root}} && cd "$(git rev-parse --git-common-dir)" && pwd)/xc-dev-sims"
+if [ -f "$REG" ]; then
+    grep -vxF "$BASE" "$REG" > "$REG.tmp" || true
+    mv "$REG.tmp" "$REG"
+fi
+"""
+
+# Worktrees Claude creates under .claude/worktrees/ are archived without `xc-dev clean`, which
+# leaves their sims and DerivedData behind; `prune` cleans those up. Every sim a task boots is
+# recorded in xc-dev-sims in the shared git dir (sim-register), and prune deletes only recorded
+# sims whose worktree is gone, so sims made any other way (the Attention-Shots-* ones
+# capture-screenshots.sh drives, say) are never touched. DerivedData is pruned when its project
+# path is inside this repo and no longer exists.
+[tasks.sim-register]
+desc = "Record this worktree's sim name for prune (run by the tasks that boot a sim)."
+cmd  = """
+REG="$(cd {{project_root}} && cd "$(git rev-parse --git-common-dir)" && pwd)/xc-dev-sims"
+grep -qxF "{{sim_name}}" "$REG" 2>/dev/null || echo "{{sim_name}}" >> "$REG"
+"""
+
+[tasks.prune]
+args = ["mode=dry-run"]
+desc = "List (mode=dry-run, default) or delete (mode=delete) sims and DerivedData left by removed worktrees."
+cmd  = """
+MAIN="{{git_main_root}}"
+REG="$(cd {{project_root}} && cd "$(git rev-parse --git-common-dir)" && pwd)/xc-dev-sims"
+LIVE=$(git -C {{project_root}} worktree list --porcelain | sed -n 's/^worktree //p' | while read -r wt; do
+    [ -f "$wt/.xc-dev/simulator.toml" ] && (cd "$wt" && xc-dev :get sim_name 2>/dev/null)
+done)
+STALE=$(grep -vxF "$LIVE" "$REG" 2>/dev/null || true)
+if [ -n "$STALE" ]; then
+    xcrun simctl list devices -j | python3 -c '
+import json, sys
+stale = set(sys.argv[1].split())
+for devices in json.load(sys.stdin)["devices"].values():
+    for d in devices:
+        if d["name"].removesuffix("-ipad").removesuffix("-duo") in stale:
+            print(d["udid"], d["name"])
+' "$STALE" | while read -r udid name; do
+        if [ "{{mode}}" = "delete" ]; then
+            xcrun simctl shutdown "$udid" 2>/dev/null || true
+            xcrun simctl delete "$udid" && echo "Deleted sim $name"
+        else
+            echo "Would delete sim $name ($udid)"
+        fi
+    done
+    if [ "{{mode}}" = "delete" ]; then
+        grep -xF "$LIVE" "$REG" > "$REG.tmp" || true
+        mv "$REG.tmp" "$REG"
+    fi
+fi
+for pl in "$HOME"/Library/Developer/Xcode/DerivedData/*/info.plist; do
+    [ -f "$pl" ] || continue
+    ws=$(plutil -extract WorkspacePath raw "$pl" 2>/dev/null) || continue
+    case "$ws" in "$MAIN"/*) ;; *) continue ;; esac
+    [ -e "$ws" ] && continue
+    dir=$(dirname "$pl")
+    if [ "{{mode}}" = "delete" ]; then
+        rm -rf "$dir" && echo "Deleted DerivedData $(basename "$dir") ($ws)"
+    else
+        echo "Would delete DerivedData $(basename "$dir") ($ws)"
+    fi
+done
+[ "{{mode}}" = "delete" ] || echo "(dry run — pass mode=delete to delete)"
+"""

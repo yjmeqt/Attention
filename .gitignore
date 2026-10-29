@@ -1,6 +1,9 @@
 .DS_Store
 build/
 
+# Hand-made worktrees (see AGENTS.md)
+/.worktrees/
+
 # Local design notes
 docs/superpowers/
 
