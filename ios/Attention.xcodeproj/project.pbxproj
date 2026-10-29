@@ -44,6 +44,7 @@
 		54AF54C1ED74471A1245D6E3 /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257256ECFF03867390921EC /* LibraryTests.swift */; };
 		56A6BE57AF8E2BD8E7EB7F13 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A3FADEEC30FFD8606052 /* QRTemplate.swift */; };
 		58B672D90D47CC651C1F85A1 /* LongPressTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */; };
+		5B8B5568A1ED984DFB7B06DA /* GuideTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */; };
 		5BD688763B6A959DB738414A /* MinimalTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */; };
 		5BDFCF3774511AD8A54A2C8C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B2442464749711F36940212 /* InfoPlist.strings */; };
 		5C22298F2D05DAB9E1E44F2B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */; };
@@ -65,6 +66,7 @@
 		88C47DF88A43C2987672EA93 /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01DED85AF2295463CF54F28 /* DemoLibrary.swift */; };
 		90C0794F7F3D266EDF4FB3EB /* ItemProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46736B2D6210E236010432C4 /* ItemProviders.swift */; };
 		97B228E4A63F1D9809BB4DBE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61EABF9910C697C13BAF4A83 /* InfoPlist.strings */; };
+		97B96EC3145008C2E3184089 /* GuideTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */; };
 		9A22F77D2E35010E3C499BEB /* Opening.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4A0053B5A944F84E96744AC /* Opening.swift */; };
 		9E73CAEC81970B4F0B643024 /* TagEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71243223C1A41C8631BC1363 /* TagEditor.swift */; };
 		9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9792D39565DE3A1F9C1B3188 /* Sharing.swift */; };
@@ -193,6 +195,7 @@
 		F430B9788D92BAB15EA6BD2A /* CardControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardControls.swift; sourceTree = "<group>"; };
 		F5C219B7609CD5CA61BFFBDB /* Attention.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Attention.entitlements; sourceTree = "<group>"; };
 		F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideTip.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -252,6 +255,7 @@
 				F430B9788D92BAB15EA6BD2A /* CardControls.swift */,
 				CC8EF56438FBF82574D6E180 /* Feed.swift */,
 				370075CD22DCAED23F786BF1 /* FeedFilter.swift */,
+				FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */,
 				ACE3A99FD286CA9E07E0085B /* HomeView.swift */,
 				B5D373591C6BA544F936EDDC /* ItemActions.swift */,
 				D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */,
@@ -524,6 +528,7 @@
 				E1A7C12C637E8B4F8B69AF6C /* EmptyState.swift in Sources */,
 				782D9C1D58D0DEEFC73FF533 /* Feed.swift in Sources */,
 				2985DF963EBFE7DEEE439485 /* FeedFilter.swift in Sources */,
+				5B8B5568A1ED984DFB7B06DA /* GuideTip.swift in Sources */,
 				F5D4C661341667503905444D /* HistoryImport.swift in Sources */,
 				4A147951327CDDD66F9CB3D8 /* HomeView.swift in Sources */,
 				BBED5C940A08071869D8F70F /* ImageData.swift in Sources */,
@@ -560,6 +565,7 @@
 				D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */,
 				39EEFA7B42B6DD7B7E90676F /* Feed.swift in Sources */,
 				8729AF82AA28471921EA3CD1 /* FeedFilter.swift in Sources */,
+				97B96EC3145008C2E3184089 /* GuideTip.swift in Sources */,
 				1949F1BC4A05FF4D657E30D6 /* HistoryImport.swift in Sources */,
 				3014AF63ECA35121E78C993E /* HomeView.swift in Sources */,
 				70CCC1F0F58333DCE052E9CA /* ImageData.swift in Sources */,
