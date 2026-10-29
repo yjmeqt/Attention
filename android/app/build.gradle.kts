@@ -19,9 +19,24 @@ android {
         versionName = "1.0"
     }
 
+    // The release key and its passwords live outside the repo, in ~/.gradle/gradle.properties.
+    val releaseStoreFile = providers.gradleProperty("ATTENTION_RELEASE_STORE_FILE").orNull
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = file(releaseStoreFile)
+                storePassword = providers.gradleProperty("ATTENTION_RELEASE_STORE_PASSWORD").get()
+                keyAlias = providers.gradleProperty("ATTENTION_RELEASE_KEY_ALIAS").get()
+                keyPassword = providers.gradleProperty("ATTENTION_RELEASE_KEY_PASSWORD").get()
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
@@ -56,6 +71,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.zxing.core)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.text.chinese)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

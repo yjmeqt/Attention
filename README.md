@@ -25,7 +25,7 @@ HarmonyOS is planned as a sibling `harmony/` folder. Each platform is a self-con
 
 1. **Unfurl**: site-specific sources first (YouTube oEmbed, Bilibili's public API, FxTwitter for X), then the page's Open Graph and Twitter tags, then the system link-metadata provider as a fallback. Pages that answer with a captcha or login wall are detected and get a QR-only card instead of a broken preview.
 2. **Icon**: the page's `apple-touch-icon` or largest `rel=icon`, then `/apple-touch-icon.png` and `/favicon.ico`, upgraded from Google's favicon service when the result is tiny.
-3. **Render**: one of four templates (hero image, post, minimal text, QR) chosen from the link type and the cover image's shape, in 4:5, 1:1 or 9:16, rendered at 1080 px wide. The card text is always Simplified Chinese, because it's read in WeChat.
+3. **Render**: one of three templates: a card with the cover photo and its color (the default when there's a preview), text, or QR (the default when there isn't). Every card is 1080 px wide and as tall as its content. The card text is always Simplified Chinese, because it's read in WeChat.
 4. **Share**: tracking parameters are stripped (`youtu.be/ID` for YouTube, no query for X, no `utm_*` elsewhere), the link goes to the clipboard and the image to the share sheet.
 
 Everything runs on the device. There is no backend and no account.

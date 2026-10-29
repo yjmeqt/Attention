@@ -3,6 +3,7 @@ package com.yijiang.attention.ui
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,28 +11,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -40,12 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yijiang.attention.R
 import com.yijiang.attention.card.CardImages
 import com.yijiang.attention.card.CardRenderer
-import com.yijiang.attention.model.CardAspect
+import com.yijiang.attention.card.CardMetrics
 import com.yijiang.attention.model.CardStyle
 import com.yijiang.attention.model.CardTemplate
 import com.yijiang.attention.model.LinkMeta
@@ -54,54 +45,17 @@ import kotlinx.coroutines.withContext
 
 private const val THUMBNAIL_SCALE = 0.2f
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StyleSheet(vm: MakerViewModel, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(stringResource(R.string.style), style = MaterialTheme.typography.titleLarge)
-            val meta = vm.meta
-            val images = vm.images
-            if (meta != null && images != null) {
-                Text(stringResource(R.string.template), style = MaterialTheme.typography.titleSmall)
-                TemplatePicker(meta, images, vm.style, onSelect = { vm.updateStyle(vm.style.copy(template = it)) })
-            }
-            Text(stringResource(R.string.aspect_ratio), style = MaterialTheme.typography.titleSmall)
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                CardAspect.entries.forEachIndexed { index, aspect ->
-                    SegmentedButton(
-                        selected = vm.style.aspect == aspect,
-                        onClick = { vm.updateStyle(vm.style.copy(aspect = aspect)) },
-                        shape = SegmentedButtonDefaults.itemShape(index, CardAspect.entries.size),
-                    ) { Text(aspect.label) }
-                }
-            }
-            meta?.let { SourceImageInfo(it) }
-            if (vm.style != CardStyle()) {
-                TextButton(onClick = { vm.updateStyle(CardStyle()) }, contentPadding = ButtonDefaults.TextButtonWithIconContentPadding) {
-                    Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
-                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                    Text(stringResource(R.string.restore_default))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle, onSelect: (CardTemplate) -> Unit) {
-    val thumbnails by produceState<Map<CardTemplate, Bitmap>>(emptyMap(), meta, images, style.aspect) {
+fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle, onSelect: (CardTemplate) -> Unit) {
+    val thumbnails by produceState<Map<CardTemplate, Bitmap>>(emptyMap(), meta, images) {
         value = withContext(Dispatchers.Default) {
             CardTemplate.entries.associateWith { template ->
                 CardRenderer.render(meta, style.copy(template = template), images, scale = 0.6f)
             }
         }
     }
-    val width = (style.aspect.width * THUMBNAIL_SCALE).dp
-    val height = (style.aspect.height * THUMBNAIL_SCALE).dp
+    // Cards are as tall as their content, so each thumbnail takes its card's shape.
+    val width = (CardMetrics.WIDTH * THUMBNAIL_SCALE).dp
     Row(
         modifier = Modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -114,6 +68,8 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable { onSelect(template) }.padding(2.dp),
             ) {
+                val thumbnail = thumbnails[template]
+                val height = thumbnail?.let { width * (it.height.toFloat() / it.width) } ?: width
                 Box(
                     modifier = Modifier
                         .size(width, height)
@@ -124,7 +80,7 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
                             shape,
                         ),
                 ) {
-                    thumbnails[template]?.let {
+                    thumbnail?.let {
                         Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(width, height))
                     }
                 }
@@ -144,7 +100,7 @@ private fun TemplatePicker(meta: LinkMeta, images: CardImages, style: CardStyle,
 }
 
 @Composable
-private fun SourceImageInfo(meta: LinkMeta) {
+fun SourceImageInfo(meta: LinkMeta) {
     val size = meta.imageSize
     val (icon, text, color) = when {
         size != null && size.width < 800 -> Triple(
@@ -163,5 +119,45 @@ private fun SourceImageInfo(meta: LinkMeta) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
         Text(text, style = MaterialTheme.typography.bodySmall, color = color)
+    }
+}
+
+/** For links shared as an image: the link's preview image or the shared image. */
+@Composable
+fun CoverPicker(preview: Bitmap?, shared: Bitmap?, usesShared: Boolean, onSelect: (Boolean) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        CoverOption(stringResource(R.string.link_preview), preview, selected = !usesShared) { onSelect(false) }
+        CoverOption(stringResource(R.string.shared_image), shared, selected = usesShared) { onSelect(true) }
+    }
+}
+
+@Composable
+private fun CoverOption(title: String, image: Bitmap?, selected: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(6.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable(onClick = onClick).padding(2.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp, 72.dp)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                .border(
+                    if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                    else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    shape,
+                ),
+        ) {
+            image?.let {
+                Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(96.dp, 72.dp))
+            }
+        }
+        Text(
+            title,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

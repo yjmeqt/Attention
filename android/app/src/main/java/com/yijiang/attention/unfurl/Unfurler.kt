@@ -45,6 +45,9 @@ object Unfurler {
 
     private const val BROWSER_AGENT =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+    /** For pages that send the iPhone agent on to an app scheme, such as the App Store's itms-appss://. */
+    private const val DESKTOP_AGENT =
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
     private const val MAX_PAGE_BYTES = 512L * 1024
 
     private val blockedTitles = listOf(
@@ -248,13 +251,19 @@ object Unfurler {
     private val metaCharset = Regex("""charset\s*=\s*["']?([\w-]+)""", RegexOption.IGNORE_CASE)
 
     /** Reads og:/twitter: tags directly from the page. Only page fetches look like Safari; Bilibili's API rejects that UA. */
-    private suspend fun html(url: HttpUrl): LinkMeta? = coroutineScope {
+    private suspend fun html(url: HttpUrl, agent: String = BROWSER_AGENT): LinkMeta? = coroutineScope {
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", BROWSER_AGENT)
+            .header("User-Agent", agent)
             .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
             .build()
-        val (finalUrl, page) = client.newCall(request).await().use { response ->
+        val response = client.newCall(request).await()
+        // OkHttp follows http redirects itself, so one that comes back here points at an app scheme.
+        if (response.isRedirect && agent != DESKTOP_AGENT) {
+            response.close()
+            return@coroutineScope html(url, DESKTOP_AGENT)
+        }
+        val (finalUrl, page) = response.use { response ->
             val body = response.body
             if (response.code != 200 || body == null) throw IOException("HTTP ${response.code}")
             val type = body.contentType()
