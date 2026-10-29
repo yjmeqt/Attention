@@ -1,1 +1,1 @@
-bookmarks,read later,link organizer,image search,qr scanner,saved pages,collection,tags,clipboard
+bookmark,read later,reading list,organizer,library,stash,url,inbox,collect,web clip,collection

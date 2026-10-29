@@ -60,6 +60,12 @@
             "state" : "translated",
             "value" : "以后 %@ 会出现在分享面板最前面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "之後 %@ 會出現在分享表單最前面"
+          }
         }
       }
     },
@@ -117,6 +123,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入"
           }
         }
       }
@@ -176,6 +188,12 @@
             "state" : "translated",
             "value" : "添加标签"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入標籤"
+          }
         }
       }
     },
@@ -233,6 +251,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隔空投送"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AirDrop"
           }
         }
       }
@@ -292,6 +316,77 @@
             "state" : "translated",
             "value" : "全部"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部"
+          }
+        }
+      }
+    },
+    "All your links in one place" : {
+      "comment" : "Simplified Chinese keeps its own pitch, sending links to WeChat, which shows them bare; other languages, Traditional Chinese included, pitch one library.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كل روابطك في مكان واحد"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle deine Links an einem Ort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos tus enlaces en un solo lugar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous vos liens au même endroit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのリンクを一か所に"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 링크를 한곳에"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все ваши ссылки в одном месте"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mọi liên kết của bạn ở một nơi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让微信也能预览的链接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有連結，集中一處"
+          }
         }
       }
     },
@@ -349,6 +444,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已保存在私密中。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存在私密中。"
           }
         }
       }
@@ -412,6 +513,12 @@
             "state" : "translated",
             "value" : "归档"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "封存"
+          }
         }
       }
     },
@@ -470,6 +577,12 @@
             "state" : "translated",
             "value" : "归档"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已封存"
+          }
         }
       }
     },
@@ -524,6 +637,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比例"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "比例"
@@ -586,6 +705,12 @@
             "state" : "translated",
             "value" : "自动"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動"
+          }
         }
       }
     },
@@ -643,6 +768,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自动 · %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動 · %@"
           }
         }
       }
@@ -702,6 +833,12 @@
             "state" : "translated",
             "value" : "哔哩哔哩 · 视频"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嗶哩嗶哩 · 影片"
+          }
         }
       }
     },
@@ -760,6 +897,12 @@
             "state" : "translated",
             "value" : "无法使用相机"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法使用相機"
+          }
         }
       }
     },
@@ -814,6 +957,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "取消"
@@ -877,6 +1026,12 @@
             "state" : "translated",
             "value" : "卡片"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡片"
+          }
         }
       }
     },
@@ -934,6 +1089,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "可以改为选择一张带二维码的照片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可以改為選擇一張含 QR Code 的照片。"
           }
         }
       }
@@ -993,6 +1154,12 @@
             "state" : "translated",
             "value" : "从相册选择"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從照片選擇"
+          }
         }
       }
     },
@@ -1048,6 +1215,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除"
@@ -1110,6 +1283,12 @@
             "state" : "translated",
             "value" : "拷贝"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拷貝"
+          }
         }
       }
     },
@@ -1167,6 +1346,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "复制链接，或在任意 App 里分享给 %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拷貝連結，或在任何 App 中分享給 %@"
           }
         }
       }
@@ -1226,6 +1411,12 @@
             "state" : "translated",
             "value" : "复制链接"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拷貝連結"
+          }
         }
       }
     },
@@ -1284,6 +1475,12 @@
             "state" : "translated",
             "value" : "无法获取预览，已生成基础卡片。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法取得預覽，已產生基本卡片。"
+          }
         }
       }
     },
@@ -1338,6 +1535,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "封面"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "封面"
@@ -1400,6 +1603,12 @@
             "state" : "translated",
             "value" : "删除"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
         }
       }
     },
@@ -1457,6 +1666,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "删除 %lld 项？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要刪除 %lld 個項目嗎？"
           }
         }
       }
@@ -1516,6 +1731,12 @@
             "state" : "translated",
             "value" : "删除此项？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要刪除此項目嗎？"
+          }
         }
       }
     },
@@ -1570,6 +1791,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "忽略"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "忽略"
@@ -1632,6 +1859,12 @@
             "state" : "translated",
             "value" : "完成"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
         }
       }
     },
@@ -1689,6 +1922,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "编辑"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯"
           }
         }
       }
@@ -1748,6 +1987,12 @@
             "state" : "translated",
             "value" : "编辑标签…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯標籤⋯"
+          }
         }
       }
     },
@@ -1805,6 +2050,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "输入链接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入連結"
           }
         }
       }
@@ -1864,6 +2115,12 @@
             "state" : "translated",
             "value" : "输入链接…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入連結⋯"
+          }
         }
       }
     },
@@ -1921,6 +2178,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "个人收藏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個人收藏"
           }
         }
       }
@@ -1980,6 +2243,12 @@
             "state" : "translated",
             "value" : "筛选"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "篩選"
+          }
         }
       }
     },
@@ -2037,6 +2306,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "找到 %@，点击左边的 ⊕"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找到 %@，點一下左邊的 ⊕"
           }
         }
       }
@@ -2097,6 +2372,12 @@
             "state" : "translated",
             "value" : "生成"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "產生"
+          }
         }
       }
     },
@@ -2155,6 +2436,12 @@
             "state" : "translated",
             "value" : "生成带标题、封面和二维码的卡片"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "產生含標題、封面和 QR Code 的卡片"
+          }
         }
       }
     },
@@ -2209,6 +2496,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "前往"
@@ -2272,6 +2565,12 @@
             "state" : "translated",
             "value" : "历史记录"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄"
+          }
         }
       }
     },
@@ -2333,6 +2632,12 @@
             "state" : "translated",
             "value" : "大图"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大圖"
+          }
         }
       }
     },
@@ -2390,6 +2695,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "图片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片"
           }
         }
       }
@@ -2449,6 +2760,12 @@
             "state" : "translated",
             "value" : "链接已复制"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已拷貝連結"
+          }
         }
       }
     },
@@ -2506,6 +2823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "链接已复制，发完图片后粘贴即可。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已拷貝連結，傳送圖片後貼上即可。"
           }
         }
       }
@@ -2565,63 +2888,11 @@
             "state" : "translated",
             "value" : "链接预览图"
           }
-        }
-      }
-    },
-    "Links WeChat can preview" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "روابط يمكن معاينتها في WeChat"
-          }
         },
-        "de" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Links mit Vorschau in WeChat"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enlaces con vista previa en WeChat"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Des liens avec aperçu dans WeChat"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WeChat でもプレビューできるリンク"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WeChat에서도 미리 보이는 링크"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ссылки с превью в WeChat"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liên kết có bản xem trước trên WeChat"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "让微信也能预览的链接"
+            "value" : "連結預覽圖"
           }
         }
       }
@@ -2681,6 +2952,12 @@
             "state" : "translated",
             "value" : "由 %@ 生成"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由 %@ 製作"
+          }
         }
       }
     },
@@ -2738,6 +3015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "邮件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "郵件"
           }
         }
       }
@@ -2797,6 +3080,12 @@
             "state" : "translated",
             "value" : "信息"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訊息"
+          }
         }
       }
     },
@@ -2851,6 +3140,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更多"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "更多"
@@ -2913,6 +3208,12 @@
             "state" : "translated",
             "value" : "移到私密"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移到私密"
+          }
         }
       }
     },
@@ -2971,6 +3272,12 @@
             "state" : "translated",
             "value" : "新标签"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新標籤"
+          }
         }
       }
     },
@@ -3028,6 +3335,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有归档内容"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有封存的項目"
           }
         }
       }
@@ -3088,6 +3401,12 @@
             "state" : "translated",
             "value" : "还没有记录"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還沒有記錄"
+          }
         }
       }
     },
@@ -3145,6 +3464,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这段文字里没有找到链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這段文字中沒有找到連結。"
           }
         }
       }
@@ -3204,6 +3529,12 @@
             "state" : "translated",
             "value" : "剪贴板里没有链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剪貼板中沒有連結。"
+          }
         }
       }
     },
@@ -3261,6 +3592,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有分享链接或图片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有分享連結或圖片。"
           }
         }
       }
@@ -3320,6 +3657,12 @@
             "state" : "translated",
             "value" : "无法获取预览，可识别二维码或粘贴链接打开"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法取得預覽，可掃描 QR Code 或貼上連結開啟"
+          }
         }
       }
     },
@@ -3377,6 +3720,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有私密内容"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有私密項目"
           }
         }
       }
@@ -3436,6 +3785,12 @@
             "state" : "translated",
             "value" : "这张照片里没有找到二维码。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這張照片中沒有找到 QR Code。"
+          }
         }
       }
     },
@@ -3493,6 +3848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有原图"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有原圖"
           }
         }
       }
@@ -3552,6 +3913,12 @@
             "state" : "translated",
             "value" : "备忘录"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備忘錄"
+          }
         }
       }
     },
@@ -3609,6 +3976,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这里还没有内容"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這裡還沒有內容"
           }
         }
       }
@@ -3668,6 +4041,12 @@
             "state" : "translated",
             "value" : "没有可保存的内容"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有可儲存的內容"
+          }
         }
       }
     },
@@ -3722,6 +4101,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "好"
@@ -3784,6 +4169,12 @@
             "state" : "translated",
             "value" : "只看 #%@"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只看 #%@"
+          }
         }
       }
     },
@@ -3838,6 +4229,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只看 %@"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "只看 %@"
@@ -3900,6 +4297,12 @@
             "state" : "translated",
             "value" : "打开"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開"
+          }
         }
       }
     },
@@ -3958,6 +4361,12 @@
             "state" : "translated",
             "value" : "在 App 中打开"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 App 中打開"
+          }
         }
       }
     },
@@ -4015,6 +4424,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在浏览器中打开"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在瀏覽器中打開"
           }
         }
       }
@@ -4075,6 +4490,12 @@
             "state" : "translated",
             "value" : "粘贴链接"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貼上連結"
+          }
         }
       }
     },
@@ -4132,6 +4553,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "把 %@ 固定到分享面板最前面"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將 %@ 固定在分享表單最前面"
           }
         }
       }
@@ -4191,6 +4618,12 @@
             "state" : "translated",
             "value" : "固定到分享面板"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定到分享表單"
+          }
         }
       }
     },
@@ -4249,6 +4682,12 @@
             "state" : "translated",
             "value" : "帖子"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貼文"
+          }
         }
       }
     },
@@ -4303,6 +4742,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "私密"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "私密"
@@ -4365,6 +4810,12 @@
             "state" : "translated",
             "value" : "私密已锁定"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "私密已鎖定"
+          }
         }
       }
     },
@@ -4422,6 +4873,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "私密内容由面容 ID 或设备密码保护。请先在“设置”中开启密码，才能使用私密。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "私密項目受 Face ID 或裝置密碼保護。請先在「設定」中開啟密碼，才能使用私密。"
           }
         }
       }
@@ -4481,6 +4938,12 @@
             "state" : "translated",
             "value" : "二维码"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code"
+          }
         }
       }
     },
@@ -4536,6 +4999,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近"
@@ -4598,6 +5067,12 @@
             "state" : "translated",
             "value" : "提醒事项"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提醒事項"
+          }
         }
       }
     },
@@ -4652,6 +5127,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移出私密"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "移出私密"
@@ -4714,6 +5195,12 @@
             "state" : "translated",
             "value" : "将项目移出私密"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將項目移出私密"
+          }
         }
       }
     },
@@ -4768,6 +5255,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新播放"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "重新播放"
@@ -4831,6 +5324,77 @@
             "state" : "translated",
             "value" : "恢复默认"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回復預設值"
+          }
+        }
+      }
+    },
+    "Save links from YouTube, X and any other site. No feed, no algorithm, no tracking." : {
+      "comment" : "Simplified Chinese keeps its own pitch, sending links to WeChat, which shows them bare; other languages, Traditional Chinese included, pitch one library.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احفظ الروابط من YouTube وX وأي موقع آخر. بلا خلاصة، ولا خوارزمية، ولا تتبع."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere Links von YouTube, X und jeder anderen Website. Kein Feed, kein Algorithmus, kein Tracking."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda enlaces de YouTube, X y cualquier otro sitio. Sin feed, sin algoritmo, sin rastreo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez des liens de YouTube, X et de n’importe quel site. Pas de fil, pas d’algorithme, pas de suivi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTube や X など、どのサイトのリンクも保存できます。フィードも、アルゴリズムも、トラッキングもありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTube, X 등 어떤 사이트의 링크든 저장하세요. 피드도, 알고리즘도, 추적도 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраняйте ссылки с YouTube, X и любых других сайтов. Без ленты, без алгоритмов, без отслеживания."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu liên kết từ YouTube, X và mọi trang khác. Không bảng tin, không thuật toán, không theo dõi."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTube、X 等很多网站的链接在微信里只显示一串网址。把它们变成带标题、封面和二维码的图片卡片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存 YouTube、X 和任何網站的連結。沒有動態消息、沒有演算法、沒有追蹤。"
+          }
         }
       }
     },
@@ -4888,6 +5452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已保存到 %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存到 %@"
           }
         }
       }
@@ -4947,6 +5517,12 @@
             "state" : "translated",
             "value" : "扫描二维码"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "掃描 QR Code"
+          }
         }
       }
     },
@@ -5004,6 +5580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "长按识别二维码打开"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "掃描 QR Code 開啟"
           }
         }
       }
@@ -5063,6 +5645,12 @@
             "state" : "translated",
             "value" : "长按识别"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "掃描開啟"
+          }
         }
       }
     },
@@ -5121,63 +5709,76 @@
             "state" : "translated",
             "value" : "选择"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取"
+          }
         }
       }
     },
-    "Send the image in WeChat, then paste the link — it's already copied" : {
+    "Send the image anywhere, then paste the link — it's already copied" : {
+      "comment" : "Simplified Chinese keeps its own pitch, sending links to WeChat, which shows them bare; other languages, Traditional Chinese included, pitch one library.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أرسل الصورة في WeChat، ثم الصق الرابط — فهو منسوخ بالفعل"
+            "value" : "أرسل الصورة إلى أي مكان، ثم الصق الرابط — فهو منسوخ بالفعل"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sende das Bild in WeChat und füge dann den Link ein – er ist schon kopiert"
+            "value" : "Sende das Bild, wohin du willst, und füge dann den Link ein – er ist schon kopiert"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envía la imagen en WeChat y pega el enlace: ya está copiado"
+            "value" : "Envía la imagen donde quieras y pega el enlace: ya está copiado"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoyez l’image dans WeChat, puis collez le lien — il est déjà copié"
+            "value" : "Envoyez l’image où vous voulez, puis collez le lien — il est déjà copié"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WeChat で画像を送ってからリンクを貼り付け(コピー済み)"
+            "value" : "画像を好きな場所に送ってからリンクを貼り付け(コピー済み)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WeChat에서 이미지를 보낸 뒤 링크를 붙여넣으세요. 이미 복사되어 있습니다"
+            "value" : "이미지를 원하는 곳에 보낸 뒤 링크를 붙여넣으세요. 이미 복사되어 있습니다"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отправьте изображение в WeChat, затем вставьте ссылку — она уже скопирована"
+            "value" : "Отправьте изображение куда угодно, затем вставьте ссылку — она уже скопирована"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gửi ảnh trong WeChat rồi dán liên kết — đã được sao chép sẵn"
+            "value" : "Gửi ảnh đến bất kỳ đâu, rồi dán liên kết — liên kết đã được sao chép"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在微信里发送图片，再粘贴链接（已自动复制）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把圖片傳到任何地方，再貼上連結（已自動拷貝）"
           }
         }
       }
@@ -5237,6 +5838,12 @@
             "state" : "translated",
             "value" : "请先设置密码"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先設定密碼"
+          }
         }
       }
     },
@@ -5291,6 +5898,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享"
@@ -5353,6 +5966,12 @@
             "state" : "translated",
             "value" : "分享为图片"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享為圖片"
+          }
         }
       }
     },
@@ -5410,6 +6029,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享链接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享連結"
           }
         }
       }
@@ -5469,6 +6094,12 @@
             "state" : "translated",
             "value" : "分享的原图"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享的原圖"
+          }
         }
       }
     },
@@ -5526,6 +6157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示全部"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示全部"
           }
         }
       }
@@ -5585,6 +6222,12 @@
             "state" : "translated",
             "value" : "显示你的私密内容"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的私密項目"
+          }
         }
       }
     },
@@ -5642,6 +6285,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "原图 %lld × %lld"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原圖 %lld × %lld"
           }
         }
       }
@@ -5701,6 +6350,12 @@
             "state" : "translated",
             "value" : "原图 %lld × %lld · 分辨率较低"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原圖 %lld × %lld · 解析度較低"
+          }
         }
       }
     },
@@ -5755,6 +6410,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %lld 步：%@"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "第 %lld 步：%@"
@@ -5818,6 +6479,12 @@
             "state" : "translated",
             "value" : "样式"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "樣式"
+          }
         }
       }
     },
@@ -5875,6 +6542,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "建议"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建議"
           }
         }
       }
@@ -5934,6 +6607,12 @@
             "state" : "translated",
             "value" : "在 App 一栏滑到最后，点击“更多”"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 App 列滑到最後，點一下「更多」"
+          }
         }
       }
     },
@@ -5991,6 +6670,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "标签"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標籤"
           }
         }
       }
@@ -6050,6 +6735,12 @@
             "state" : "translated",
             "value" : "为 %lld 项添加标签"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "為 %lld 個項目加上標籤"
+          }
         }
       }
     },
@@ -6107,6 +6798,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "可以加标签、归档、设为私密或删除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可以加上標籤、封存、移到私密或刪除。"
           }
         }
       }
@@ -6166,6 +6863,12 @@
             "state" : "translated",
             "value" : "标签"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標籤"
+          }
         }
       }
     },
@@ -6223,6 +6926,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点击右上角“编辑”"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "點一下右上角的「編輯」"
           }
         }
       }
@@ -6282,6 +6991,12 @@
             "state" : "translated",
             "value" : "点击分享按钮"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "點一下分享按鈕"
+          }
         }
       }
     },
@@ -6339,6 +7054,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点击 ✓ 完成"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "點一下 ✓ 完成"
           }
         }
       }
@@ -6398,6 +7119,12 @@
             "state" : "translated",
             "value" : "模板"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "樣板"
+          }
         }
       }
     },
@@ -6452,6 +7179,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "文字"
@@ -6514,6 +7247,12 @@
             "state" : "translated",
             "value" : "图片中的文字"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片中的文字"
+          }
         }
       }
     },
@@ -6571,6 +7310,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这个二维码里没有链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個 QR Code 中沒有連結。"
           }
         }
       }
@@ -6630,6 +7375,12 @@
             "state" : "translated",
             "value" : "长按链接"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按住連結"
+          }
         }
       }
     },
@@ -6687,6 +7438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试着保存这条链接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試著儲存這個連結"
           }
         }
       }
@@ -6746,6 +7503,12 @@
             "state" : "translated",
             "value" : "取消归档"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消封存"
+          }
         }
       }
     },
@@ -6800,6 +7563,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "微信"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "微信"
@@ -6862,6 +7631,12 @@
             "state" : "translated",
             "value" : "X · 帖子"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X · 貼文"
+          }
         }
       }
     },
@@ -6919,6 +7694,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你复制了一个链接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你拷貝了一個連結"
           }
         }
       }
@@ -6979,6 +7760,12 @@
             "state" : "translated",
             "value" : "卡片会显示在这里"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡片會顯示在這裡"
+          }
         }
       }
     },
@@ -7037,63 +7824,11 @@
             "state" : "translated",
             "value" : "YouTube · 视频"
           }
-        }
-      }
-    },
-    "YouTube, X and many sites show up in WeChat as a bare link. Turn them into an image card with the title, cover and a QR code." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تظهر روابط YouTube وX ومواقع كثيرة في WeChat كعنوان فقط. حوّلها إلى بطاقة صورة تضم العنوان والغلاف ورمز QR."
-          }
         },
-        "de" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Links von YouTube, X und vielen Websites erscheinen in WeChat nur als nackte Adresse. Mach daraus eine Bildkarte mit Titel, Cover und QR-Code."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En WeChat, los enlaces de YouTube, X y muchos sitios aparecen como una simple dirección. Conviértelos en una tarjeta con título, portada y código QR."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dans WeChat, les liens YouTube, X et de nombreux sites s’affichent comme une simple adresse. Transformez-les en carte image avec titre, couverture et code QR."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YouTube や X など多くのサイトのリンクは、WeChat では URL だけが表示されます。タイトル、カバー、QR コード入りの画像カードに変えましょう。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YouTube, X 등 많은 사이트의 링크가 WeChat에서는 주소만 보입니다. 제목, 커버, QR 코드가 담긴 이미지 카드로 바꿔 보세요."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ссылки на YouTube, X и многие сайты в WeChat выглядят как голый адрес. Превратите их в карточку с заголовком, обложкой и QR-кодом."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liên kết YouTube, X và nhiều trang web chỉ hiện dưới dạng địa chỉ trần trong WeChat. Hãy biến chúng thành thẻ ảnh có tiêu đề, ảnh bìa và mã QR."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YouTube、X 等很多网站的链接在微信里只显示一串网址。把它们变成带标题、封面和二维码的图片卡片。"
+            "value" : "YouTube · 影片"
           }
         }
       }

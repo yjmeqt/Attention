@@ -180,9 +180,15 @@ struct HomeView: View {
             if DemoLibrary.unlocksPrivate {
                 filter.showsPrivate = true
                 // The first Face ID request after a boot can time out before its UI comes up; ask again.
+                // A matching face (simulator Face ID › Matching Face) opens Private, as the lock button does.
                 Task {
                     for _ in 0..<3 {
-                        guard await DeviceOwner.authenticate(reason: String(localized: "Show your private items")) == .failed else { break }
+                        let outcome = await DeviceOwner.authenticate(reason: String(localized: "Show your private items"))
+                        if outcome == .authenticated {
+                            filter.privateUnlocked = true
+                            actions.privateUnlocked = true
+                        }
+                        guard outcome == .failed else { break }
                     }
                 }
             }

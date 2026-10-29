@@ -14,10 +14,11 @@ struct EmptyState: View {
 
             if showsSample { SampleCard() }
 
+            // Simplified Chinese pitches sending these links to WeChat, which shows them bare; other languages pitch one library.
             VStack(spacing: 8) {
-                Text("Links WeChat can preview")
+                Text("All your links in one place")
                     .font(.title2.bold())
-                Text("YouTube, X and many sites show up in WeChat as a bare link. Turn them into an image card with the title, cover and a QR code.")
+                Text("Save links from YouTube, X and any other site. No feed, no algorithm, no tracking.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -32,7 +33,7 @@ struct EmptyState: View {
             VStack(alignment: .leading, spacing: 16) {
                 StepRow(number: 1, symbol: "link", text: "Copy a link, or share it to \(Brand.name) from any app")
                 StepRow(number: 2, symbol: "photo.on.rectangle.angled", text: "Get a card with the title, cover and QR code")
-                StepRow(number: 3, symbol: "message", text: "Send the image in WeChat, then paste the link — it's already copied")
+                StepRow(number: 3, symbol: "message", text: "Send the image anywhere, then paste the link — it's already copied")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()

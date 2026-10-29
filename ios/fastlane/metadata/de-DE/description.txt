@@ -1,4 +1,4 @@
-Attention bewahrt Links und Bilder auf, die du später wiederfinden möchtest.
+Attention sammelt Links aus allen Apps und Websites an einem Ort. Kein Feed, keine Empfehlungen, kein Algorithmus, nur was du gesichert hast.
 
 Speichere Inhalte über das Teilen-Menü in Safari oder anderen Apps oder füge einen Link ein. Wenn verfügbar, erscheinen Titel und Vorschaubild. Websites mit Anmeldung oder Zugriffsbeschränkungen bieten möglicherweise nur eingeschränkte Vorschauen.
 

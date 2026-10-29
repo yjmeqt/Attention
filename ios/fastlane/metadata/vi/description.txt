@@ -1,4 +1,4 @@
-Attention lưu những liên kết và hình ảnh bạn muốn xem lại.
+Attention gom liên kết từ mọi ứng dụng và trang web về một nơi. Không bảng tin, không gợi ý, không thuật toán, chỉ những gì bạn đã lưu.
 
 Lưu từ bảng chia sẻ của Safari hoặc ứng dụng khác, hay dán một liên kết. Tiêu đề và ảnh bìa sẽ xuất hiện khi có sẵn. Trang yêu cầu đăng nhập hoặc hạn chế truy cập có thể không có bản xem trước đầy đủ.
 

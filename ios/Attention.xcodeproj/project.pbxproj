@@ -24,10 +24,12 @@
 		1FE2BA74494548C936FBE027 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13DCB3DAE71878D65C76C77 /* CardView.swift */; };
 		201D3941CE3539E2222A1623 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E653538474654DA1B3B3A04E /* InfoPlist.strings */; };
 		2985DF963EBFE7DEEE439485 /* FeedFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370075CD22DCAED23F786BF1 /* FeedFilter.swift */; };
+		2B30C6FA6D8A89734A4A96FF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 78D52C48A3992485AFE59EAB /* InfoPlist.strings */; };
 		2BADF59A44312F571BABBB4A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 557D97726DE27F59DEEC1306 /* InfoPlist.strings */; };
 		2CD99F088DBF0BEC9995073D /* ItemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D373591C6BA544F936EDDC /* ItemActions.swift */; };
 		3014AF63ECA35121E78C993E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE3A99FD286CA9E07E0085B /* HomeView.swift */; };
 		30B27752CBBB7386D30C5FD4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AA2328CF3B5D9937C118BF35 /* InfoPlist.strings */; };
+		336241E0D9B48DCA0FB9D284 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 673FE037334CF4F013AADC70 /* InfoPlist.strings */; };
 		33F700B6D8B0A58DD62C6511 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */; };
 		34F499FBFBFB3B907A7A44E8 /* LibraryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA564C94D6880C88D7F54585 /* LibraryItem.swift */; };
 		39EEFA7B42B6DD7B7E90676F /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8EF56438FBF82574D6E180 /* Feed.swift */; };
@@ -145,9 +147,11 @@
 		5337444CD9E33BADFDAE4840 /* HistoryImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryImport.swift; sourceTree = "<group>"; };
 		557D97726DE27F59DEEC1306 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		61EABF9910C697C13BAF4A83 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		673FE037334CF4F013AADC70 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6EFA6F5B10F5569D29192E86 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		71243223C1A41C8631BC1363 /* TagEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagEditor.swift; sourceTree = "<group>"; };
 		777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unfurler.swift; sourceTree = "<group>"; };
+		78D52C48A3992485AFE59EAB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		846AA8FA9D947B6EAF662FFC /* Attention.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Attention.icon; sourceTree = "<group>"; };
 		89D7C0908C223B3136FC2223 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8A2F728FC507EA853909873C /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -282,6 +286,7 @@
 				8B2442464749711F36940212 /* InfoPlist.strings */,
 				3F761CDD8E7EE346C30A17EC /* InfoPlist.strings */,
 				E653538474654DA1B3B3A04E /* InfoPlist.strings */,
+				673FE037334CF4F013AADC70 /* InfoPlist.strings */,
 				BCD5ADC04FD53110AFF20000 /* PrivacyInfo.xcprivacy */,
 				AB4CA1D0F66EE6F25B2809D7 /* ShareViewController.swift */,
 			);
@@ -323,6 +328,7 @@
 				B2F939F274BC9DFD6C090703 /* InfoPlist.strings */,
 				2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */,
 				8A2F728FC507EA853909873C /* InfoPlist.strings */,
+				78D52C48A3992485AFE59EAB /* InfoPlist.strings */,
 				E50AE3F00A589DE5E00A2F1B /* PrivacyInfo.xcprivacy */,
 			);
 			path = App;
@@ -437,6 +443,7 @@
 				ru,
 				vi,
 				"zh-Hans",
+				"zh-Hant",
 			);
 			mainGroup = 50E02927D8803BA82F7553EE;
 			minimizedProjectReferenceProxies = 1;
@@ -464,6 +471,7 @@
 				5C8B852783176AD7B639ECAD /* InfoPlist.strings in Resources */,
 				4D16D85E982747D60AE4DBCB /* InfoPlist.strings in Resources */,
 				97B228E4A63F1D9809BB4DBE /* InfoPlist.strings in Resources */,
+				2B30C6FA6D8A89734A4A96FF /* InfoPlist.strings in Resources */,
 				DFA500B0F32CE3438A11A2FB /* InfoPlist.strings in Resources */,
 				6680A0E284CF2200EA0DA26D /* InfoPlist.strings in Resources */,
 				6C0841EE34FEF9986BA16F91 /* InfoPlist.strings in Resources */,
@@ -482,6 +490,7 @@
 				748A97FA37A143EE88B1C280 /* InfoPlist.strings in Resources */,
 				2BADF59A44312F571BABBB4A /* InfoPlist.strings in Resources */,
 				1B8DA7790DBB1EF07745F4D9 /* InfoPlist.strings in Resources */,
+				336241E0D9B48DCA0FB9D284 /* InfoPlist.strings in Resources */,
 				42B1FC1C83116EE40EBE5313 /* InfoPlist.strings in Resources */,
 				5BDFCF3774511AD8A54A2C8C /* InfoPlist.strings in Resources */,
 				C40CFDD1928CD57B886A894A /* InfoPlist.strings in Resources */,
@@ -662,7 +671,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -807,7 +816,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

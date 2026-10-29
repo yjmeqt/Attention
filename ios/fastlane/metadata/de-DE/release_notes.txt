@@ -1,1 +1,1 @@
-Die erste Version von Attention.
+Ein klarerer Startbildschirm und kleine Fehlerbehebungen.
