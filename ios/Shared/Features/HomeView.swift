@@ -72,13 +72,20 @@ struct HomeView: View {
             }
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if showsFilterBar {
-                    FilterBar(filter: filter, items: library.items, library: library)
-                        .padding(.bottom, 4)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                VStack(spacing: 8) {
+                    if clipboardHasLink && !selecting {
+                        ClipboardBanner(paste: paste, dismiss: dismissClipboard)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    if showsFilterBar {
+                        FilterBar(filter: filter, items: library.items, library: library)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
+                .padding(.bottom, 4)
             }
             .animation(.snappy, value: showsFilterBar)
+            .animation(.snappy, value: clipboardHasLink)
             .scrollEdgeEffectHidden(true, for: .vertical)
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
             .onScrollGeometryChange(for: Bool.self) {
@@ -320,6 +327,7 @@ struct HomeView: View {
                             }
                         }
                     }
+                    Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
                     Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
                     if !library.items.isEmpty {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
@@ -332,11 +340,10 @@ struct HomeView: View {
                 }
             }
             ToolbarItem(placement: .bottomBar) {
-                Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                // A plain button so it matches Scan; reading the clipboard asks the user each time.
-                Button("Paste", systemImage: "clipboard") { paste(UIPasteboard.general.itemProviders) }
+                // The system paste button reads the clipboard without the paste-permission prompt.
+                PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
+                    .labelStyle(.iconOnly)
+                    .buttonBorderShape(.circle)
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             // Unconditional: without it the system moves search up next to More.
@@ -386,6 +393,11 @@ struct HomeView: View {
         }
     }
 
+    private func dismissClipboard() {
+        Clipboard.ignoreCurrent()
+        clipboardHasLink = false
+    }
+
     private func scanned(_ url: URL) { open(.link(url, image: nil)) }
 
     private func openSample(_ url: URL) { open(.link(url, image: nil)) }
@@ -429,5 +441,32 @@ struct HomeView: View {
         let privateIDs = Set(library.items.filter(\.isPrivate).map(\.id))
         if path.contains(where: privateIDs.contains) { path = [] }
         selection.subtract(privateIDs)
+    }
+}
+
+/// Offers a link the user copied elsewhere. Spotting it doesn't read the clipboard, and the system
+/// paste button reads it without the paste-permission prompt.
+private struct ClipboardBanner: View {
+    let paste: ([NSItemProvider]) -> Void
+    let dismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Label("You copied a link", systemImage: "link")
+                .font(.subheadline.weight(.medium))
+                .lineLimit(1)
+            Spacer(minLength: 0)
+            PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
+                .buttonBorderShape(.capsule)
+            Button("Dismiss", systemImage: "xmark", action: dismiss)
+                .labelStyle(.iconOnly)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.leading, 16)
+        .padding(.trailing, 12)
+        .padding(.vertical, 8)
+        .glassEffect(.regular, in: .capsule)
+        .frame(maxWidth: 520)
+        .padding(.horizontal)
     }
 }

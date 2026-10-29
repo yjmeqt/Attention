@@ -1,0 +1,5 @@
+DerivedData/
+simulator.local.toml
+app-path
+warm-run.log
+warm-run.pid

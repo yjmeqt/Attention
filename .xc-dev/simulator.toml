@@ -1,0 +1,23 @@
+# .xc-dev/simulator.toml — one simulator per worktree.
+#
+# `git_worktree_slug` keeps names unique across worktrees, so parallel worktrees never share a
+# booted sim, and none of them touch the Attention-Shots-* sims that
+# ios/Tools/capture-screenshots.sh drives. xc-dev finds or creates the sim on first reference to
+# {{sim_id}} and caches its UDID in simulator.local.toml.
+schema_version = 1
+
+[sim.default]
+name    = "{{product_name}}-{{git_worktree_slug}}"
+device  = "iPhone 17 Pro Max"
+runtime = "iOS 27.0"
+
+[sim.ipad]
+name    = "{{product_name}}-{{git_worktree_slug}}-ipad"
+device  = "iPad Pro 13-inch (M5)"
+runtime = "iOS 27.0"
+
+# The iOS 27.1 runtime only supports iPhone Duo, and iOS 27.0 doesn't support it.
+[sim.duo]
+name    = "{{product_name}}-{{git_worktree_slug}}-duo"
+device  = "iPhone Duo"
+runtime = "iOS 27.1"
