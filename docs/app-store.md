@@ -88,14 +88,18 @@ What to Test (per build):
 
 ## Screenshots
 
-Four scenes, positioned around "keep the links you care about":
+Five per device, in the order the App Store shows them; people mostly see the first three. Every language but Simplified Chinese pitches one library for links from every site, with no feed and no tracking:
 
-1. `1-feed`: home feed, the waterfall of link previews
-2. `2-share`: Safari's own share sheet on the locale's Wikipedia page, with Attention in the app row lifted out and enlarged, so people see where to find it
-3. `3-detail`: item detail with the card lifted off the screen, the templates, Open and Share
-4. `4-private`: the Private section, locked, with the Face ID (Touch ID on Duo) prompt over an empty screen
+1. `feed`: the home feed, all your links in one place
+2. `share`: Safari's own share sheet with Attention in its app row, saving from any app
+3. `private`: Private unlocked with Face ID; no algorithm, no tracking
+4. `search`: search results, find it by site
+5. `detail`: the item detail with its card, share it as a card, text or QR code
 
-Search and tags are left out on purpose: they're secondary to saving and sharing.
+Simplified Chinese pitches sending YouTube and X links to WeChat, which shows them bare:
+
+1. `compare`: a bare link in a chat bubble, then the same link as a card (no app screen)
+2. `detail`, 3. `share`, 4. `template` (the Text template), 5. `search`
 
 | Device | Size | App Store Connect slot |
 |---|---|---|
@@ -105,20 +109,21 @@ Search and tags are left out on purpose: they're secondary to saving and sharing
 | `duo` (iPhone Duo, inner display) | 2007 × 2853 | iPhone Duo inner display (optional until April 2027; shows the "optimized for iPhone Duo" badge) |
 | `duo-cover` (iPhone Duo, outer display) | 1398 × 2034 | iPhone Duo outer display (same simulator, folded shut) |
 
-Pipeline, run from `ios/`:
+Pipeline, run from `ios/` (the export needs Google Chrome and `npm install` in `Tools/store-shots` once):
 
 ```
-zsh Tools/capture-screenshots.sh        # raw shots into fastlane/raw (ONLY="en-US ko", DEVICES="ipad duo", SCENES="2-share" for a subset)
-swift Tools/frame-screenshots.swift     # framed shots into fastlane/screenshots
+zsh Tools/store-shots/capture.zsh                 # raw screens into fastlane/raw (ONLY="en-US ko", DEVICES="ipad duo", SCENES="share" for a subset)
+node Tools/store-shots/export.js                  # framed shots into fastlane/screenshots, headers into fastlane/headers
+node Tools/store-shots/export.js screenshots duo ar-SA   # one device and locale; "headers" renders only the headers
 ```
 
-- The capture script reinstalls the Debug build for every scene and fills the library with the Debug-only launch arguments in `Shared/Library/DemoLibrary.swift`: `-demoLinks` (newest first, only when the library is empty, needs network access), `-demoTags "1=Music;2=Travel"`, `-demoPrivate "10 11"`, `-demoOpen 0` and `-demoUnlockPrivate YES` (Private, still locked, with Face ID scanning: the script enrolls Face ID on the simulator). The share scene isn't the app: the script boots the simulator in that locale's language (the share sheet is drawn by the system), opens the page in Safari, taps Share with the argent CLI, and saves the frame of Attention's cell next to the screenshot. The detail and Private scenes save the frames of the card and the Face ID label the same way. `-seenShareGuide YES` skips the first-launch guide. The demo library uses Apple and Wikipedia pages only, so no third-party content appears in the screenshots.
-- The iPad is rotated to landscape with the argent CLI (`argent run rotate`), since iPadOS ignores an app's own orientation request. The Duo is unfolded (`argent run fold --posture open`) for the inner display and folded shut for the outer one; both are shot with argent, since `simctl` doesn't capture a folded device's panel.
-- Captions live in `Tools/frame-screenshots.swift` (10 locales; `es-MX` reuses `es-ES`). The framed PNGs have no alpha channel, as App Store Connect requires. Neither the raw nor the framed screenshots are in git: run the pipeline to regenerate them before uploading.
-- Design: product first, modeled on Things 3 (one brand color across the set, a top-left caption that is a bold lead and a plain rest, a large device running off the bottom) and Opal (one real element lifted out of the screen and enlarged). Scenes 1–3 are on the icon's coral (`#D64A33`, a little deeper so white text reads on it), Private on its ink. The lifted element is Attention's cell in Safari's share sheet, the card on the detail screen (lifted only slightly, so it breaks past the device's edges), and the Face ID prompt over the empty, locked Private screen in Dark Mode; the feed has none. The simulator draws the Face ID prompt without its glyph, so the frame script draws the `faceid` symbol where iOS puts it. The Duo unlocks with Touch ID, so its Private caption says Touch ID and shows the system prompt as captured. Captions mark the bold lead with `**…**`; Chinese and Japanese start the rest on its own line. Captions shrink to fit three lines (two on iPad).
-- Devices: Apple's product bezels from the [iOS and iPadOS 27 UI kit](https://www.figma.com/design/rIbzSxeU0qjqqaWd0ULzUU/iOS-and-iPadOS-27--Community-?node-id=507-24672) (Product Bezels page): iPhone 18 Pro Max (Black, and Silver on Private), iPad Pro 13" M4 landscape (Space Gray, Silver), iPhone Duo inner display portrait and outer display closed portrait (Night Sky, Star White). Export each bezel image at full size (the image fill of the bezel layer, 3× for iPhone and Duo, 2× for iPad) into `ios/fastlane/bezels/` as `iphone.png`, `iphone-light.png`, `ipad.png`, `ipad-light.png`, `duo.png`, `duo-light.png`, `duo-cover.png`, `duo-cover-light.png`. The folder is gitignored, since Apple's license doesn't allow redistributing them; without it the script draws a plain bezel.
+- The capture script builds the Debug app named Attention (into `build/store-shots`), drives the `Attention-Shots-*` simulators, and reinstalls the app for every scene, filling the library with the Debug-only launch arguments in `Shared/Library/DemoLibrary.swift`: `-demoLinks` (needs network access), `-demoSearch Apple`, `-demoOpen 0`, `-demoPrivate` with `-demoUnlockPrivate YES` (the script enrolls Face ID and sends a matching face). `-seenShareGuide YES` skips the first-launch guide. It boots each simulator in the locale's language, since the share sheet is drawn by the system, and empties the clipboard so the "You copied a link" banner stays away.
+- Content: outside Simplified Chinese the library is Apple and Wikipedia pages only (the locale's Bauhaus article, Apple's iPhone, Music, Maps, Keynote, Swift, Podcasts and HIG pages), so no third-party content or people appear. Russian uses the US storefront, whose Apple pages preview. Traditional Chinese shares Apple's Swift page, since Chinese Wikipedia shows a sitenotice. Simplified Chinese shows a 3Blue1Brown YouTube video, its pitch, and Apple's Chinese pages; on iPad and the Duo's inner display it shares Apple's Swift page, since desktop YouTube shows faces in its sidebar.
+- The iPad is rotated to landscape and the Duo unfolded or folded with the argent CLI, which also takes the Duo's screenshots (`simctl` doesn't capture a folded device's panel) and does the taps.
+- Design: Constructivism. Paper (`#ece2cd`), ink and red (`#d4261b`), a red wedge and a black diagonal bar, a heavy headline tilted −8° with its second half in red, and a monospaced subline (each script's own Noto face where the mono font doesn't cover it). The device shows the real, unedited app screen. Arabic is mirrored. Headlines and sublines live in `Tools/store-shots/copy.js` (11 locales; `es-MX` reuses `es-ES`); the layout, with each language's line-breaking rules, is `frame.html`. The exporter renders each frame at an exact App Store size and writes PNGs with no alpha channel.
+- Product page header (21:9, 3840 × 1646): `header.html`, in the same style, with the first screenshot's headline and generic link cards (no real site, logo or URL). Everything that matters sits in the middle 60%, since devices crop the edges. App Store Connect takes headers in its Asset Library, which needs an approved version; `release.sh` doesn't upload them.
+- Neither the raw nor the framed images are in git: run the pipeline to regenerate them before uploading. Look through every image first: a link that failed to unfurl shows as a bare tile, and Safari sometimes shows the wrong page under the share sheet. Rerun just that scene with `SCENES`, `ONLY` and `DEVICES`.
 - Upload with `Tools/release.sh metadata --apply` (see Releasing), or by hand in App Store Connect: drag each device's files into its slot, and both Duo displays into the one iPhone Duo slot.
-- Look through every framed image before uploading: a link that failed to unfurl shows as a bare tile.
 
 ## Design decisions
 

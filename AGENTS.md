@@ -23,7 +23,7 @@ xc-dev run-device <id>      # physical iPhone; ids from `xc-dev devices-iphone`
 xc-dev :get sim_id          # any resolved variable: sim_name, bundle_id, git_worktree_slug, ...
 ```
 
-- Each worktree gets its own simulators, named `Attention-<worktree slug>` (plus `-ipad` and `-duo`), so parallel worktrees never share one. Don't use the `Attention-Shots-*` simulators: `ios/Tools/capture-screenshots.sh` drives them.
+- Each worktree gets its own simulators, named `Attention-<worktree slug>` (plus `-ipad` and `-duo`), so parallel worktrees never share one. Don't use the `Attention-Shots-*` simulators: `ios/Tools/store-shots/capture.zsh` drives them.
 - Builds go to Xcode's own DerivedData folder for the worktree's project path (`~/Library/Developer/Xcode/DerivedData/Attention-<hash>`), the same one Xcode uses when it opens that project. `xc-dev clean` deletes it.
 - Add a task to `.xc-dev/tasks.toml` rather than hand-writing an `xcodebuild` call that a task could cover.
 
