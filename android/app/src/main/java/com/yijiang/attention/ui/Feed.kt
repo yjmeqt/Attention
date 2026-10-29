@@ -262,9 +262,14 @@ fun FilterBar(filter: FeedFilter, items: List<LibraryItem>, library: Library, re
     val domains = remember(section) { LibraryRules.ranked(section.map { it.domain }) }
     val tags = remember(section) { LibraryRules.ranked(section.flatMap { it.tags }) }
     val state = rememberLazyListState()
-    // Tags come after every site, so bring a selected one into view when the bar appears.
+    // "Only youtube.com" or "Only #tag" can pick a chip that's off screen, so bring the first selected one into view.
     LaunchedEffect(Unit) {
-        filter.tags.firstOrNull()?.let { tag -> tags.indexOf(tag).takeIf { it >= 0 }?.let { state.scrollToItem(1 + domains.size + it) } }
+        val domain = domains.indexOfFirst { it in filter.domains }
+        val tag = tags.indexOfFirst { it in filter.tags }
+        when {
+            domain >= 0 -> state.scrollToItem(1 + domain)
+            tag >= 0 -> state.scrollToItem(1 + domains.size + tag)
+        }
     }
     LazyRow(
         state = state,

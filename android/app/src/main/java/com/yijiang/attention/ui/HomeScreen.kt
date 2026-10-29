@@ -91,6 +91,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yijiang.attention.R
+import com.yijiang.attention.model.BRAND_NAME
 import com.yijiang.attention.data.LibraryItem
 import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -346,7 +347,7 @@ private fun MoreMenu(vm: HomeViewModel, hasItems: Boolean, actions: ItemActions)
             }
             MenuItem(R.string.enter_link_ellipsis, Icons.Default.TextFields) { run { vm.showsLinkEntry = true } }
             if (hasItems) MenuItem(R.string.select, Icons.Default.CheckCircle) { run { vm.startSelecting() } }
-            MenuItem(R.string.pin_guide_link, Icons.Default.PushPin) { run { vm.showsGuide = true } }
+            MenuItem(stringResource(R.string.pin_guide_link, BRAND_NAME), Icons.Default.PushPin) { run { vm.showsGuide = true } }
         }
     }
 }

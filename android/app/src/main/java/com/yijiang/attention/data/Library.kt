@@ -311,7 +311,15 @@ class Library(context: Context, private val directory: File = File(context.files
             !it.isImage && it.title.isEmpty() && data(Kind.COVER, it) == null &&
                 it.id !in _enriching.value && retriedPreviews.add(it.id)
         }
-        for (item in stale.take(20)) enrich(item)
+        for (item in stale.take(20)) {
+            val url = item.httpUrl
+            val secure = url?.let(::upgradedToHttps)
+            val upgraded = if (secure != null && secure != url) {
+                val key = DomainTag.key(secure)
+                if (itemWithKey(key) == null) update(item.id) { it.copy(url = secure.toString(), key = key) } else null
+            } else null
+            enrich(upgraded ?: item)
+        }
     }
 
     /** One-time import of the pre-library history (`history/index.json` plus image files per entry). */

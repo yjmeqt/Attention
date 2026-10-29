@@ -195,9 +195,13 @@ fun ItemMenuItems(item: LibraryItem, actions: ItemActions, onSelect: (() -> Unit
 }
 
 @Composable
-fun MenuItem(text: Int, icon: ImageVector, enabled: Boolean = true, onClick: () -> Unit) {
+fun MenuItem(text: Int, icon: ImageVector, enabled: Boolean = true, onClick: () -> Unit) =
+    MenuItem(stringResource(text), icon, enabled, onClick)
+
+@Composable
+fun MenuItem(text: String, icon: ImageVector, enabled: Boolean = true, onClick: () -> Unit) {
     DropdownMenuItem(
-        text = { Text(stringResource(text)) },
+        text = { Text(text) },
         leadingIcon = { Icon(icon, contentDescription = null) },
         enabled = enabled,
         onClick = onClick,
