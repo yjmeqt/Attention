@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -30,12 +31,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.MoreVert
@@ -45,6 +46,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material3.AlertDialog
@@ -54,6 +56,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,18 +84,20 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yijiang.attention.R
-import com.yijiang.attention.model.BRAND_NAME
 import com.yijiang.attention.data.LibraryItem
+import com.yijiang.attention.model.BRAND_NAME
 import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
@@ -158,7 +163,19 @@ private fun Feed(vm: HomeViewModel, items: List<LibraryItem>, actions: ItemActio
     val showsFilterBar = items.isNotEmpty() && (vm.searching || filter.domains.isNotEmpty() || filter.tags.isNotEmpty())
     val selected = items.filter { it.id in vm.selection }.map { it.id }
 
-    fun paste() = vm.paste(Sharing.clipboardText(context), Sharing.clipboardImage(context))
+    fun dismissClipboard() {
+        Clipboard.ignoreCurrent(context)
+        vm.clipboardHasLink = false
+    }
+
+    fun paste() {
+        dismissClipboard()
+        vm.paste(Sharing.clipboardText(context), Sharing.clipboardImage(context))
+    }
+
+    // Android shows the clipboard only to the focused window, so check each time focus comes back.
+    val focused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(focused) { if (focused) vm.clipboardHasLink = Clipboard.hasNewLink(context) }
 
     if (vm.selecting) BackHandler { vm.stopSelecting() }
     else if (vm.searching) BackHandler { vm.searching = false; vm.filter = filter.copy(search = "") }
@@ -202,6 +219,9 @@ private fun Feed(vm: HomeViewModel, items: List<LibraryItem>, actions: ItemActio
                 }
             } else {
                 Column {
+                    AnimatedVisibility(vm.clipboardHasLink, enter = slideInVertically { it } + fadeIn(), exit = slideOutVertically { it } + fadeOut()) {
+                        ClipboardBanner(onPaste = ::paste, onDismiss = ::dismissClipboard)
+                    }
                     AnimatedVisibility(showsFilterBar, enter = slideInVertically { it } + fadeIn(), exit = slideOutVertically { it } + fadeOut()) {
                         FilterBar(filter, items, vm.library, revision) { vm.filter = it }
                     }
@@ -209,7 +229,6 @@ private fun Feed(vm: HomeViewModel, items: List<LibraryItem>, actions: ItemActio
                         if (vm.searching) {
                             SearchField(vm)
                         } else {
-                            BarButton(R.string.scan_qr_code, Icons.Default.QrCodeScanner) { vm.showsScanner = true }
                             BarButton(R.string.paste, Icons.Default.ContentPaste) { paste() }
                             Spacer(Modifier.weight(1f))
                             BarButton(R.string.search, Icons.Default.Search) { vm.searching = true }
@@ -345,6 +364,7 @@ private fun MoreMenu(vm: HomeViewModel, hasItems: Boolean, actions: ItemActions)
                 )
                 HorizontalDivider()
             }
+            MenuItem(R.string.scan_qr_code, Icons.Default.QrCodeScanner) { run { vm.showsScanner = true } }
             MenuItem(R.string.enter_link_ellipsis, Icons.Default.TextFields) { run { vm.showsLinkEntry = true } }
             if (hasItems) MenuItem(R.string.select, Icons.Default.CheckCircle) { run { vm.startSelecting() } }
             MenuItem(stringResource(R.string.pin_guide_link, BRAND_NAME), Icons.Default.PushPin) { run { vm.showsGuide = true } }
@@ -418,6 +438,43 @@ fun NoticeCapsule(vm: HomeViewModel, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             )
+        }
+    }
+}
+
+/** Offers a link copied in another app. Spotting it doesn't read the clipboard; Paste does. */
+@Composable
+private fun ClipboardBanner(onPaste: () -> Unit, onDismiss: () -> Unit) {
+    Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), contentAlignment = Alignment.Center) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shadowElevation = 2.dp,
+            modifier = Modifier.widthIn(max = 520.dp).fillMaxWidth(),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            ) {
+                Icon(Icons.Default.Link, contentDescription = null, modifier = Modifier.size(20.dp))
+                Text(
+                    stringResource(R.string.copied_link_banner),
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                FilledTonalButton(onClick = onPaste) {
+                    Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.paste))
+                }
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.dismiss),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 }

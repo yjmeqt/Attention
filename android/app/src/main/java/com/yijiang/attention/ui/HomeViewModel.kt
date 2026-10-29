@@ -47,6 +47,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var pendingDelete by mutableStateOf<List<String>?>(null)
     var showsPasscodeRequired by mutableStateOf(false)
     var showsScanner by mutableStateOf(false)
+    /** A link copied in another app and not yet pasted or dismissed. */
+    var clipboardHasLink by mutableStateOf(false)
     var showsLinkEntry by mutableStateOf(false)
     /** Opened on first launch; Done stays off until the animation has played once. */
     var showsGuide by mutableStateOf(!prefs.getBoolean(SEEN_GUIDE, false))
