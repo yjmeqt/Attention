@@ -2,7 +2,7 @@
 #
 # `git_worktree_slug` keeps names unique across worktrees, so parallel worktrees never share a
 # booted sim, and none of them touch the Attention-Shots-* sims that
-# ios/Tools/capture-screenshots.sh drives. xc-dev finds or creates the sim on first reference to
+# ios/Tools/store-shots/capture.zsh drives. xc-dev finds or creates the sim on first reference to
 # {{sim_id}} and caches its UDID in simulator.local.toml.
 schema_version = 1
 

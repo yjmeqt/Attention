@@ -1,0 +1,8 @@
+{
+  "name": "attention-store-shots",
+  "private": true,
+  "description": "Renders Attention's App Store screenshots and product page headers; see export.js.",
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

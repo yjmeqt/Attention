@@ -11,9 +11,10 @@ docs/superpowers/
 xcuserdata/
 *.xcuserstate
 ios/fastlane/raw/
-ios/fastlane/bezels/
-# Framed screenshots are generated locally by Tools/frame-screenshots.swift.
+# Screenshots and headers are generated locally by Tools/store-shots.
 ios/fastlane/screenshots/
+ios/fastlane/headers/
+ios/Tools/store-shots/node_modules/
 # asc upload reports.
 ios/.asc/
 

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Attention Header</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@900&family=Noto+Sans+TC:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Noto+Sans:wght@900&family=Noto+Kufi+Arabic:wght@900&display=swap">
+<style>
+/* App Store product page header, 21:9. Laid out at 1920×823 CSS px, captured at 2× for 3840×1646.
+   Everything that matters sits in the middle 60%; the edges carry only background shapes, since devices crop them. */
+:root { --paper: #ece2cd; --ink: #111; --red: #d4261b; --grey: #b9b1a0; --white: #fbf7ee; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+.hd { position: relative; width: 1920px; height: 823px; overflow: hidden; background: var(--paper); font-family: "Noto Sans SC", "PingFang SC", sans-serif; }
+.hd .tri { position: absolute; right: -6%; bottom: -30%; width: 58%; height: 130%; background: var(--red); clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+.hd .bar { position: absolute; left: -10%; top: 62%; width: 120%; height: 26px; background: var(--ink); transform: rotate(-14deg); }
+.hd .bar.thin { top: 4%; height: 8px; transform: rotate(-14deg) translateX(30%); }
+.hd .disc { position: absolute; left: 6%; top: -18%; width: 330px; height: 330px; border-radius: 50%; background: var(--ink); }
+.stage { position: absolute; left: 20%; right: 20%; top: 0; bottom: 0; display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; gap: 30px; }
+h1 { margin: 0; font-weight: 900; font-size: 92px; white-space: nowrap; line-height: 1.02; color: var(--ink); transform: rotate(-8deg); transform-origin: left center; letter-spacing: -.01em; }
+h1 span { display: block; } h1 span + span { color: var(--red); }
+:lang(zh) h1 { font-size: 112px; letter-spacing: .02em; }
+:lang(zh-Hant) .hd { font-family: "Noto Sans TC", sans-serif; } :lang(ja) .hd { font-family: "Noto Sans JP", sans-serif; } :lang(ko) .hd { font-family: "Noto Sans KR", sans-serif; }
+:lang(ru) .hd, :lang(vi) .hd { font-family: "Noto Sans", sans-serif; } :lang(ar) .hd { font-family: "Noto Kufi Arabic", sans-serif; }
+:lang(ar) h1 { transform: rotate(8deg); transform-origin: right center; }
+:lang(ko) h1 { word-break: keep-all; }
+/* Right to left: the poster is mirrored, so the headline sits on paper and the cards on the red. */
+:lang(ar) .hd { transform: scaleX(-1); } :lang(ar) .stage { transform: scaleX(-1); }
+
+/* Generic link cards: a cover, a title, a source line and a QR. No real site, logo or URL. */
+.card { position: absolute; width: 250px; border-radius: 18px; overflow: hidden; background: var(--white); box-shadow: 0 28px 50px -24px #000a; }
+.card .cover { height: 150px; }
+.card .meta { padding: 16px 18px 18px; display: grid; gap: 9px; }
+.card .meta i { display: block; height: 14px; border-radius: 7px; background: var(--ink); }
+.card .meta i.s { width: 38%; height: 9px; background: var(--grey); }
+.card .meta i.t2 { width: 72%; }
+.card.dark { background: var(--ink); } .card.dark .meta i { background: var(--white); } .card.dark .meta i.s { background: #6b675f; }
+.card.red { background: var(--red); } .card.red .meta i { background: var(--white); } .card.red .meta i.s { background: #f0a39c; }
+.qr { position: absolute; right: 14px; bottom: 14px; width: 58px; height: 58px; background: #fff; border-radius: 8px; padding: 6px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+.qr b { background: var(--ink); } .qr b.o { background: transparent; }
+.cards { position: relative; height: 100%; }
+
+/* Chinese: a bare link, struck out, becomes a card. */
+.bare { position: absolute; left: -4%; top: 16%; display: flex; align-items: center; gap: 12px; background: var(--white); border-radius: 20px; padding: 20px 26px; box-shadow: 0 20px 40px -24px #0008; }
+.bare svg { flex: none; }
+.bare .dots { display: flex; gap: 6px; } .bare .dots i { width: 22px; height: 10px; border-radius: 5px; background: #8b97b8; }
+.bare .x { position: absolute; right: -20px; top: -20px; width: 48px; height: 48px; border-radius: 50%; background: var(--red); color: #fff; font: 900 30px/48px "Noto Sans SC", sans-serif; text-align: center; }
+.card:has(.qr) .meta { padding-right: 86px; }
+.arrow { position: absolute; left: 22%; top: 37%; width: 110px; height: 30px; transform: rotate(28deg); background: var(--ink); clip-path: polygon(0 35%, 70% 35%, 70% 0, 100% 50%, 70% 100%, 70% 65%, 0 65%); }
+</style>
+</head>
+<body>
+<div class="hd" id="hd"></div>
+<script src="copy.js"></script>
+<script>
+const qr = () => {
+  // A decorative 7×7 pattern with the three finder corners; it does not encode anything.
+  const on = (r, c) => (r < 3 && c < 3) || (r < 3 && c > 3) || (r > 3 && c < 3) || ((r * 5 + c * 3) % 4 === 0);
+  let s = ""; for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) s += `<b class="${on(r, c) ? "" : "o"}"></b>`;
+  return `<span class="qr">${s}</span>`;
+};
+const cover = {
+  net: "background: radial-gradient(circle at 30% 40%, #fff 0 5%, transparent 6%), radial-gradient(circle at 60% 30%, #fff 0 5%, transparent 6%), radial-gradient(circle at 70% 70%, #fff 0 5%, transparent 6%), linear-gradient(150deg, transparent 46%, #d4261b 47% 50%, transparent 51%), linear-gradient(30deg, transparent 46%, #3fb6d6 47% 50%, transparent 51%), #111",
+  sun: "background: radial-gradient(circle at 70% 75%, #d4261b 0 26%, transparent 27%), linear-gradient(#f2d14c, #f2d14c)",
+  arch: "background: linear-gradient(90deg, #111 0 18%, transparent 18% 30%, #111 30% 48%, transparent 48% 60%, #111 60% 78%, transparent 78%) bottom/100% 55% no-repeat, #b9b1a0",
+  wave: "background: repeating-linear-gradient(-14deg, #111 0 10px, #ece2cd 10px 26px)",
+};
+const card = (cls, cv, style, withQr) =>
+  `<div class="card ${cls}" style="${style}"><div class="cover" style="${cover[cv]}"></div><div class="meta"><i class="s"></i><i></i><i class="t2"></i></div>${withQr ? qr() : ""}</div>`;
+
+// ?l=<fastlane locale>; the headline is that locale's first screenshot headline, its red part on the second line.
+const l = new URLSearchParams(location.search).get("l") || "en-US";
+const lang = l === "zh-Hans" ? "zh" : l;
+document.documentElement.lang = { "zh-Hans": "zh-Hans", "zh-Hant": "zh-Hant", "ar-SA": "ar", "fr-FR": "fr", "de-DE": "de", "es-ES": "es", "en-US": "en" }[l] || l;
+if (l === "ar-SA") document.documentElement.dir = "rtl";
+const [lead, rest] = COPY[l][0][0].replace(/<br>/g, "").split("<span>");
+const title = `<h1><span>${lead.trim()}</span><span>${rest.replace("</span>", "").trim()}</span></h1>`;
+const bg = `<span class="disc"></span><span class="tri"></span><span class="bar"></span><span class="bar thin"></span>`;
+const en = `<div class="stage">${title}<div class="cards">
+  ${card("", "sun", "left: 4%; top: 13%; transform: rotate(-9deg)")}
+  ${card("dark", "net", "left: 34%; top: 4%; transform: rotate(5deg)")}
+  ${card("red", "wave", "left: 12%; top: 46%; transform: rotate(4deg)")}
+  ${card("", "arch", "left: 46%; top: 40%; transform: rotate(-6deg)", true)}
+</div></div>`;
+const link = `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8b97b8" stroke-width="2.4" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>`;
+const zh = `<div class="stage">${title}<div class="cards">
+  <div class="bare">${link}<span class="dots"><i></i><i></i><i></i><i></i><i></i></span><span class="x">✕</span></div>
+  <span class="arrow"></span>
+  ${card("dark", "net", "left: 34%; top: 42%; width: 290px; transform: rotate(-5deg)", true)}
+</div></div>`;
+document.getElementById("hd").innerHTML = bg + (lang === "zh" ? zh : en);
+// Shrink the headline until its longer line fits its column.
+document.fonts.ready.then(() => {
+  const h = document.querySelector("h1"), col = h.parentElement.firstElementChild.getBoundingClientRect().width;
+  let size = parseFloat(getComputedStyle(h).fontSize);
+  while (h.scrollWidth > col && size > 40) h.style.fontSize = `${size -= 2}px`;
+  document.body.dataset.ready = "1";
+});
+</script>
+</body>
+</html>

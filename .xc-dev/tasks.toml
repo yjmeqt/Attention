@@ -192,7 +192,7 @@ fi
 # leaves their sims and DerivedData behind; `prune` cleans those up. Every sim a task boots is
 # recorded in xc-dev-sims in the shared git dir (sim-register), and prune deletes only recorded
 # sims whose worktree is gone, so sims made any other way (the Attention-Shots-* ones
-# capture-screenshots.sh drives, say) are never touched. DerivedData is pruned when its project
+# store-shots/capture.zsh drives, say) are never touched. DerivedData is pruned when its project
 # path is inside this repo and no longer exists.
 [tasks.sim-register]
 desc = "Record this worktree's sim name for prune (run by the tasks that boot a sim)."

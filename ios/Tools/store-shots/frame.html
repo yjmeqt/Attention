@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Attention Store Frame</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;900&family=Noto+Sans+TC:wght@400;900&family=Noto+Sans+JP:wght@400;900&family=Noto+Sans+KR:wght@400;900&family=Noto+Sans:wght@400;900&family=Noto+Kufi+Arabic:wght@400;900&family=Share+Tech+Mono&display=swap">
+<style>
+/* One App Store screenshot in the Constructivism style, chosen by ?d=device&l=locale&k=screen.
+   Each device is laid out in whole CSS px and captured at deviceScaleFactor 4 (iPhone, iPad) or 3 (Duo).
+   The phone or tablet shows the real, unedited app screenshot; only the poster around it is styled. */
+:root { --paper: #ece2cd; --ink: #111; --red: #d4261b;
+  --sans: "Noto Sans SC", "PingFang SC", sans-serif; --mono: "Share Tech Mono", ui-monospace, monospace; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); }
+.f { position: relative; overflow: hidden; isolation: isolate; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); display: flex; flex-direction: column; gap: calc(var(--u) * 7px); padding: calc(var(--u) * 22px) calc(var(--u) * 16px) 0; }
+.f .a { position: absolute; z-index: 0; inset: auto -20% -8% 25%; height: 72%; background: var(--red); clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+.f .b { position: absolute; z-index: 0; left: -10%; top: 56%; width: 130%; height: calc(var(--u) * 14px); background: var(--ink); transform: rotate(-26deg); }
+h3 { position: relative; z-index: 2; margin: calc(var(--u) * 4px) 0 0; font-weight: 900; font-size: calc(var(--u) * 25px); line-height: 1.12;
+  transform: rotate(-8deg); transform-origin: left top; text-wrap: balance; }
+h3 span { color: var(--red); }
+.f > p { position: relative; z-index: 2; margin: 0; font-size: calc(var(--u) * 11.5px); line-height: 1.5; font-family: var(--mono); letter-spacing: .1em; }
+/* Scripts the mono face doesn't cover set the subline in their own sans. */
+:lang(zh-Hant) { --sans: "Noto Sans TC", sans-serif; } :lang(ja) { --sans: "Noto Sans JP", sans-serif; } :lang(ko) { --sans: "Noto Sans KR", sans-serif; }
+:lang(ru), :lang(vi) { --sans: "Noto Sans", sans-serif; } :lang(ar) { --sans: "Noto Kufi Arabic", sans-serif; }
+:is(:lang(zh), :lang(ja), :lang(ko), :lang(ru), :lang(vi), :lang(ar)) .f > p { font-family: var(--sans); font-weight: 400; letter-spacing: .04em; }
+:lang(ar) h3 { transform: rotate(8deg); transform-origin: right top; margin-top: calc(var(--u) * 14px); }
+:lang(ar) :is(.duo, .duo-cover) h3 { margin-top: calc(var(--u) * 26px); }
+/* Korean breaks lines between words, not inside them. */
+:lang(ko) :is(h3, .f > p) { word-break: keep-all; }
+/* Russian words run long; a smaller headline keeps them inside the frame. */
+:lang(ru) h3 { font-size: calc(var(--u) * 21px); } :lang(ru) .ipad h3 { font-size: calc(var(--u) * 26px); }
+/* Japanese: no line may start with small kana or closing punctuation. */
+:lang(ja) :is(h3, .f > p) { line-break: strict; }
+:lang(ar) .f .a { inset: auto 25% -8% -20%; clip-path: polygon(0 0, 100% 100%, 0 100%); }
+:lang(ar) .f .b { transform: rotate(26deg); }
+
+.dev { position: relative; z-index: 3; margin-top: auto; align-self: center; background: #000; overflow: hidden;
+  border: calc(var(--u) * 5px) solid #1d1d1f; box-shadow: 0 0 0 1px #6e6e7366, 0 calc(var(--u) * 18px) calc(var(--u) * 40px) calc(var(--u) * -16px) #000a; }
+.dev img { display: block; width: 100%; height: auto; }
+.iphone .dev, .duo-cover .dev { width: 74%; margin-bottom: 4%; border-radius: calc(var(--u) * 30px); } .iphone .dev img, .duo-cover .dev img { border-radius: calc(var(--u) * 25px); }
+.duo .dev { width: 80%; margin-bottom: 4%; border-radius: calc(var(--u) * 26px); } .duo .dev img { border-radius: calc(var(--u) * 21px); }
+.ipad .dev { width: 66%; margin-bottom: 3.5%; border-radius: calc(var(--u) * 22px); border-width: calc(var(--u) * 7px); } .ipad .dev img { border-radius: calc(var(--u) * 15px); }
+.ipad { padding: calc(var(--u) * 20px) calc(var(--u) * 26px) 0; }
+.ipad h3 { font-size: calc(var(--u) * 30px); transform: rotate(-5deg); } .ipad h3 span { display: block; }
+:lang(ar) .ipad h3 { transform: rotate(5deg); } .ipad .f > p, .ipad > p { font-size: calc(var(--u) * 12px); }
+.ipad .b { top: 62%; }
+
+/* zh-Hans screen 1: a bare link in a chat bubble, then the same link as a card. Generic chat styling. */
+.cmp { position: relative; z-index: 3; margin-top: auto; margin-bottom: 7%; align-self: center; width: 88%; display: flex; flex-direction: column; gap: calc(var(--u) * 6px); }
+.ipad .cmp { width: 52%; margin-bottom: 4%; }
+/* The card is taller than wide; on Duo the block is sized so the card fits under the headline. */
+.duo .cmp, .duo-cover .cmp { width: 52%; margin-bottom: 5%; }
+.duo-cover .cmp { width: 44%; margin-bottom: 4%; } .duo-cover .cmp .bubble { font-size: calc(var(--u) * 10px); }
+.cmp .tag { align-self: flex-start; font: 900 calc(var(--u) * 13px)/1 var(--sans); letter-spacing: .12em; padding: calc(var(--u) * 5px) calc(var(--u) * 8px) calc(var(--u) * 5px) calc(var(--u) * 10px); background: var(--ink); color: var(--paper); }
+.cmp .tag.now { background: var(--red); color: #fff; margin-top: calc(var(--u) * 10px); }
+.cmp .bubble { position: relative; align-self: flex-start; background: #fff; border-radius: calc(var(--u) * 12px); padding: calc(var(--u) * 10px) calc(var(--u) * 12px);
+  font: calc(var(--u) * 12px)/1.3 -apple-system, "PingFang SC", sans-serif; color: #2a5db0; box-shadow: 0 calc(var(--u) * 6px) calc(var(--u) * 16px) calc(var(--u) * -8px) #0006; }
+.cmp .bubble small { display: block; color: #8a8a8a; font-size: calc(var(--u) * 9.5px); margin-top: calc(var(--u) * 3px); }
+.cmp .bubble b { position: absolute; right: calc(var(--u) * -12px); top: calc(var(--u) * -12px); width: calc(var(--u) * 26px); height: calc(var(--u) * 26px); border-radius: 50%;
+  background: var(--red); color: #fff; font: 900 calc(var(--u) * 15px)/calc(var(--u) * 26px) var(--sans); text-align: center; }
+.cmp img { display: block; width: 100%; height: auto; border-radius: calc(var(--u) * 7px); box-shadow: 0 calc(var(--u) * 14px) calc(var(--u) * 30px) calc(var(--u) * -12px) #000b; transform: rotate(-2deg); }
+</style>
+</head>
+<body>
+<div id="f"></div>
+<script src="copy.js"></script>
+<script>
+// Frame sizes in whole CSS px (pixel size ÷ the exporter's scale factor) and the type unit, 1 being a 264 px wide iPhone frame.
+const DEVICES = {
+  "iphone": [330, 717, 1.25], "ipad": [688, 516, 1.5625], "duo": [669, 951, 2.1667], "duo-cover": [466, 678, 1.75],
+};
+const q = new URLSearchParams(location.search);
+const d = q.get("d"), l = q.get("l"), k = +q.get("k");
+const [w, h, u] = DEVICES[d];
+const lang = { "zh-Hans": "zh-Hans", "zh-Hant": "zh-Hant", "ar-SA": "ar", "fr-FR": "fr", "de-DE": "de", "es-ES": "es", "en-US": "en" }[l] || l;
+document.documentElement.lang = lang;
+if (lang === "ar") document.documentElement.dir = "rtl";
+const [head, sub, scene] = COPY[l][k - 1];
+// capture.zsh's screens; card.png is the card export.js crops out of the zh-Hans iPhone detail screen.
+const raw = s => `../../fastlane/raw/${l}/${d}-${s}.png`;
+const body = scene === "compare"
+  ? `<div class="cmp"><span class="tag">以前</span><div class="bubble">https://youtu.be/aircAruvnKk<small>好友：这是什么？</small><b>✕</b></div><span class="tag now">现在</span><img src="../../fastlane/raw/zh-Hans/card.png" alt=""></div>`
+  : `<div class="dev"><img src="${raw(scene)}" alt=""></div>`;
+const f = document.getElementById("f");
+f.className = `f ${d}`;
+f.style.cssText = `width:${w}px;height:${h}px;--u:${u}`;
+f.innerHTML = `<span class="a"></span><span class="b"></span><h3>${head}</h3><p>${sub}</p>${body}`;
+</script>
+</body>
+</html>
