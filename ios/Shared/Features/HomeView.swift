@@ -32,6 +32,7 @@ struct HomeView: View {
     @State private var selection: Set<UUID> = []
     @State private var showsGuide = false
     @State private var guideWatched = false
+    @State private var guideFolded = 0
     @State private var showsScanner = false
     @State private var showsLinkEntry = false
     @State private var typedLink = ""
@@ -39,6 +40,7 @@ struct HomeView: View {
     @State private var searching = false
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
+    private let guideTip = GuideTip()
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
@@ -59,6 +61,10 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 16) {
+                    // Inline, as a popover tip on the More menu never shows.
+                    TipView(guideTip)
+                        .frame(maxWidth: 520)
+                        .padding(.horizontal)
                     if library.items.isEmpty {
                         EmptyState(showsPaste: false, paste: paste, onSample: openSample)
                             .frame(maxWidth: 520)
@@ -144,7 +150,7 @@ struct HomeView: View {
         .onChange(of: filter.showsPrivate) { _, shows in
             if !shows { lockPrivate() }
         }
-        .sheet(isPresented: $showsGuide, onDismiss: { seenShareGuide = true }) {
+        .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
                 ShareSheetGuide(onWatched: { guideWatched = true })
                     .toolbar {
@@ -156,6 +162,8 @@ struct HomeView: View {
             }
             .presentationSizing(.page)
             .interactiveDismissDisabled(!guideWatched)
+            // Dismissing shrinks the guide into More, where it can be replayed.
+            .navigationTransition(.zoom(sourceID: Self.guideSource, in: zoom))
         }
         .sheet(isPresented: $showsScanner) {
             QRScanSheet(onLink: scanned)
@@ -316,7 +324,7 @@ struct HomeView: View {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
             ToolbarItem(placement: .primaryAction) {
-                Menu("More", systemImage: "ellipsis") {
+                Menu {
                     if !library.items.isEmpty {
                         Section {
                             Toggle(isOn: Binding(get: { filter.showsArchived }, set: { _ in toggleArchived() })) {
@@ -334,11 +342,17 @@ struct HomeView: View {
                     }
                     NavigationLink {
                         ShareSheetGuide()
+                            .onAppear { guideTip.invalidate(reason: .actionPerformed) }
                     } label: {
                         Label("Pin \(Brand.name) to the front of the share sheet", systemImage: "pin")
                     }
+                } label: {
+                    Label("More", systemImage: "ellipsis")
+                        .symbolEffect(.bounce, value: guideFolded)
                 }
+                .sensoryFeedback(.impact(weight: .light), trigger: guideFolded)
             }
+            .matchedTransitionSource(id: Self.guideSource, in: zoom)
             ToolbarItem(placement: .bottomBar) {
                 // The system paste button reads the clipboard without the paste-permission prompt.
                 PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
@@ -348,6 +362,18 @@ struct HomeView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             // Unconditional: without it the system moves search up next to More.
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        }
+    }
+
+    private static let guideSource = "shareSheetGuide"
+
+    /// Once the guide has shrunk into More, More bounces, then a tip says the guide lives there.
+    private func guideDismissed() {
+        seenShareGuide = true
+        guideFolded += 1
+        Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            GuideTip.guideFolded = true
         }
     }
 
