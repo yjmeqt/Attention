@@ -32,6 +32,10 @@
 	<string>Unlock your private items.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save link cards to your photo library.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>INSendMessageIntent</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

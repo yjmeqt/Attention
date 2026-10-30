@@ -38,6 +38,7 @@ final class ItemActions {
             copied = .linkForImage
         }
         presenter.present([ShareItem(image: image, title: item.displayTitle, url: url, icon: library.favicon(item))])
+        Assistant.sherlock.donate()
     }
 
     private func shareURL(_ item: LibraryItem) -> URL? {

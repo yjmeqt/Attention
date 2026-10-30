@@ -5,6 +5,8 @@ struct ItemDetailView: View {
     let item: LibraryItem
     /// Set in the share extension: shows a Done button that closes it.
     var onDone: (() -> Void)?
+    /// Opens the share sheet with the card as soon as the view is up, for Sherlock's suggestion.
+    var autoShare = false
 
     @State private var actions: ItemActions
     @State private var image: UIImage?
@@ -12,9 +14,10 @@ struct ItemDetailView: View {
     @State private var covers: (preview: UIImage?, shared: UIImage?)?
     @Environment(\.dismiss) private var dismiss
 
-    init(item: LibraryItem, library: Library, privateUnlocked: Bool = false, onDone: (() -> Void)? = nil) {
+    init(item: LibraryItem, library: Library, privateUnlocked: Bool = false, autoShare: Bool = false, onDone: (() -> Void)? = nil) {
         self.item = item
         self.onDone = onDone
+        self.autoShare = autoShare
         let actions = ItemActions(library: library)
         actions.privateUnlocked = privateUnlocked
         _actions = State(initialValue: actions)
@@ -55,6 +58,12 @@ struct ItemDetailView: View {
                 ? (library.data(.cover, of: item).flatMap(Self.coverThumbnail),
                    library.data(.source, of: item).flatMap(Self.coverThumbnail))
                 : nil
+        }
+        .task {
+            guard autoShare else { return }
+            // The share anchor needs to be in the window before the sheet can present from it.
+            try? await Task.sleep(for: .milliseconds(400))
+            actions.shareImage(item)
         }
         .onAppear {
             actions.copied = nil
