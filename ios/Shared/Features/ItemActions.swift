@@ -21,7 +21,7 @@ final class ItemActions {
 
     func shareLink(_ item: LibraryItem) {
         guard let url = shareURL(item) else { return }
-        presenter.present([url])
+        presenter.present([ShareItem(url: url, title: item.displayTitle, icon: library.favicon(item))])
     }
 
     func copyLink(_ item: LibraryItem) {
@@ -32,11 +32,13 @@ final class ItemActions {
 
     func shareImage(_ item: LibraryItem) {
         guard let image = library.fullImage(item) else { return }
-        if let url = shareURL(item) {
+        let url = shareURL(item)
+        if let url {
             Clipboard.copy(url)
             copied = .linkForImage
         }
-        presenter.present([image])
+        presenter.present([ShareItem(image: image, title: item.displayTitle, url: url, icon: library.favicon(item))])
+        ShareSuggestion.share.donate()
     }
 
     private func shareURL(_ item: LibraryItem) -> URL? {

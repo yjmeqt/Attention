@@ -85,6 +85,7 @@
 		95A25F1DAA152B75C0E00A94 /* Vision.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB62E4296F1EED134B56DB97 /* Vision.swift */; };
 		97B228E4A63F1D9809BB4DBE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61EABF9910C697C13BAF4A83 /* InfoPlist.strings */; };
 		97B96EC3145008C2E3184089 /* GuideTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */; };
+		99EB6DC707C74D02B7303972 /* ShareSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A54ED73BE55F2399F8E6A2 /* ShareSuggestions.swift */; };
 		9A22F77D2E35010E3C499BEB /* Opening.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4A0053B5A944F84E96744AC /* Opening.swift */; };
 		9E73CAEC81970B4F0B643024 /* TagEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71243223C1A41C8631BC1363 /* TagEditor.swift */; };
 		9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9792D39565DE3A1F9C1B3188 /* Sharing.swift */; };
@@ -127,6 +128,7 @@
 		F4F4A584744CF40B115DD840 /* CardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430B9788D92BAB15EA6BD2A /* CardControls.swift */; };
 		F4FE6AB07E01445FBBD65ED1 /* CardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430B9788D92BAB15EA6BD2A /* CardControls.swift */; };
 		F5D4C661341667503905444D /* HistoryImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5337444CD9E33BADFDAE4840 /* HistoryImport.swift */; };
+		FA1CCA192835C0D9CDE91283 /* ShareSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A54ED73BE55F2399F8E6A2 /* ShareSuggestions.swift */; };
 		FBA86F2E9FEB560B7CB3C001 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995BDC3986BCF6B25F34BEF3 /* Platform.swift */; };
 		FE91EE4E9D4EC545548A499C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F25185D8C537E29BF073422D /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
@@ -170,6 +172,7 @@
 		1AF7324B5EBF1F088F7F36B0 /* Intake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intake.swift; sourceTree = "<group>"; };
 		1E7465AC0D67046C8C505116 /* CardPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPalette.swift; sourceTree = "<group>"; };
 		1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTemplate.swift; sourceTree = "<group>"; };
+		22A54ED73BE55F2399F8E6A2 /* ShareSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSuggestions.swift; sourceTree = "<group>"; };
 		236301C39C52D5FA004AD1CA /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		370075CD22DCAED23F786BF1 /* FeedFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFilter.swift; sourceTree = "<group>"; };
@@ -275,6 +278,7 @@
 				995BDC3986BCF6B25F34BEF3 /* Platform.swift */,
 				C1CB68E970E6B587DFFBF994 /* QRScanner.swift */,
 				18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */,
+				22A54ED73BE55F2399F8E6A2 /* ShareSuggestions.swift */,
 				9792D39565DE3A1F9C1B3188 /* Sharing.swift */,
 				777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */,
 				413D94BF01D3E686B75D4FE2 /* Card */,
@@ -675,6 +679,7 @@
 				5E92145300F60B3BA2D03F70 /* QRScanner.swift in Sources */,
 				11439DAF98CE599F18B38FD3 /* QRTemplate.swift in Sources */,
 				0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */,
+				FA1CCA192835C0D9CDE91283 /* ShareSuggestions.swift in Sources */,
 				9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */,
 				9E73CAEC81970B4F0B643024 /* TagEditor.swift in Sources */,
 				AF256F2DD5F9D18473D735FC /* TileTemplate.swift in Sources */,
@@ -713,6 +718,7 @@
 				410391E562DD9663730B1638 /* QRScanner.swift in Sources */,
 				56A6BE57AF8E2BD8E7EB7F13 /* QRTemplate.swift in Sources */,
 				027200EC7E80BC55E51E5F82 /* ShareSheetGuide.swift in Sources */,
+				99EB6DC707C74D02B7303972 /* ShareSuggestions.swift in Sources */,
 				ECE8D2F82106875E9609C88E /* ShareViewController.swift in Sources */,
 				C0A56CB704FF2B96B432D8A4 /* Sharing.swift in Sources */,
 				093824F18D2FC574C9FBC3DF /* TagEditor.swift in Sources */,
