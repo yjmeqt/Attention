@@ -67,6 +67,30 @@ struct LibraryTests {
         #expect(a.domain == DomainTag.images)
     }
 
+    /// What two devices that saved the same link before syncing end up with.
+    @Test func duplicatesFromSyncMergeIntoOneItem() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        library.addTag("music", to: [a])
+        library.addTag("later", to: [b])
+        library.setPrivate(true, [b])
+        library.write(Data([1, 2, 3]), .icon, of: b)
+        b.key = a.key
+        library.save()
+
+        library.mergeDuplicates()
+
+        #expect(library.items.count == 1)
+        let kept = library.items[0]
+        // Every device keeps the copy with the lowest id, so they all keep the same one.
+        let lowest = a.id.uuidString < b.id.uuidString ? a.id : b.id
+        #expect(kept.id == lowest)
+        #expect(Set(kept.tags) == ["music", "later"])
+        #expect(kept.isPrivate)
+        #expect(library.data(.icon, of: kept) == Data([1, 2, 3]))
+    }
+
     @Test func capRemovesOldestNonPrivate() {
         let library = makeLibrary()
         library.maxItems = 3

@@ -16,6 +16,7 @@ Links from YouTube, X and many other sites show up in WeChat as a bare URL, with
 | Path | Platform | Status |
 |---|---|---|
 | [`ios/`](ios) | iOS 26+, iPhone, iPad and iPhone Duo (SwiftUI, Swift 6) | Main app, feature complete for 1.0 |
+| [`ios/Mac/`](ios/Mac) | macOS 26+: library window and menu bar item (SwiftUI, AppKit), same Xcode project and App Store record | New |
 | [`android/`](android) | Android 12+ (Kotlin, Jetpack Compose, Material 3) | In progress |
 | [`docs/`](docs) | App Store preparation, privacy policy | |
 
@@ -28,7 +29,7 @@ HarmonyOS is planned as a sibling `harmony/` folder. Each platform is a self-con
 3. **Render**: one of three templates: a card with the cover photo and its color (the default when there's a preview), text, or QR (the default when there isn't). Every card is 1080 px wide and as tall as its content. The card text is always Simplified Chinese, because it's read in WeChat.
 4. **Share**: tracking parameters are stripped (`youtu.be/ID` for YouTube, no query for X, no `utm_*` elsewhere), the link goes to the clipboard and the image to the share sheet.
 
-Everything runs on the device. There is no backend and no account.
+Everything runs on the device. There is no backend and no account: the library syncs between a person's iPhone, iPad and Mac through their own iCloud (CloudKit private database).
 
 ## iOS
 
@@ -52,8 +53,12 @@ xcodebuild -project Attention.xcodeproj -scheme Attention \
 | `Attention` | The app (`App/`, plus everything in `Shared/`) |
 | `AttentionExtension` | Share extension, so links can be shared from Safari, YouTube, X, etc. (`ShareExtension/`) |
 | `AttentionTests` | Swift Testing suites (`Tests/`) |
+| `AttentionMac` | The Mac app (`Mac/`, plus the library, unfurler, card templates and feed tiles from `Shared/`) |
 
 - Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.<bundle ID>.shared`.
+- The Mac app compiles only the parts of `Shared/` it needs (see its `sources` in `project.yml`); `Shared/Platform.swift` gives `NSImage` the few `UIImage` members they use, so shared code says `PlatformImage` and `Image(platformImage:)`. Its library window has sites and tags in the sidebar, the feed as a grid, and the selected card in an inspector; ⌘V or a drop saves a link or image. The menu bar panel makes a card from a copied link, and ⌃⌥⌘A anywhere turns the link on the clipboard into a card image on the clipboard, ready to paste into WeChat. It shows in the Dock only while the library window is open. `xc-dev run-mac` builds and opens it.
+- **iCloud**: the library (`LibraryItem`, with its images as external-storage attributes) syncs through the container `iCloud.<bundle ID>`. CloudKit rules out unique attributes, so `Library.mergeDuplicates()` folds together copies of the same link saved on two devices before they synced. The share extension writes to the store without syncing; the app uploads its changes. Feed thumbnails are a local cache each device rebuilds. Before the first release that syncs, deploy the schema from Development to Production in the [CloudKit Console](https://icloud.developer.apple.com/) (run a Debug build that has saved an item first, so every field exists).
+- The Mac app ships through the same App Store record as iOS (same bundle ID, one purchase): `Tools/release.sh beta --mac` uploads a build, `Tools/release.sh metadata --mac` pushes the listing and `mac-*.png` screenshots to the macOS version.
 - Debug and Release install side by side: Debug is `com.yjmeqt.attn.dev` ("Attention Dev"), Release is `com.yjmeqt.attn` ("Attention"). The extension and tests append `.share` and `.tests`.
 - Signing uses automatic provisioning with team `M3V5P234X3`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and `APP_BUNDLE_ID` in `project.yml`.
 - UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/Attention.icon`), so iOS derives the dark, tinted and clear appearances itself.

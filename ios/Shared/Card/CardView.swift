@@ -26,19 +26,24 @@ struct CardView: View {
 
     /// Points. Every template is as tall as its content.
     static func size(for meta: LinkMeta, style: CardStyle) -> CGSize {
+        #if os(macOS)
+        // `NSHostingController.sizeThatFits` lets the templates' spacers take the whole unbounded height.
+        let fitting = NSHostingView(rootView: CardView(meta: meta, style: style)).fittingSize
+        #else
         let fitting = UIHostingController(rootView: CardView(meta: meta, style: style))
             .sizeThatFits(in: CGSize(width: width, height: .greatestFiniteMagnitude))
+        #endif
         return CGSize(width: width, height: fitting.height.rounded(.up))
     }
 }
 
 enum CardRenderer {
-    static func render(_ meta: LinkMeta, style: CardStyle, scale: CGFloat = 3) -> UIImage? {
+    static func render(_ meta: LinkMeta, style: CardStyle, scale: CGFloat = 3) -> PlatformImage? {
         let size = CardView.size(for: meta, style: style)
         let renderer = ImageRenderer(content: CardView(meta: meta, style: style, height: size.height))
         renderer.proposedSize = ProposedViewSize(size)
         renderer.scale = scale
         renderer.isOpaque = true
-        return renderer.uiImage
+        return renderer.platformImage
     }
 }

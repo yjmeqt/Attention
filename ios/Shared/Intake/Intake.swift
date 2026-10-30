@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 import UniformTypeIdentifiers
 
 /// Something shared into or pasted into Attention, before it's saved.

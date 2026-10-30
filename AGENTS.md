@@ -15,6 +15,7 @@ xc-dev build                # xcodegen if project.yml changed, then build for th
 xc-dev run                  # build, boot this worktree's iPhone sim, install, launch
 xc-dev run-ipad             # same on this worktree's iPad sim
 xc-dev run-duo              # same on this worktree's iPhone Duo sim
+xc-dev run-mac              # build and open the Mac menu bar app
 xc-dev stop                 # kill this worktree's xcodebuild, terminate the app on its sims
 xc-dev clean                # delete this worktree's sims and its DerivedData
 xc-dev prune                # dry run: sims and DerivedData left by removed worktrees

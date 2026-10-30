@@ -78,12 +78,12 @@ struct FeedTile: View {
     }
 
     /// A photo with a band below it in the photo's own color, like App Store Today cards.
-    private func card(_ photo: UIImage) -> some View {
+    private func card(_ photo: PlatformImage) -> some View {
         let tint = library.tint(item)
         return VStack(alignment: .leading, spacing: 0) {
             Color.clear
                 .aspectRatio(item.thumbnailAspect, contentMode: .fit)
-                .overlay { Image(uiImage: photo).resizable().scaledToFill() }
+                .overlay { Image(platformImage: photo).resizable().scaledToFill() }
                 .clipped()
             VStack(alignment: .leading, spacing: 4) {
                 Eyebrow(item: item, library: library)
@@ -97,7 +97,7 @@ struct FeedTile: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(tint.map { Color(uiColor: $0.color) } ?? Color(.secondarySystemBackground))
+            .background(tint.map(\.color) ?? .secondaryBackground)
             .environment(\.colorScheme, tint.map { $0.isDark ? .dark : .light } ?? colorScheme)
         }
     }
@@ -114,7 +114,7 @@ struct FeedTile: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color.secondaryBackground)
     }
 
     /// Time on the left; links get an Open button on the right, like the App Store's Get button.
@@ -153,7 +153,7 @@ private struct Eyebrow: View {
     var body: some View {
         HStack(spacing: 4) {
             if let icon = library.favicon(item) {
-                Image(uiImage: icon)
+                Image(platformImage: icon)
                     .resizable()
                     .frame(width: 14, height: 14)
                     .clipShape(.rect(cornerRadius: 3))
@@ -198,7 +198,7 @@ struct FilterBar: View {
                         ForEach(Self.ranked(section.map(\.domain)), id: \.self) { domain in
                             chip(DomainTag.label(domain), selected: filter.domains.contains(domain)) {
                                 if let item = byDomain[domain], let icon = library.favicon(item) {
-                                    Image(uiImage: icon).resizable().scaledToFit()
+                                    Image(platformImage: icon).resizable().scaledToFit()
                                         .frame(width: 16, height: 16)
                                         .clipShape(.rect(cornerRadius: 4, style: .continuous))
                                 } else {

@@ -1,4 +1,4 @@
-import UIKit
+import SwiftUI
 import LinkPresentation
 import UniformTypeIdentifiers
 
@@ -28,7 +28,7 @@ enum Unfurler {
     }
 
     private static func pixelWidth(_ data: Data?) -> CGFloat {
-        guard let data, let image = UIImage(data: data) else { return 0 }
+        guard let data, let image = PlatformImage(data: data) else { return 0 }
         return image.size.width * image.scale
     }
 
@@ -76,7 +76,7 @@ enum Unfurler {
     private static func imageData(_ string: String?) async -> Data? {
         guard let string else { return nil }
         for url in imageCandidates(string) {
-            if let data = try? await fetch(url), let image = UIImage(data: data),
+            if let data = try? await fetch(url), let image = PlatformImage(data: data),
                image.size.width >= 48, image.size.height >= 48 { return data }
         }
         return nil
@@ -102,7 +102,7 @@ enum Unfurler {
     /// Downloads an icon and keeps it at most 192 px, preserving transparency.
     private static func iconData(_ string: String?) async -> Data? {
         guard let string, let url = URL(string: string),
-              let data = try? await fetch(url), let image = UIImage(data: data),
+              let data = try? await fetch(url), let image = PlatformImage(data: data),
               image.size.width >= 16 else { return nil }
         guard image.size.width > 192 else { return image.pngData() }
         return image.preparingThumbnail(of: CGSize(width: 192, height: 192 * image.size.height / image.size.width))?.pngData()
@@ -121,7 +121,7 @@ enum Unfurler {
         guard let api = URL(string: "https://www.google.com/s2/favicons?domain=\(iconHost(url))&sz=128") else { return nil }
         guard let (data, response) = try? await session.data(for: URLRequest(url: api, timeoutInterval: 3)),
               (response as? HTTPURLResponse)?.statusCode == 200,
-              let image = UIImage(data: data), image.size.width >= 32 else { return nil }
+              let image = PlatformImage(data: data), image.size.width >= 32 else { return nil }
         return data
     }
 
@@ -135,7 +135,7 @@ enum Unfurler {
     }
 
     private static func thumbnail(_ data: Data?, side: CGFloat) -> Data? {
-        guard let data, let image = UIImage(data: data) else { return nil }
+        guard let data, let image = PlatformImage(data: data) else { return nil }
         return image.preparingThumbnail(of: CGSize(width: side, height: side))?.jpegData(compressionQuality: 0.85)
     }
 

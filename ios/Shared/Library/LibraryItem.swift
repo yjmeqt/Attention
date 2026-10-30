@@ -1,45 +1,46 @@
 import Foundation
 import SwiftData
 
+/// Synced through CloudKit, which rules out unique attributes and needs a default for every property.
+/// `Library` merges the duplicates two devices can create for the same `key`.
 @Model
 final class LibraryItem {
-    @Attribute(.unique) var id: UUID
+    var id = UUID()
     /// Cleaned URL for links, `image:<sha256>` for images.
-    @Attribute(.unique) var key: String
+    var key = ""
     var urlString: String?
-    var createdAt: Date
-    var updatedAt: Date
-    var site: String
-    var title: String
+    var createdAt = Date.now
+    var updatedAt = Date.now
+    var site = ""
+    var title = ""
     var authorName: String?
     var authorHandle: String?
     var ocrText: String?
-    var templateRaw: String
-    /// Unused since cards dropped aspect ratios; kept so the store needs no migration.
-    var aspectRaw: String
-    var tags: [String]
-    var isPrivate: Bool
+    var templateRaw = CardTemplate.auto.rawValue
+    var tags: [String] = []
+    var isPrivate = false
     /// Hidden from the feed but kept, unlike deleted items.
-    var isArchived: Bool = false
+    var isArchived = false
     /// For links shared as an image: show that image instead of the link's preview image.
-    var usesSharedImage: Bool = false
+    var usesSharedImage = false
     /// Width ÷ height of the thumbnail, so the feed can lay out tiles before loading them.
-    var thumbnailAspect: Double
+    var thumbnailAspect = 0.8
+
+    // Images live outside the database and sync as CloudKit assets. Read and write them through `Library`.
+    /// The link's preview image.
+    @Attribute(.externalStorage) var coverData: Data?
+    @Attribute(.externalStorage) var avatarData: Data?
+    @Attribute(.externalStorage) var iconData: Data?
+    /// The image the item was shared or pasted as.
+    @Attribute(.externalStorage) var sourceData: Data?
 
     @MainActor
     init(key: String, url: URL?, site: String, title: String = "", style: CardStyle = CardStyle()) {
-        id = UUID()
         self.key = key
         urlString = url?.absoluteString
-        createdAt = .now
-        updatedAt = .now
         self.site = site
         self.title = title
         templateRaw = style.template.rawValue
-        aspectRaw = "portrait"
-        tags = []
-        isPrivate = false
-        thumbnailAspect = 0.8
     }
 }
 

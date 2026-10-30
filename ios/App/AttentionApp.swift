@@ -3,7 +3,7 @@ import TipKit
 
 @main
 struct AttentionApp: App {
-    @State private var library = Library()
+    @State private var library = Library(syncs: true)
 
     init() {
         #if DEBUG

@@ -1,9 +1,9 @@
-import Foundation
+import SwiftUI
 import Observation
 import SwiftData
-import UIKit
+import CoreData
 
-/// Every saved link and image, shared by the app and the share extension.
+/// Every saved link and image, shared by the app and the share extension, and synced through iCloud.
 @Observable
 final class Library {
     @ObservationIgnored var maxItems = 5000
@@ -17,19 +17,24 @@ final class Library {
 
     @ObservationIgnored private let context: ModelContext
     @ObservationIgnored let directory: URL
-    @ObservationIgnored private let thumbnails = NSCache<NSString, UIImage>()
+    @ObservationIgnored private let thumbnails = NSCache<NSString, PlatformImage>()
     @ObservationIgnored private let tints = NSCache<NSString, Tint>()
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
     @ObservationIgnored var retriedPreviews: Set<UUID> = []
+    @ObservationIgnored private var remoteChanges: (any NSObjectProtocol)?
+    @ObservationIgnored private var pendingReload: Task<Void, Never>?
 
+    /// `syncs` is for the apps. The share extension writes to the same store without syncing it;
+    /// the app uploads those changes from the store's history the next time it runs.
     init(directory: URL = AppGroup.container.appending(path: "Library", directoryHint: .isDirectory),
-         inMemory: Bool = false) {
+         inMemory: Bool = false, syncs: Bool = false) {
         self.directory = directory
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let cloud: ModelConfiguration.CloudKitDatabase = syncs ? CloudSync.containerID.map { .private($0) } ?? .none : .none
         let configuration = inMemory
-            ? ModelConfiguration(isStoredInMemoryOnly: true)
-            : ModelConfiguration(url: directory.appending(path: "Library.store"))
+            ? ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+            : ModelConfiguration(url: directory.appending(path: "Library.store"), cloudKitDatabase: cloud)
         let container: ModelContainer
         do {
             container = try ModelContainer(for: LibraryItem.self, configurations: configuration)
@@ -39,6 +44,52 @@ final class Library {
         context = ModelContext(container)
         context.autosaveEnabled = false
         reload()
+        if syncs { observeRemoteChanges() }
+    }
+
+    /// Imports from iCloud (and saves by the share extension) arrive as remote changes to the store.
+    /// They come in bursts, so a reload waits for a quiet moment.
+    private func observeRemoteChanges() {
+        remoteChanges = NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.pendingReload?.cancel()
+                self.pendingReload = Task {
+                    try? await Task.sleep(for: .milliseconds(500))
+                    guard !Task.isCancelled else { return }
+                    self.reload()
+                    self.mergeDuplicates()
+                    self.revision += 1
+                }
+            }
+        }
+    }
+
+    /// Two devices can save the same link before they sync. Every device keeps the same copy, the one
+    /// with the lowest id, so they agree without talking, and folds the others into it.
+    func mergeDuplicates() {
+        let groups = Dictionary(grouping: items, by: \.key).values.filter { $0.count > 1 }
+        guard !groups.isEmpty else { return }
+        for group in groups {
+            let sorted = group.sorted { $0.id.uuidString < $1.id.uuidString }
+            let keeper = sorted[0]
+            for other in sorted.dropFirst() {
+                keeper.createdAt = min(keeper.createdAt, other.createdAt)
+                keeper.updatedAt = max(keeper.updatedAt, other.updatedAt)
+                keeper.tags += other.tags.filter { !keeper.tags.contains($0) }
+                keeper.isPrivate = keeper.isPrivate || other.isPrivate
+                if keeper.title.isEmpty { keeper.title = other.title }
+                if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
+                if keeper.coverData == nil { keeper.coverData = other.coverData }
+                if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
+                if keeper.iconData == nil { keeper.iconData = other.iconData }
+                if keeper.sourceData == nil { keeper.sourceData = other.sourceData }
+                try? FileManager.default.removeItem(at: folder(other))
+                context.delete(other)
+            }
+            refreshThumbnail(keeper)
+        }
+        save()
     }
 
     func reload() {
@@ -128,32 +179,53 @@ final class Library {
 
     // MARK: - Files
 
+    /// The thumbnail is a local cache each device makes from the synced images; the rest sync with the item.
     enum File: String { case cover, avatar, icon, source, thumbnail = "tile" }
 
+    /// Holds the item's local cache.
     func folder(_ item: LibraryItem) -> URL {
         directory.appending(path: item.id.uuidString, directoryHint: .isDirectory)
     }
 
     func data(_ file: File, of item: LibraryItem) -> Data? {
-        try? Data(contentsOf: folder(item).appending(path: file.rawValue))
+        switch file {
+        case .cover: item.coverData
+        case .avatar: item.avatarData
+        case .icon: item.iconData
+        case .source: item.sourceData
+        case .thumbnail: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
+        }
     }
 
     func write(_ data: Data?, _ file: File, of item: LibraryItem) {
-        let url = folder(item).appending(path: file.rawValue)
-        guard let data else {
-            try? FileManager.default.removeItem(at: url)
-            return
+        switch file {
+        case .cover: item.coverData = data
+        case .avatar: item.avatarData = data
+        case .icon: item.iconData = data
+        case .source: item.sourceData = data
+        case .thumbnail:
+            let url = folder(item).appending(path: file.rawValue)
+            guard let data else {
+                try? FileManager.default.removeItem(at: url)
+                return
+            }
+            try? FileManager.default.createDirectory(at: folder(item), withIntermediateDirectories: true)
+            #if os(iOS)
+            try? data.write(to: url, options: item.isPrivate ? [.atomic, .completeFileProtection] : .atomic)
+            #else
+            try? data.write(to: url, options: .atomic)
+            #endif
         }
-        try? FileManager.default.createDirectory(at: folder(item), withIntermediateDirectories: true)
-        try? data.write(to: url, options: item.isPrivate ? [.atomic, .completeFileProtection] : .atomic)
     }
 
     private func protect(_ item: LibraryItem) {
+        #if os(iOS)
         let protection: FileProtectionType = item.isPrivate ? .complete : .completeUntilFirstUserAuthentication
         let files = (try? FileManager.default.contentsOfDirectory(at: folder(item), includingPropertiesForKeys: nil)) ?? []
         for file in files {
             try? FileManager.default.setAttributes([.protectionKey: protection], ofItemAtPath: file.path)
         }
+        #endif
     }
 
     // MARK: - Metadata
@@ -208,11 +280,11 @@ final class Library {
     // MARK: - Thumbnails
 
     /// The feed image: the link's preview image or the shared image. Nil when there's none.
-    func thumbnail(_ item: LibraryItem) -> UIImage? {
+    func thumbnail(_ item: LibraryItem) -> PlatformImage? {
         let key = item.id.uuidString as NSString
         if let cached = thumbnails.object(forKey: key) { return cached }
         if data(.thumbnail, of: item) == nil, checked.insert(item.id).inserted { refreshThumbnail(item) }
-        guard let data = data(.thumbnail, of: item), let image = UIImage(data: data) else { return nil }
+        guard let data = data(.thumbnail, of: item), let image = PlatformImage(data: data) else { return nil }
         thumbnails.setObject(image, forKey: key)
         return image
     }
@@ -222,31 +294,31 @@ final class Library {
         let key = item.id.uuidString as NSString
         if let cached = tints.object(forKey: key) { return cached }
         guard let image = thumbnail(item)?.cgImage, let rgb = ImageData.bottomEdgeColor(image) else { return nil }
-        let tint = Tint(color: UIColor(red: rgb.red, green: rgb.green, blue: rgb.blue, alpha: 1),
+        let tint = Tint(color: Color(red: rgb.red, green: rgb.green, blue: rgb.blue),
                         isDark: 0.299 * rgb.red + 0.587 * rgb.green + 0.114 * rgb.blue < 0.6)
         tints.setObject(tint, forKey: key)
         return tint
     }
 
     final class Tint {
-        let color: UIColor
+        let color: Color
         let isDark: Bool
-        init(color: UIColor, isDark: Bool) { self.color = color; self.isDark = isDark }
+        init(color: Color, isDark: Bool) { self.color = color; self.isDark = isDark }
     }
 
-    func favicon(_ item: LibraryItem) -> UIImage? {
+    func favicon(_ item: LibraryItem) -> PlatformImage? {
         let key = "icon-\(item.id.uuidString)" as NSString
         if let cached = thumbnails.object(forKey: key) { return cached }
         guard let data = data(.icon, of: item), let cgImage = ImageData.downsample(data, maxPixel: 128) else { return nil }
-        let image = UIImage(cgImage: cgImage)
+        let image = PlatformImage(cgImage: cgImage)
         thumbnails.setObject(image, forKey: key)
         return image
     }
 
     /// The full-size card for links, the shared image for images.
-    func fullImage(_ item: LibraryItem) -> UIImage? {
+    func fullImage(_ item: LibraryItem) -> PlatformImage? {
         if let meta = meta(for: item) { return CardRenderer.render(meta, style: item.style) }
-        return data(.source, of: item).flatMap(UIImage.init(data:))
+        return data(.source, of: item).flatMap(PlatformImage.init(data:))
     }
 
     /// Tiles crop their photo to this range, like Messages link previews.
@@ -257,7 +329,7 @@ final class Library {
         let image = source.flatMap { ImageData.downsample($0, maxPixel: 720) }
             .flatMap { item.isImage || min($0.width, $0.height) >= 200 ? $0 : nil }
         let aspect = image.map { min(max(Double($0.width) / Double($0.height), Self.tileAspects.lowerBound), Self.tileAspects.upperBound) } ?? 0
-        write(image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }, .thumbnail, of: item)
+        write(image.flatMap { ImageData.jpeg($0, quality: 0.8) }, .thumbnail, of: item)
         try? FileManager.default.removeItem(at: folder(item).appending(path: "thumbnail"))
         thumbnails.removeObject(forKey: item.id.uuidString as NSString)
         thumbnails.removeObject(forKey: "icon-\(item.id.uuidString)" as NSString)

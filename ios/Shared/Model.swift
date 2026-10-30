@@ -2,11 +2,24 @@ import SwiftUI
 
 enum AppGroup {
     static let id = Bundle.main.object(forInfoDictionaryKey: "AppGroupID") as? String ?? "group.com.yjmeqt.attention"
+    #if os(macOS)
+    // The Mac app has no extension, so it has no app group and keeps everything in its own sandbox.
+    // (macOS hands out a group folder even to apps not entitled to it, and touching it asks the user
+    // for access to other apps' data.)
+    static let defaults = UserDefaults.standard
+    static var container: URL { URL.applicationSupportDirectory }
+    #else
     static let defaults = UserDefaults(suiteName: id) ?? .standard
     static var container: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id)
             ?? URL.applicationSupportDirectory
     }
+    #endif
+}
+
+enum CloudSync {
+    /// `iCloud.<bundle ID>`, from Info.plist; nil leaves the library on this device.
+    static let containerID = Bundle.main.object(forInfoDictionaryKey: "CloudKitContainerID") as? String
 }
 
 enum Brand {
@@ -48,12 +61,12 @@ struct LinkMeta: Codable {
 
     var kind: LinkKind { LinkKind(url: url) }
     var hasPreview: Bool { !title.isEmpty }
-    var image: UIImage? { imageData.flatMap(UIImage.init(data:)) }
-    var avatar: UIImage? { avatarData.flatMap(UIImage.init(data:)) }
-    var icon: UIImage? { iconData.flatMap(UIImage.init(data:)) }
+    var image: PlatformImage? { imageData.flatMap(PlatformImage.init(data:)) }
+    var avatar: PlatformImage? { avatarData.flatMap(PlatformImage.init(data:)) }
+    var icon: PlatformImage? { iconData.flatMap(PlatformImage.init(data:)) }
 
     /// A favicon big enough to show at 64 pt on a 3x card without looking blurry.
-    var largeIcon: UIImage? {
+    var largeIcon: PlatformImage? {
         guard let icon, icon.size.width * icon.scale >= 120 else { return nil }
         return icon
     }

@@ -10,7 +10,7 @@ struct MinimalTemplate: View {
                 SiteChip(meta: meta, palette: palette)
                 Spacer(minLength: 8)
                 if let image = meta.image ?? meta.largeIcon {
-                    Image(uiImage: image)
+                    Image(platformImage: image)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 64, height: 64)

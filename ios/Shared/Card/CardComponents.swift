@@ -2,18 +2,18 @@ import SwiftUI
 import CoreImage.CIFilterBuiltins
 
 enum QRCode {
-    private static var cache: [String: UIImage] = [:]
+    private static var cache: [String: PlatformImage] = [:]
     private static let context = CIContext()
 
     /// Use `H` (30% recovery) when a logo covers the center.
-    static func image(_ string: String, correctionLevel: String = "M") -> UIImage {
+    static func image(_ string: String, correctionLevel: String = "M") -> PlatformImage {
         let key = correctionLevel + string
         if let cached = cache[key] { return cached }
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(string.utf8)
         filter.correctionLevel = correctionLevel
         let output = filter.outputImage!.transformed(by: .init(scaleX: 10, y: 10))
-        let image = UIImage(cgImage: context.createCGImage(output, from: output.extent)!)
+        let image = PlatformImage(cgImage: context.createCGImage(output, from: output.extent)!)
         cache[key] = image
         return image
     }
@@ -33,7 +33,7 @@ struct SiteChip: View {
     }
 
     /// Shown at 14 pt (42 px); smaller favicons would look blurry.
-    private var icon: UIImage? {
+    private var icon: PlatformImage? {
         guard let icon = meta.icon, icon.size.width * icon.scale >= 32 else { return nil }
         return icon
     }
@@ -41,7 +41,7 @@ struct SiteChip: View {
     var body: some View {
         HStack(spacing: 5) {
             if let icon {
-                Image(uiImage: icon)
+                Image(platformImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 14, height: 14)
@@ -65,17 +65,17 @@ struct QRBadge: View {
     let size: CGFloat
     let palette: CardPalette
     var caption = String(localized: "Scan to open")
-    var logo: UIImage?
+    var logo: PlatformImage?
 
     var body: some View {
         VStack(spacing: 5) {
-            Image(uiImage: QRCode.image(url.absoluteString, correctionLevel: logo == nil ? "M" : "H"))
+            Image(platformImage: QRCode.image(url.absoluteString, correctionLevel: logo == nil ? "M" : "H"))
                 .interpolation(.none)
                 .resizable()
                 .frame(width: size, height: size)
                 .overlay {
                     if let logo {
-                        Image(uiImage: logo)
+                        Image(platformImage: logo)
                             .resizable()
                             .scaledToFit()
                             .frame(width: size * 0.18, height: size * 0.18)
@@ -133,7 +133,7 @@ struct FaviconView: View {
     var body: some View {
         Group {
             if let icon = meta.icon {
-                Image(uiImage: icon).resizable().scaledToFit().padding(size * 0.12)
+                Image(platformImage: icon).resizable().scaledToFit().padding(size * 0.12)
             } else {
                 Image(systemName: "link").font(.system(size: size * 0.45, weight: .semibold)).foregroundStyle(.secondary)
             }
@@ -151,5 +151,37 @@ struct PlayGlyph: View {
             .foregroundStyle(.white)
             .frame(width: 60, height: 60)
             .background(.black.opacity(0.55), in: .circle)
+    }
+}
+
+/// A SwiftUI rendition of the app icon for use inside mock system UI.
+struct AttentionGlyph: View {
+    let size: CGFloat
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
+            .fill(Color(red: 0.949, green: 0.929, blue: 0.894))
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.07, style: .continuous)
+                    .fill(Color(red: 0.659, green: 0.749, blue: 0.651))
+                    .frame(width: size * 0.5, height: size * 0.62)
+                    .overlay(alignment: .top) {
+                        RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
+                            .fill(Color(red: 0.91, green: 0.333, blue: 0.239))
+                            .frame(width: size * 0.42, height: size * 0.27)
+                            .overlay {
+                                Image(systemName: "link")
+                                    .font(.system(size: size * 0.17, weight: .bold))
+                                    .foregroundStyle(.black.opacity(0.85))
+                            }
+                            .padding(.top, size * 0.04)
+                    }
+                    .rotationEffect(.degrees(-8))
+            }
+            .frame(width: size, height: size)
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
+                    .strokeBorder(.black.opacity(0.08), lineWidth: 0.5)
+            }
     }
 }

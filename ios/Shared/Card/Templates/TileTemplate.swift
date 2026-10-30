@@ -20,7 +20,7 @@ struct TileTemplate: View {
         Group {
             if let image = meta.image, let ratio = Self.imageRatio(meta) {
                 let tint = CardTint(image) ?? .neutral
-                let photo = Image(uiImage: image)
+                let photo = Image(platformImage: image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: Self.width, height: Self.width * ratio)
@@ -127,7 +127,7 @@ struct TileTemplate: View {
     private func favicon(size: CGFloat) -> some View {
         Group {
             if let icon = meta.icon {
-                Image(uiImage: icon).resizable().scaledToFit().padding(size * 0.12)
+                Image(platformImage: icon).resizable().scaledToFit().padding(size * 0.12)
             } else {
                 Image(systemName: "globe").font(.system(size: size * 0.55)).foregroundStyle(.secondary)
             }
@@ -152,7 +152,7 @@ struct TileTemplate: View {
                 }
             }
             Spacer(minLength: 0)
-            Image(uiImage: QRCode.image(meta.shareURL.absoluteString))
+            Image(platformImage: QRCode.image(meta.shareURL.absoluteString))
                 .interpolation(.none)
                 .resizable()
                 .frame(width: 60, height: 60)
@@ -173,14 +173,14 @@ struct CardTint {
     var secondary: Color { primary.opacity(isDark ? 0.72 : 0.6) }
 
     /// From the image's bottom edge, like the feed.
-    init?(_ image: UIImage) {
+    init?(_ image: PlatformImage) {
         guard let cgImage = image.cgImage, let rgb = ImageData.bottomEdgeColor(cgImage) else { return nil }
         color = Color(red: rgb.red, green: rgb.green, blue: rgb.blue)
         isDark = 0.299 * rgb.red + 0.587 * rgb.green + 0.114 * rgb.blue < 0.6
     }
 
     /// Colorful favicons tint the card; black, white and gray ones would make it a slab, so they don't.
-    init?(favicon: UIImage) {
+    init?(favicon: PlatformImage) {
         guard let cgImage = favicon.cgImage, let rgb = ImageData.averageColor(cgImage) else { return nil }
         let high = max(rgb.red, rgb.green, rgb.blue), low = min(rgb.red, rgb.green, rgb.blue)
         guard high > 0.15, (high - low) / high > 0.35 else { return nil }
