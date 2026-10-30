@@ -1,5 +1,4 @@
-import Foundation
-import UIKit
+import SwiftUI
 import UniformTypeIdentifiers
 import os
 
@@ -47,9 +46,9 @@ enum ItemProviders {
                 log.info("found image as \(type, privacy: .public): \(data.count, privacy: .public) bytes")
                 return data
             }
-            if provider.canLoadObject(ofClass: UIImage.self),
-               let data = await load("UIImage", { done in
-                   _ = provider.loadObject(ofClass: UIImage.self) { image, _ in done((image as? UIImage)?.pngData()) }
+            if provider.canLoadObject(ofClass: PlatformImage.self),
+               let data = await load("image object", { done in
+                   _ = provider.loadObject(ofClass: PlatformImage.self) { image, _ in done((image as? PlatformImage)?.pngData()) }
                }) {
                 return data
             }

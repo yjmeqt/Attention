@@ -86,6 +86,32 @@ done
 echo "No simulator UI found under $XCODE_APP" >&2
 """
 
+# ── Mac ───────────────────────────────────────────────────────────────────────
+# The menu bar app (AttentionMac). Same DerivedData folder as the iOS build, under Products/<config>.
+[tasks.build-mac]
+args    = ["config=Debug"]
+depends = ["generate"]
+desc    = "Build the Mac menu bar app."
+cmd     = """
+set -o pipefail
+xcodebuild -project {{project_root}}/{{path}} -scheme AttentionMac \
+  -configuration {{config}} \
+  -destination 'platform=macOS' \
+  -allowProvisioningUpdates \
+  build | {{xcb}} || exit 1
+"""
+
+[tasks.run-mac]
+args    = ["config=Debug"]
+depends = ["build-mac"]
+desc    = "Build the Mac menu bar app, quit a running copy, and open it."
+cmd     = """
+PRODUCTS=$(xcodebuild -project {{project_root}}/{{path}} -scheme AttentionMac -configuration {{config}} \
+  -showBuildSettings 2>/dev/null | awk -F' = ' '/^ *BUILT_PRODUCTS_DIR = /{print $2; exit}')
+pkill -f "$PRODUCTS/Attention.app/Contents/MacOS/Attention" 2>/dev/null || true
+open "$PRODUCTS/Attention.app"
+"""
+
 # ── Stop ──────────────────────────────────────────────────────────────────────
 # Matches this worktree's project path, so other worktrees' builds are left alone.
 # Reads the cached UDIDs rather than {{sim_id}} so it never creates a sim just to stop one.

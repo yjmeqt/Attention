@@ -1,16 +1,20 @@
 #!/bin/zsh
 # Release helper built on the asc CLI (https://github.com/rorkai/App-Store-Connect-CLI).
 #
-#   Tools/release.sh beta [--group NAME] [--notes TEXT] [--no-upload]
+#   Tools/release.sh beta [--mac] [--group NAME] [--notes TEXT] [--no-upload]
 #       Bumps CURRENT_PROJECT_VERSION to the next free build number, archives Release,
-#       exports an IPA and uploads it to TestFlight. --group adds the build to that beta
-#       group once processed; --notes sets What to Test (en-US). --no-upload stops after
-#       the IPA, keeping the local build number.
+#       exports an IPA (a PKG with --mac) and uploads it to TestFlight. --group adds the build to
+#       that beta group once processed; --notes sets What to Test (en-US). --no-upload stops after
+#       the export, keeping the local build number.
 #
-#   Tools/release.sh metadata [--apply]
+#   Tools/release.sh metadata [--mac] [--apply]
 #       Pushes fastlane/metadata (listing text and copyright) and fastlane/screenshots to the
-#       App Store version matching MARKETING_VERSION. Without --apply it only prints the plan.
-#       --screenshots-only skips the text; ONLY="zh-Hans ja" limits screenshots to those locales.
+#       App Store version matching MARKETING_VERSION, or its macOS version with --mac. Without
+#       --apply it only prints the plan. --screenshots-only skips the text; ONLY="zh-Hans ja"
+#       limits screenshots to those locales.
+#
+# iOS and macOS are one App Store record (same bundle ID, so one purchase covers both); each
+# platform has its own versions, builds and screenshots.
 #
 # Needs an App Store Connect API key stored once with `asc auth login`.
 set -euo pipefail
@@ -29,6 +33,10 @@ export ASC_UPLOAD_TIMEOUT=${ASC_UPLOAD_TIMEOUT:-30m}
 # and iPhone Duo, whose one set holds the inner (duo-*, 2007x2853) and then the outer (duo-cover-*,
 # 1398x2034) display. IPHONE_DUO needs asc 5.12 or later.
 SCREENSHOT_SETS=("iphone|IPHONE_69" "iphone63|IPHONE_61" "ipad|IPAD_PRO_3GEN_129" "duo|IPHONE_DUO")
+# Mac screenshots are mac-*.png, 2880x1800 (or 1280x800, 1440x900, 2560x1600).
+MAC_SCREENSHOT_SETS=("mac|APP_DESKTOP")
+# Set by --mac.
+PLATFORM=IOS
 
 die() { print -u2 "error: $*"; exit 1 }
 step() { print -P "%F{cyan}==>%f $*" }
@@ -45,6 +53,7 @@ beta() {
   local group="" notes="" upload=1
   while (( $# )); do
     case $1 in
+      --mac) PLATFORM=MAC_OS; shift ;;
       --group) group=$2; shift 2 ;;
       --notes) notes=$2; shift 2 ;;
       --no-upload) upload=0; shift ;;
@@ -56,7 +65,7 @@ beta() {
   local version=$(setting MARKETING_VERSION) build=$(setting CURRENT_PROJECT_VERSION)
   if (( upload )); then
     # Next free build number on App Store Connect, never lower than the local one + 1.
-    local remote=$(asc builds next-build-number --app $APP_ID --version $version --platform IOS --output json | jq -r '.nextBuildNumber')
+    local remote=$(asc builds next-build-number --app $APP_ID --version $version --platform $PLATFORM --output json | jq -r '.nextBuildNumber')
     [[ $remote == <-> ]] || die "could not read next build number from App Store Connect"
     build=$(( remote > build + 1 ? remote : build + 1 ))
     step "Build $version ($build)"
@@ -64,27 +73,29 @@ beta() {
   fi
   xcodegen generate --quiet
 
-  local name=$SCHEME-$version-$build
-  local archive=$OUT/$name.xcarchive ipa=$OUT/$name.ipa
+  local scheme=$SCHEME destination=generic/platform=iOS kind=ipa
+  [[ $PLATFORM == MAC_OS ]] && scheme=AttentionMac destination=generic/platform=macOS kind=pkg
+  local name=$scheme-$version-$build
+  local archive=$OUT/$name.xcarchive artifact=$OUT/$name.$kind
   mkdir -p $OUT
 
-  step "Archive"
-  asc xcode archive --project Attention.xcodeproj --scheme $SCHEME --configuration Release \
+  step "Archive $scheme"
+  asc xcode archive --project Attention.xcodeproj --scheme $scheme --configuration Release \
     --archive-path $archive --overwrite --output table \
-    --xcodebuild-flag=-destination --xcodebuild-flag=generic/platform=iOS \
+    --xcodebuild-flag=-destination --xcodebuild-flag=$destination \
     --xcodebuild-flag=-allowProvisioningUpdates
 
-  step "Export IPA"
-  asc xcode export --archive-path $archive --ipa-path $ipa --overwrite --output table \
+  step "Export ${kind:u}"
+  asc xcode export --archive-path $archive --$kind-path $artifact --overwrite --output table \
     --xcodebuild-flag=-allowProvisioningUpdates
 
   if (( ! upload )); then
-    step "IPA at ${ipa:A} (not uploaded)"
+    step "${kind:u} at ${artifact:A} (not uploaded)"
     return
   fi
 
   step "Upload to TestFlight (waits for processing)"
-  local args=(--app $APP_ID --ipa $ipa --version $version --build-number $build --wait --output table)
+  local args=(--app $APP_ID --$kind $artifact --version $version --build-number $build --wait --output table)
   if [[ -n $group ]]; then args+=(--group $group --notify); else args+=(--upload-only); fi
   [[ -n $notes ]] && args+=(--test-notes $notes --locale en-US)
   asc publish testflight $args
@@ -97,6 +108,7 @@ metadata() {
   local apply=0 text_too=1
   while (( $# )); do
     case $1 in
+      --mac) PLATFORM=MAC_OS; SCREENSHOT_SETS=($MAC_SCREENSHOT_SETS); shift ;;
       --apply) apply=1; shift ;;
       --screenshots-only) text_too=0; shift ;;
       *) die "unknown metadata option: $1" ;;
@@ -114,15 +126,15 @@ metadata() {
   fi
 
   local version=$(setting MARKETING_VERSION)
-  local version_id=$(asc versions list --app $APP_ID --platform IOS --version $version --output json | jq -r '.data[0].id // empty')
-  [[ -n $version_id ]] || die "no App Store version $version in App Store Connect; create it there first"
+  local version_id=$(asc versions list --app $APP_ID --platform $PLATFORM --version $version --output json | jq -r '.data[0].id // empty')
+  [[ -n $version_id ]] || die "no $PLATFORM App Store version $version in App Store Connect; create it there first"
 
   if (( text_too )); then
   step "Listing text for $version"
   local mode=(--dry-run); (( apply )) && mode=(--confirm)
   # An app's first version has no What's New; App Store Connect rejects release notes on it.
   local text=$FASTLANE
-  local versions=$(asc versions list --app $APP_ID --platform IOS --paginate --output json)
+  local versions=$(asc versions list --app $APP_ID --platform $PLATFORM --paginate --output json)
   if jq -e --arg v $version '[.data[] | select(.attributes.versionString != $v)] | length == 0' <<< $versions >/dev/null; then
     print "  first version: leaving out release_notes.txt"
     text=$OUT/fastlane

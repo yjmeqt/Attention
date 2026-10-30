@@ -17,7 +17,9 @@ struct TagEditor: View {
                             .focused($fieldFocused)
                             .submitLabel(.done)
                             .onSubmit(add)
+                            #if os(iOS)
                             .textInputAutocapitalization(.never)
+                            #endif
                         Button("Add", action: add)
                             .disabled(Library.normalizedTag(newTag).isEmpty)
                     }
@@ -46,7 +48,9 @@ struct TagEditor: View {
                 }
             }
             .navigationTitle(items.count == 1 ? String(localized: "Tags") : String(localized: "Tag \(items.count) Items"))
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .close) { dismiss() }

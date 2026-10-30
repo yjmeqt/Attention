@@ -71,8 +71,8 @@ struct TemplatePicker: View {
 
 /// For links shared as an image: the link's preview image or the shared image.
 struct CoverPicker: View {
-    let preview: UIImage?
-    let shared: UIImage?
+    let preview: PlatformImage?
+    let shared: PlatformImage?
     @Binding var usesShared: Bool
 
     var body: some View {
@@ -82,13 +82,13 @@ struct CoverPicker: View {
         }
     }
 
-    private func option(_ title: String, image: UIImage?, selected: Bool, action: @escaping () -> Void) -> some View {
+    private func option(_ title: String, image: PlatformImage?, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Color.clear
                     .frame(width: 96, height: 72)
                     .overlay {
-                        if let image { Image(uiImage: image).resizable().scaledToFill() }
+                        if let image { Image(platformImage: image).resizable().scaledToFill() }
                     }
                     .background(.fill.tertiary)
                     .clipShape(.rect(cornerRadius: 6))

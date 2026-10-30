@@ -448,38 +448,6 @@ private enum GuideApp {
     }
 }
 
-/// A SwiftUI rendition of the app icon for use inside mock system UI.
-struct AttentionGlyph: View {
-    let size: CGFloat
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
-            .fill(Color(red: 0.949, green: 0.929, blue: 0.894))
-            .overlay {
-                RoundedRectangle(cornerRadius: size * 0.07, style: .continuous)
-                    .fill(Color(red: 0.659, green: 0.749, blue: 0.651))
-                    .frame(width: size * 0.5, height: size * 0.62)
-                    .overlay(alignment: .top) {
-                        RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
-                            .fill(Color(red: 0.91, green: 0.333, blue: 0.239))
-                            .frame(width: size * 0.42, height: size * 0.27)
-                            .overlay {
-                                Image(systemName: "link")
-                                    .font(.system(size: size * 0.17, weight: .bold))
-                                    .foregroundStyle(.black.opacity(0.85))
-                            }
-                            .padding(.top, size * 0.04)
-                    }
-                    .rotationEffect(.degrees(-8))
-            }
-            .frame(width: size, height: size)
-            .overlay {
-                RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
-                    .strokeBorder(.black.opacity(0.08), lineWidth: 0.5)
-            }
-    }
-}
-
 #Preview {
     NavigationStack { ShareSheetGuide() }
 }

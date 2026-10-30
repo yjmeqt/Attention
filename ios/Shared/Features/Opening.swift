@@ -1,6 +1,7 @@
 import SwiftUI
-import SafariServices
 import LocalAuthentication
+#if os(iOS)
+import SafariServices
 
 enum Opening {
     /// Whether this process can hand links to other apps; app extensions can't.
@@ -38,6 +39,7 @@ struct SafariView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ controller: SFSafariViewController, context: Context) {}
 }
+#endif
 
 enum DeviceOwner {
     enum Outcome { case authenticated, failed, unavailable }
