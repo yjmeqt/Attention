@@ -5,7 +5,7 @@ struct ItemDetailView: View {
     let item: LibraryItem
     /// Set in the share extension: shows a Done button that closes it.
     var onDone: (() -> Void)?
-    /// Opens the share sheet with the card as soon as the view is up, for Sherlock's suggestion.
+    /// Opens the share sheet with the card as soon as the view is up, for the Share suggestion.
     var autoShare = false
 
     @State private var actions: ItemActions

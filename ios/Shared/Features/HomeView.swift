@@ -431,7 +431,7 @@ struct HomeView: View {
     private func open(_ capture: Capture) {
         notice = nil
         let item = library.save(capture)
-        Assistant.watson.donate()
+        ShareSuggestion.save.donate()
         Task { await library.enrich(item) }
         if item.isPrivate && !filter.privateUnlocked {
             notice = String(localized: "Already saved in Private.")

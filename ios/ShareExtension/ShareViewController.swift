@@ -5,8 +5,8 @@ final class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let items = extensionContext?.inputItems as? [NSExtensionItem] ?? []
-        let assistant = Assistant(intent: extensionContext?.intent)
-        let root = ShareRoot(items: items, assistant: assistant) { [weak self] in
+        let suggestion = ShareSuggestion(intent: extensionContext?.intent)
+        let root = ShareRoot(items: items, suggestion: suggestion) { [weak self] in
             self?.extensionContext?.completeRequest(returningItems: nil)
         }
         let host = UIHostingController(rootView: root)
@@ -19,24 +19,24 @@ final class ShareViewController: UIViewController {
 }
 
 /// Saves whatever was shared as soon as it's read, then shows it with Share and Done.
-/// Opened from Watson's suggestion it only confirms the save and closes; from Sherlock's,
+/// Opened from the Save suggestion it only confirms the save and closes; from Share,
 /// it waits for the card and opens the share sheet with it.
 private struct ShareRoot: View {
     let items: [NSExtensionItem]
-    let assistant: Assistant?
+    let suggestion: ShareSuggestion?
     let onDone: () -> Void
     @State private var library = Library()
     @State private var item: LibraryItem?
-    @State private var watsonSaved = false
+    @State private var savedOnly = false
     @State private var failed = false
 
     var body: some View {
         NavigationStack {
             Group {
-                if watsonSaved {
-                    ContentUnavailableView("Watson saved it", systemImage: "checkmark.circle.fill")
+                if savedOnly {
+                    ContentUnavailableView("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
                 } else if let item {
-                    ItemDetailView(item: item, library: library, autoShare: assistant == .sherlock, onDone: onDone)
+                    ItemDetailView(item: item, library: library, autoShare: suggestion == .share, onDone: onDone)
                 } else if failed {
                     ContentUnavailableView("Nothing to save", systemImage: "link.badge.plus",
                                            description: Text("No link or image was shared."))
@@ -59,20 +59,20 @@ private struct ShareRoot: View {
                 return
             }
             let saved = library.save(capture)
-            switch assistant {
-            case .watson:
-                Assistant.watson.donate()
-                watsonSaved = true
+            switch suggestion {
+            case .save:
+                ShareSuggestion.save.donate()
+                savedOnly = true
                 // Keeps the confirmation up for at least a second, longer if the preview takes longer.
                 let shown = ContinuousClock.now
                 await library.enrich(saved)
                 try? await Task.sleep(until: shown + .seconds(1))
                 onDone()
-            case .sherlock:
+            case .share:
                 await library.enrich(saved)
                 item = saved
             case nil:
-                Assistant.watson.donate()
+                ShareSuggestion.save.donate()
                 item = saved
                 await library.enrich(saved)
             }
