@@ -27,14 +27,22 @@ private struct ShareRoot: View {
     let onDone: () -> Void
     @State private var library = Library()
     @State private var item: LibraryItem?
-    @State private var savedOnly = false
+    /// Set when opened from the Save suggestion: the item, shown briefly as a confirmation.
+    @State private var savedOnly: LibraryItem?
     @State private var failed = false
 
     var body: some View {
         NavigationStack {
             Group {
-                if savedOnly {
-                    ContentUnavailableView("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
+                if let savedOnly {
+                    ContentUnavailableView {
+                        Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
+                            .symbolRenderingMode(.multicolor)
+                    } description: {
+                        Text(savedOnly.isImage ? String(localized: "Image") : savedOnly.displayTitle)
+                            .lineLimit(2)
+                    }
+                    .symbolEffect(.bounce, value: savedOnly.id)
                 } else if let item {
                     ItemDetailView(item: item, library: library, autoShare: suggestion == .share, onDone: onDone)
                 } else if failed {
@@ -62,11 +70,11 @@ private struct ShareRoot: View {
             switch suggestion {
             case .save:
                 ShareSuggestion.save.donate()
-                savedOnly = true
-                // Keeps the confirmation up for at least a second, longer if the preview takes longer.
-                let shown = ContinuousClock.now
-                await library.enrich(saved)
-                try? await Task.sleep(until: shown + .seconds(1))
+                savedOnly = saved
+                // Closes after a second without waiting for the preview: the app fetches
+                // previews that are still missing the next time it opens.
+                Task { await library.enrich(saved) }
+                try? await Task.sleep(for: .seconds(1.2))
                 onDone()
             case .share:
                 await library.enrich(saved)
