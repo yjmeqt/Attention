@@ -30,21 +30,22 @@ struct TemplatePicker: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 12) {
-                ForEach(CardTemplate.allCases) { template in
+                ForEach(CardTemplate.allCases.filter { $0 != .auto }) { template in
+                    let selected = isSelected(template)
                     Button {
                         style.template = template
                     } label: {
                         VStack(spacing: 6) {
-                            thumbnail(template)
-                            Text(template == .auto ? String(localized: "Auto · \(template.resolved(for: meta).label)") : template.label)
+                            Text(template.label)
                                 .font(.caption)
-                                .foregroundStyle(style.template == template ? .primary : .secondary)
+                                .foregroundStyle(selected ? .primary : .secondary)
+                            thumbnail(template, selected: selected)
                         }
                     }
                     .buttonStyle(.plain)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(template.label)
-                    .accessibilityAddTraits(style.template == template ? [.isButton, .isSelected] : .isButton)
+                    .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
                 }
             }
             .padding(.vertical, 2)
@@ -52,12 +53,16 @@ struct TemplatePicker: View {
         .scrollIndicators(.hidden)
     }
 
-    private func thumbnail(_ template: CardTemplate) -> some View {
+    /// An item still on `.auto` shows the template it resolves to as selected.
+    private func isSelected(_ template: CardTemplate) -> Bool {
+        style.template.resolved(for: meta) == template
+    }
+
+    private func thumbnail(_ template: CardTemplate, selected: Bool) -> some View {
         var thumbStyle = style
         thumbStyle.template = template
         let size = CardView.size(for: meta, style: thumbStyle)
-        let selected = style.template == template
-        return CardView(meta: meta, style: thumbStyle)
+        return CardView(meta: meta, style: thumbStyle, height: size.height)
             .scaleEffect(scale, anchor: .topLeading)
             .frame(width: size.width * scale, height: size.height * scale, alignment: .topLeading)
             .clipShape(.rect(cornerRadius: 6))
