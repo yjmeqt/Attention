@@ -93,8 +93,14 @@ extension Library {
         }
         let result = await Unfurler.unfurlWithFallback(url)
         let read = await text
-        item.ocrText = read?.fullText
         var meta = result.meta
+        if let read {
+            item.ocrText = read.fullText
+        } else if let cover = meta.imageData, !meta.imageIsIcon {
+            item.ocrText = await TextReader.read(cover)?.fullText
+        } else {
+            item.ocrText = nil
+        }
         // On the first fetch, a link with no usable preview image starts out showing the image it was shared as.
         if meta.imageData == nil || meta.imageIsIcon, source != nil, item.title.isEmpty, !item.usesCustomImage {
             item.usesSharedImage = true
