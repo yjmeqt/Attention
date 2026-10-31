@@ -41,6 +41,11 @@ final class ItemActions {
         ShareSuggestion.share.donate()
     }
 
+    /// What a plain Share does: the link or the image as Settings says; image items have only their image.
+    func share(_ item: LibraryItem, _ preference: ShareDefault) {
+        if item.url == nil || preference == .image { shareImage(item) } else { shareLink(item) }
+    }
+
     private func shareURL(_ item: LibraryItem) -> URL? {
         library.meta(for: item)?.shareURL ?? item.url
     }
@@ -85,42 +90,26 @@ final class ItemActions {
     }
 }
 
+/// The feed's long-press menu: quick actions only. Opening is a tap on the card, and tags and selection
+/// live on the detail page and in More.
 struct ItemMenu: View {
     let item: LibraryItem
     let actions: ItemActions
-    var filter: FeedFilter?
-    var onSelect: (() -> Void)?
+    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
 
     var body: some View {
-        if item.url != nil {
-            Section {
-                if Opening.canOpenApps {
-                    Button("Open in App", systemImage: "arrow.up.forward.app") { actions.openInApp(item) }
-                }
-                Button("Open in Browser", systemImage: "safari") { actions.openInBrowser(item) }
-            }
-        }
-        ShareMenu(item: item, actions: actions)
-        if let filter {
-            Menu("Filter", systemImage: "line.3.horizontal.decrease") {
-                Button(String(localized: "Only \(item.domainLabel)")) { filter.only(domain: item.domain) }
-                ForEach(item.tags, id: \.self) { tag in
-                    Button(String(localized: "Only #\(tag)")) { filter.only(tag: tag) }
-                }
+        Section {
+            Button("Share", systemImage: "square.and.arrow.up") { actions.share(item, shareDefault) }
+            if item.url != nil {
+                Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
             }
         }
         Section {
-            Button("Edit Tags…", systemImage: "tag") { actions.editTags([item]) }
             if item.isPrivate {
                 Button("Remove from Private", systemImage: "lock.open") { Task { await actions.setPrivate(false, [item]) } }
             } else {
                 Button("Move to Private", systemImage: "lock") { Task { await actions.setPrivate(true, [item]) } }
             }
-            if let onSelect {
-                Button("Select", systemImage: "checkmark.circle", action: onSelect)
-            }
-        }
-        Section {
             if item.isArchived {
                 Button("Unarchive", systemImage: "tray.and.arrow.up") { actions.setArchived(false, [item]) }
             } else {
@@ -131,30 +120,47 @@ struct ItemMenu: View {
     }
 }
 
+/// What tapping Share shares, set in Settings. Kept in the app group so the share extension follows it too.
+enum ShareDefault: String, CaseIterable {
+    case link, image
+
+    static let key = "shareDefault"
+}
+
 /// Share Link, Copy Link and Share as Image; a single Share button for image items, which have no link.
 struct ShareMenu<MenuLabel: View>: View {
     let item: LibraryItem
     let actions: ItemActions
+    /// Tapping shares the way Settings says; the menu opens on a long press.
+    var sharesOnTap = false
     @ViewBuilder var label: () -> MenuLabel
+    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
 
     var body: some View {
         if item.url == nil {
             Button { actions.shareImage(item) } label: { label() }
+        } else if sharesOnTap {
+            Menu {
+                options
+            } label: {
+                label()
+            } primaryAction: {
+                actions.share(item, shareDefault)
+            }
         } else {
             Menu {
-                Button("Share Link", systemImage: "link") { actions.shareLink(item) }
-                Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
-                Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
+                options
             } label: {
                 label()
             }
         }
     }
-}
 
-extension ShareMenu where MenuLabel == Label<Text, Image> {
-    init(item: LibraryItem, actions: ItemActions) {
-        self.init(item: item, actions: actions) { Label("Share", systemImage: "square.and.arrow.up") }
+    @ViewBuilder
+    private var options: some View {
+        Button("Share Link", systemImage: "link") { actions.shareLink(item) }
+        Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
+        Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
     }
 }
 

@@ -119,7 +119,7 @@ struct LibraryTests {
         #expect(!keys.contains("https://b.com"))
     }
 
-    @Test func archivedItemsShowOnlyInArchivedOfTheirSection() {
+    @Test func archivedShowsArchivedItemsAndPrivateShowsAllPrivateOnes() {
         let library = makeLibrary()
         let live = library.save(.link(URL(string: "https://a.com")!, image: nil))
         let archived = library.save(.link(URL(string: "https://b.com")!, image: nil))
@@ -129,9 +129,9 @@ struct LibraryTests {
 
         let filter = FeedFilter()
         #expect(filter.apply(library.items).map(\.id) == [live.id])
-        filter.showsArchived = true
+        filter.scope = .archived
         #expect(filter.apply(library.items).map(\.id) == [archived.id])
-        filter.showsPrivate = true
+        filter.scope = .locked
         filter.privateUnlocked = true
         #expect(filter.apply(library.items).map(\.id) == [privateArchived.id])
     }
@@ -145,16 +145,15 @@ struct LibraryTests {
 
         let filter = FeedFilter()
         #expect(filter.apply(library.items).map(\.id) == [open.id])
-        filter.tags = ["x"]
+        filter.scope = .tag("x")
         #expect(filter.apply(library.items).map(\.id) == [open.id])
-        filter.reset()
-        filter.showsPrivate = true
+        filter.scope = .locked
         #expect(filter.apply(library.items).isEmpty)
         filter.privateUnlocked = true
         #expect(filter.apply(library.items).map(\.id) == [hidden.id])
     }
 
-    @Test func filtersCombineDomainsTagsAndSearch() {
+    @Test func sitesAndTagsNarrowLiveItemsAndSearchNarrowsThem() {
         let library = makeLibrary()
         let a = library.save(.link(URL(string: "https://youtu.be/1")!, image: nil))
         let b = library.save(.link(URL(string: "https://www.youtube.com/watch?v=2")!, image: nil))
@@ -162,13 +161,14 @@ struct LibraryTests {
         a.title = "Swift talk"
         library.addTag("dev", to: [a, c])
         let filter = FeedFilter()
-        filter.domains = ["youtube.com"]
+        filter.scope = .site("youtube.com")
         #expect(Set(filter.apply(library.items).map(\.id)) == [a.id, b.id])
-        filter.tags = ["dev"]
-        #expect(filter.apply(library.items).map(\.id) == [a.id])
-        filter.reset()
+        filter.scope = .tag("dev")
+        #expect(Set(filter.apply(library.items).map(\.id)) == [a.id, c.id])
         filter.search = "swift"
         #expect(filter.apply(library.items).map(\.id) == [a.id])
+        library.setArchived(true, [a])
+        #expect(filter.apply(library.items).isEmpty)
     }
 
     @Test func importsOldHistory() throws {

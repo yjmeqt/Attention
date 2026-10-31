@@ -38,12 +38,15 @@ struct HomeView: View {
     @State private var typedLink = ""
     @State private var scroll = HomeScroll()
     @State private var searching = false
+    @State private var drawerOpen = false
+    @State private var showsSettings = false
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     private let guideTip = GuideTip()
     @Namespace private var zoom
     @AppStorage("seenShareGuide") private var seenShareGuide = false
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     init(library: Library) {
         self.library = library
@@ -51,88 +54,27 @@ struct HomeView: View {
     }
 
     private var visible: [LibraryItem] { filter.apply(library.items) }
-    /// While a site or tag filter is on, the bar stays so it can be changed or cleared.
-    private var showsFilterBar: Bool {
-        !library.items.isEmpty && (searching || !filter.domains.isEmpty || !filter.tags.isEmpty)
-    }
+    /// iPhone, and an iPad app in a narrow window: the sidebar is a drawer instead of a split view column.
+    private var usesDrawer: Bool { sizeClass != .regular }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Inline, as a popover tip on the More menu never shows.
-                    TipView(guideTip)
-                        .frame(maxWidth: 520)
-                        .padding(.horizontal)
-                    if library.items.isEmpty {
-                        EmptyState(showsPaste: false, paste: paste, onSample: openSample)
-                            .frame(maxWidth: 520)
-                            .padding(.horizontal)
-                    } else {
-                        feed
-                    }
+        Group {
+            if usesDrawer {
+                Drawer(isOpen: $drawerOpen, isEnabled: path.isEmpty && !selecting) {
+                    sidebar
+                } content: {
+                    stack
                 }
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity)
-            }
-            // Right above the search field, which lives in the bottom bar.
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                VStack(spacing: 8) {
-                    if clipboardHasLink && !selecting {
-                        ClipboardBanner(paste: paste, dismiss: dismissClipboard)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                    if showsFilterBar {
-                        FilterBar(filter: filter, items: library.items, library: library)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+            } else {
+                NavigationSplitView {
+                    sidebar
+                } detail: {
+                    stack
                 }
-                .padding(.bottom, 4)
-            }
-            .animation(.snappy, value: showsFilterBar)
-            .animation(.snappy, value: clipboardHasLink)
-            .scrollEdgeEffectHidden(true, for: .vertical)
-            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
-            .onScrollGeometryChange(for: Bool.self) {
-                $0.contentOffset.y + $0.contentInsets.top > 12
-            } action: { [scroll] _, scrolled in
-                scroll.scrolled = scrolled
-            }
-            .overlay(alignment: .bottom) {
-                if let notice {
-                    Text(notice)
-                        .font(.footnote)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .glassEffect(.regular, in: .capsule)
-                        .padding(.bottom, 8)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .task(id: notice) {
-                            try? await Task.sleep(for: .seconds(3))
-                            withAnimation { self.notice = nil }
-                        }
-                }
-            }
-            .animation(.snappy, value: notice)
-            .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
-            .searchFocused($searchFocused)
-            .searchToolbarBehavior(.minimize)
-            .navigationTitle(Brand.name)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: UUID.self) { id in
-                if let item = library.items.first(where: { $0.id == id }) {
-                    ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
-                        .navigationTransition(.zoom(sourceID: id, in: zoom))
-                }
-            }
-            .toolbar { toolbar }
-            .itemActionPresentations(actions)
-            .onDrop(of: ItemProviders.pasteTypes, isTargeted: nil) { providers in
-                paste(providers)
-                return true
             }
         }
+        .onChange(of: drawerOpen) { _, open in if open { searchFocused = false } }
         .overlay {
             if filter.showsPrivate, scenePhase != .active {
                 Rectangle().fill(.regularMaterial).ignoresSafeArea()
@@ -150,6 +92,7 @@ struct HomeView: View {
         .onChange(of: filter.showsPrivate) { _, shows in
             if !shows { lockPrivate() }
         }
+        .sheet(isPresented: $showsSettings) { SettingsView() }
         .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
                 ShareSheetGuide(onWatched: { guideWatched = true })
@@ -186,7 +129,7 @@ struct HomeView: View {
             #if DEBUG
             await DemoLibrary.run(into: library)
             if DemoLibrary.unlocksPrivate {
-                filter.showsPrivate = true
+                filter.scope = .locked
                 // The first Face ID request after a boot can time out before its UI comes up; ask again.
                 // A matching face (simulator Face ID › Matching Face) opens Private, as the lock button does.
                 Task {
@@ -200,7 +143,7 @@ struct HomeView: View {
                     }
                 }
             }
-            if let tag = DemoLibrary.tagFilter { filter.tags = [Library.normalizedTag(tag)] }
+            if let tag = DemoLibrary.tagFilter { filter.scope = .tag(Library.normalizedTag(tag)) }
             if let text = DemoLibrary.search {
                 searching = true
                 filter.search = text
@@ -217,6 +160,94 @@ struct HomeView: View {
         .onAppear {
             actions.onDeleted = { deleted in selection.subtract(deleted.map(\.id)) }
             actions.onArchived = { archived in selection.subtract(archived.map(\.id)) }
+        }
+    }
+
+    private var stack: some View {
+        NavigationStack(path: $path) {
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Inline, as a popover tip on the More menu never shows.
+                    TipView(guideTip)
+                        .frame(maxWidth: 520)
+                        .padding(.horizontal)
+                    if library.items.isEmpty {
+                        EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+                            .frame(maxWidth: 520)
+                            .padding(.horizontal)
+                    } else {
+                        feed
+                    }
+                }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+            }
+            // Right above the search field, which lives in the bottom bar.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if clipboardHasLink && !selecting {
+                    ClipboardBanner(paste: paste, dismiss: dismissClipboard)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .padding(.bottom, 4)
+                }
+            }
+            .animation(.snappy, value: clipboardHasLink)
+            .scrollEdgeEffectHidden(true, for: .vertical)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
+            .onScrollGeometryChange(for: Bool.self) {
+                $0.contentOffset.y + $0.contentInsets.top > 12
+            } action: { [scroll] _, scrolled in
+                scroll.scrolled = scrolled
+            }
+            .overlay(alignment: .bottom) {
+                if let notice {
+                    Text(notice)
+                        .font(.footnote)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .glassEffect(.regular, in: .capsule)
+                        .padding(.bottom, 8)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .task(id: notice) {
+                            try? await Task.sleep(for: .seconds(3))
+                            withAnimation { self.notice = nil }
+                        }
+                }
+            }
+            .animation(.snappy, value: notice)
+            .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
+            .searchFocused($searchFocused)
+            .searchToolbarBehavior(.minimize)
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: UUID.self) { id in
+                if let item = library.items.first(where: { $0.id == id }) {
+                    ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
+                        .navigationTransition(.zoom(sourceID: id, in: zoom))
+                }
+            }
+            .toolbar { toolbar }
+            .itemActionPresentations(actions)
+            .onDrop(of: ItemProviders.pasteTypes, isTargeted: nil) { providers in
+                paste(providers)
+                return true
+            }
+        }
+    }
+
+    private var sidebar: some View {
+        Sidebar(library: library, filter: filter, select: select) {
+            setDrawer(open: false)
+            showsSettings = true
+        }
+    }
+
+    private var title: String {
+        switch filter.scope {
+        case .all: Brand.name
+        case .archived: String(localized: "Archived")
+        case .locked: String(localized: "Private")
+        case let .site(domain): DomainTag.label(domain)
+        case let .tag(tag): "#\(tag)"
         }
     }
 
@@ -262,11 +293,8 @@ struct HomeView: View {
             .matchedTransitionSource(id: item.id, in: zoom)
             .popoverTip(item.id == visible.first?.id ? longPressTip : nil, arrowEdge: .top)
             .contextMenu {
-                ItemMenu(item: item, actions: actions, filter: filter) {
-                    selecting = true
-                    selection = [item.id]
-                }
-                .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
+                ItemMenu(item: item, actions: actions)
+                    .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
             } preview: {
                 FeedTile(item: item, library: library).frame(width: 280)
             }
@@ -306,35 +334,21 @@ struct HomeView: View {
                     .disabled(selection.isEmpty)
             }
         } else {
+            if usesDrawer {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Show Sidebar", systemImage: "line.3.horizontal") { setDrawer(open: true) }
+                }
+            }
             ToolbarItem(placement: .principal) {
-                HeaderGlyph(scroll: scroll)
-            }
-            // Shown only while a section is open, so it's clear where you are and one tap gets you out.
-            if filter.showsArchived {
-                ToolbarItem(placement: .primaryAction) {
-                    sectionButton("Archived", systemImage: "archivebox.fill", action: toggleArchived)
+                // All Items shows the glyph once scrolled; a site, tag, Archived or Private says which it is.
+                if filter.isAll {
+                    HeaderGlyph(scroll: scroll)
+                } else {
+                    Text(title).font(.headline).lineLimit(1)
                 }
-            }
-            if filter.showsPrivate {
-                ToolbarItem(placement: .primaryAction) {
-                    sectionButton("Private", systemImage: "lock.fill", action: togglePrivate)
-                }
-            }
-            if filter.showsArchived || filter.showsPrivate {
-                ToolbarSpacer(.fixed, placement: .primaryAction)
             }
             ToolbarItem(placement: .primaryAction) {
                 Menu {
-                    if !library.items.isEmpty {
-                        Section {
-                            Toggle(isOn: Binding(get: { filter.showsArchived }, set: { _ in toggleArchived() })) {
-                                Label("Archived", systemImage: "archivebox")
-                            }
-                            Toggle(isOn: Binding(get: { filter.showsPrivate }, set: { _ in togglePrivate() })) {
-                                Label("Private", systemImage: "lock")
-                            }
-                        }
-                    }
                     Button("Scan QR Code", systemImage: "qrcode.viewfinder") { showsScanner = true }
                     Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
                     if !library.items.isEmpty {
@@ -377,24 +391,18 @@ struct HomeView: View {
         }
     }
 
-    private func sectionButton(_ title: LocalizedStringKey, systemImage: String, action: @escaping () -> Void) -> some View {
-        Button(title, systemImage: systemImage, action: action)
-            .buttonStyle(.glassProminent)
-            .tint(.accentColor)
-            .accessibilityAddTraits(.isSelected)
+    private func setDrawer(open: Bool) {
+        withAnimation(.snappy(duration: 0.3)) { drawerOpen = open }
     }
 
-    private func toggleArchived() {
-        if filter.showsArchived {
-            filter.showsArchived = false
+    /// Leaving Private locks it again (see `onChange(of: filter.showsPrivate)`); entering it asks for Face ID first.
+    private func select(_ scope: FeedFilter.Scope) {
+        setDrawer(open: false)
+        if scope == .locked {
+            if !filter.showsPrivate { unlockPrivate() }
         } else {
-            filter.clearFilters()
-            filter.showsArchived = true
+            filter.scope = scope
         }
-    }
-
-    private func togglePrivate() {
-        if filter.showsPrivate { filter.reset() } else { unlockPrivate() }
     }
 
     // MARK: - Intake
@@ -453,8 +461,7 @@ struct HomeView: View {
             }
             selecting = false
             selection = []
-            filter.reset()
-            filter.showsPrivate = true
+            filter.scope = .locked
             filter.privateUnlocked = true
             actions.privateUnlocked = true
         }
