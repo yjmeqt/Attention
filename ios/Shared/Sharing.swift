@@ -30,6 +30,11 @@ enum Clipboard {
         ]])
         ignoreCurrent()
     }
+
+    static func copy(_ image: UIImage) {
+        UIPasteboard.general.image = image
+        ignoreCurrent()
+    }
 }
 
 /// A shared image or link plus the title and icon the share sheet's header shows for it,

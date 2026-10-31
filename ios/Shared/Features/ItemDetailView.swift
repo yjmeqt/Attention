@@ -66,7 +66,7 @@ struct ItemDetailView: View {
             actions.shareImage(item)
         }
         .onAppear {
-            actions.copied = nil
+            actions.notice = nil
             actions.onDeleted = { deleted in
                 guard deleted.contains(where: { $0.id == item.id }) else { return }
                 if let onDone { onDone() } else { dismiss() }
@@ -98,8 +98,36 @@ struct ItemDetailView: View {
         .frame(maxWidth: .infinity)
     }
 
+    private var imageButtons: some View {
+        HStack(spacing: 12) {
+            Button {
+                actions.copyImage(item)
+            } label: {
+                Label("Copy Image", systemImage: "photo")
+            }
+            .disabled(image == nil)
+            if item.url != nil {
+                Button {
+                    actions.copyLink(item)
+                } label: {
+                    Label("Copy Link", systemImage: "link")
+                }
+            }
+            Button {
+                Task { await actions.saveToPhotos(item) }
+            } label: {
+                Label("Save to Photos", systemImage: "square.and.arrow.down")
+            }
+            .disabled(image == nil)
+        }
+        .labelStyle(StackedLabelStyle())
+        .buttonStyle(.bordered)
+        .tint(.primary)
+    }
+
     private var details: some View {
         VStack(alignment: .leading, spacing: 20) {
+            imageButtons
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)
@@ -180,11 +208,19 @@ struct ItemDetailView: View {
     private var bottomBar: some View {
         VStack(spacing: 8) {
             Group {
-                switch actions.copied {
-                case .link:
+                switch actions.notice {
+                case .linkCopied:
                     Label("Link copied", systemImage: "doc.on.clipboard")
-                case .linkForImage:
+                case .linkCopiedForImage:
                     Label("Link copied — paste it after the image.", systemImage: "doc.on.clipboard")
+                case .imageCopied:
+                    Label("Image copied", systemImage: "doc.on.clipboard")
+                case .savedToPhotos:
+                    Label("Saved to Photos", systemImage: "checkmark.circle.fill")
+                case .photosDenied:
+                    Label("Allow Photos access in Settings to save.", systemImage: "exclamationmark.triangle")
+                case .photosSaveFailed:
+                    Label("Couldn't save to Photos.", systemImage: "exclamationmark.triangle")
                 case nil:
                     if onDone != nil {
                         Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
@@ -227,6 +263,18 @@ struct ItemDetailView: View {
             Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
         }
         .disabled(item.isImage && image == nil)
+    }
+}
+
+/// Icon over title, so three buttons fit side by side on a phone.
+private struct StackedLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(spacing: 4) {
+            configuration.icon.imageScale(.large).frame(height: 24)
+            configuration.title.font(.caption).lineLimit(1).minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 4)
     }
 }
 
