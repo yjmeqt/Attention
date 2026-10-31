@@ -10,7 +10,7 @@ enum Capture: Equatable {
 
 enum Intake {
     /// Shared images are kept at most this big on the long side.
-    private static let maxImagePixel = 2048
+    static let maxImagePixel = 2048
 
     static func capture(from items: [NSExtensionItem]) async -> Capture? {
         let providers = items.flatMap { $0.attachments ?? [] }
@@ -95,7 +95,10 @@ extension Library {
         let read = await text
         item.ocrText = read?.fullText
         var meta = result.meta
-        if meta.imageData == nil || meta.imageIsIcon, let source { meta.imageData = source }
+        // On the first fetch, a link with no usable preview image starts out showing the image it was shared as.
+        if meta.imageData == nil || meta.imageIsIcon, source != nil, item.title.isEmpty, !item.usesCustomImage {
+            item.usesSharedImage = true
+        }
         if !meta.hasPreview, let title = read?.title { meta.title = title }
         if result.isFallback, !item.title.isEmpty, data(.cover, of: item) != nil {
             save()

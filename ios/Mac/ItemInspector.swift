@@ -6,7 +6,7 @@ struct ItemInspector: View {
     let actions: LibraryActions
 
     @State private var image: NSImage?
-    @State private var covers: (preview: NSImage?, shared: NSImage?)?
+    @State private var covers: (preview: NSImage?, shared: NSImage?, custom: NSImage?)?
 
     private var library: Library { actions.library }
     private var isLoading: Bool { library.enriching.contains(item.id) }
@@ -22,7 +22,11 @@ struct ItemInspector: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if let covers {
                             Text("Cover").font(.headline)
-                            CoverPicker(preview: covers.preview, shared: covers.shared, usesShared: sharedImageBinding)
+                            CoverPicker(preview: covers.preview, shared: covers.shared, custom: covers.custom, cover: coverBinding) {
+                                library.setCustomImage($0, for: item)
+                            } removeCustom: {
+                                library.removeCustomImage(item)
+                            }
                         }
                         Text("Template").font(.headline)
                         TemplatePicker(meta: meta, style: styleBinding)
@@ -33,12 +37,12 @@ struct ItemInspector: View {
             }
             .padding()
         }
-        .task(id: "\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)") {
+        .task(id: "\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
             image = library.fullImage(item)
-            covers = library.hasCoverChoice(item)
-                ? (library.data(.cover, of: item).flatMap(Self.coverThumbnail),
-                   library.data(.source, of: item).flatMap(Self.coverThumbnail))
-                : nil
+            covers = item.isImage ? nil
+                : (library.previewData(item).flatMap(Self.coverThumbnail),
+                   library.data(.source, of: item).flatMap(Self.coverThumbnail),
+                   library.data(.custom, of: item).flatMap(Self.coverThumbnail))
         }
     }
 
@@ -142,8 +146,8 @@ struct ItemInspector: View {
         .background(.fill.quinary, in: .rect(cornerRadius: 12))
     }
 
-    private var sharedImageBinding: Binding<Bool> {
-        Binding { item.usesSharedImage } set: { library.setUsesSharedImage($0, for: item) }
+    private var coverBinding: Binding<Library.Cover> {
+        Binding { library.cover(of: item) } set: { library.setCover($0, for: item) }
     }
 
     private var styleBinding: Binding<CardStyle> {

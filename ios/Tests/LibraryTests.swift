@@ -33,14 +33,15 @@ struct LibraryTests {
         #expect(second.tags == ["read later"])
     }
 
-    @Test func linkSharedAsImageCanShowEitherImage() throws {
-        func jpeg(_ width: CGFloat, _ height: CGFloat, _ color: UIColor) throws -> Data {
-            let image = UIGraphicsImageRenderer(size: CGSize(width: width, height: height)).image { context in
-                color.setFill()
-                context.fill(CGRect(x: 0, y: 0, width: width, height: height))
-            }
-            return try #require(image.jpegData(compressionQuality: 0.9))
+    func jpeg(_ width: CGFloat, _ height: CGFloat, _ color: UIColor) throws -> Data {
+        let image = UIGraphicsImageRenderer(size: CGSize(width: width, height: height)).image { context in
+            color.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: width, height: height))
         }
+        return try #require(image.jpegData(compressionQuality: 0.9))
+    }
+
+    @Test func linkCanShowPreviewSharedOrCustomImage() throws {
         let library = makeLibrary()
         let url = URL(string: "https://example.com/post")!
         let shared = try jpeg(400, 300, .red)
@@ -48,13 +49,34 @@ struct LibraryTests {
         let item = library.save(.link(url, image: shared))
         library.setMeta(LinkMeta(url: url, site: "Example", title: "Post", imageData: preview), for: item)
 
-        #expect(library.hasCoverChoice(item))
+        #expect(library.cover(of: item) == .preview)
+        #expect(library.previewData(item) == preview)
         #expect(library.meta(for: item)?.imageData == preview)
         #expect(abs(item.thumbnailAspect - 0.75) < 0.01)
 
-        library.setUsesSharedImage(true, for: item)
+        library.setCover(.shared, for: item)
         #expect(library.meta(for: item)?.imageData == shared)
         #expect(abs(item.thumbnailAspect - 4.0 / 3) < 0.01)
+
+        #expect(library.setCustomImage(try jpeg(500, 500, .green), for: item))
+        #expect(library.cover(of: item) == .custom)
+        #expect(!item.usesSharedImage)
+        #expect(abs(item.thumbnailAspect - 1) < 0.01)
+
+        library.removeCustomImage(item)
+        #expect(library.data(.custom, of: item) == nil)
+        #expect(library.cover(of: item) == .preview)
+        #expect(library.data(.source, of: item) == shared)
+    }
+
+    @Test func plainLinkCanTakeACustomImage() throws {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://example.com/plain")!, image: nil))
+        #expect(library.coverData(item) == nil)
+        #expect(!library.setCustomImage(Data("not an image".utf8), for: item))
+        #expect(library.setCustomImage(try jpeg(600, 400, .orange), for: item))
+        #expect(library.coverData(item) != nil)
+        #expect(abs(item.thumbnailAspect - 1.5) < 0.01)
     }
 
     @Test func sameImageIsSavedOnce() {

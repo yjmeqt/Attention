@@ -23,6 +23,8 @@ final class LibraryItem {
     var isArchived = false
     /// For links shared as an image: show that image instead of the link's preview image.
     var usesSharedImage = false
+    /// Show the image the user picked; wins over `usesSharedImage`, which older versions still read.
+    var usesCustomImage = false
     /// Width ÷ height of the thumbnail, so the feed can lay out tiles before loading them.
     var thumbnailAspect = 0.8
 
@@ -33,6 +35,8 @@ final class LibraryItem {
     @Attribute(.externalStorage) var iconData: Data?
     /// The image the item was shared or pasted as.
     @Attribute(.externalStorage) var sourceData: Data?
+    /// An image the user picked for a link's card.
+    @Attribute(.externalStorage) var customData: Data?
 
     @MainActor
     init(key: String, url: URL?, site: String, title: String = "", style: CardStyle = CardStyle()) {

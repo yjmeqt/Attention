@@ -84,6 +84,10 @@ final class Library {
                 if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
                 if keeper.iconData == nil { keeper.iconData = other.iconData }
                 if keeper.sourceData == nil { keeper.sourceData = other.sourceData }
+                if keeper.customData == nil, other.customData != nil {
+                    keeper.customData = other.customData
+                    keeper.usesCustomImage = other.usesCustomImage
+                }
                 try? FileManager.default.removeItem(at: folder(other))
                 context.delete(other)
             }
@@ -180,7 +184,7 @@ final class Library {
     // MARK: - Files
 
     /// The thumbnail is a local cache each device makes from the synced images; the rest sync with the item.
-    enum File: String { case cover, avatar, icon, source, thumbnail = "tile" }
+    enum File: String { case cover, avatar, icon, source, custom, thumbnail = "tile" }
 
     /// Holds the item's local cache.
     func folder(_ item: LibraryItem) -> URL {
@@ -193,6 +197,7 @@ final class Library {
         case .avatar: item.avatarData
         case .icon: item.iconData
         case .source: item.sourceData
+        case .custom: item.customData
         case .thumbnail: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
         }
     }
@@ -203,6 +208,7 @@ final class Library {
         case .avatar: item.avatarData = data
         case .icon: item.iconData = data
         case .source: item.sourceData = data
+        case .custom: item.customData = data
         case .thumbnail:
             let url = folder(item).appending(path: file.rawValue)
             guard let data else {
@@ -239,21 +245,55 @@ final class Library {
                         iconData: data(.icon, of: item))
     }
 
-    /// The image a link's card and tile show: its preview image, or the image it was shared as.
+    /// Which image a link's card shows.
+    enum Cover { case preview, shared, custom }
+
+    func cover(of item: LibraryItem) -> Cover {
+        if item.usesCustomImage, data(.custom, of: item) != nil { return .custom }
+        if item.usesSharedImage, data(.source, of: item) != nil { return .shared }
+        return .preview
+    }
+
+    /// The image a link's card and tile show: its preview image, the image it was shared as, or one the user picked.
     func coverData(_ item: LibraryItem) -> Data? {
-        if item.usesSharedImage, let source = data(.source, of: item) { return source }
-        return data(.cover, of: item)
+        switch cover(of: item) {
+        case .preview: data(.cover, of: item)
+        case .shared: data(.source, of: item)
+        case .custom: data(.custom, of: item)
+        }
     }
 
-    /// Both a preview image and a different shared image, so there's a choice to make.
-    func hasCoverChoice(_ item: LibraryItem) -> Bool {
-        guard !item.isImage, let source = data(.source, of: item), let cover = data(.cover, of: item) else { return false }
-        return source != cover
+    /// The link's own preview image. Items saved before previews and shared images were kept apart
+    /// may hold a copy of the shared image here, which isn't a preview.
+    func previewData(_ item: LibraryItem) -> Data? {
+        guard let cover = data(.cover, of: item), cover != data(.source, of: item) else { return nil }
+        return cover
     }
 
-    func setUsesSharedImage(_ uses: Bool, for item: LibraryItem) {
-        guard item.usesSharedImage != uses else { return }
-        item.usesSharedImage = uses
+    func setCover(_ cover: Cover, for item: LibraryItem) {
+        guard self.cover(of: item) != cover else { return }
+        item.usesCustomImage = cover == .custom
+        item.usesSharedImage = cover == .shared
+        refreshThumbnail(item)
+        save()
+    }
+
+    /// Keeps a picked image as the link's custom image and shows it. False when it isn't an image.
+    @discardableResult
+    func setCustomImage(_ data: Data, for item: LibraryItem) -> Bool {
+        guard let cgImage = ImageData.downsample(data, maxPixel: Intake.maxImagePixel),
+              let jpeg = ImageData.jpeg(cgImage) else { return false }
+        write(jpeg, .custom, of: item)
+        item.usesCustomImage = true
+        item.usesSharedImage = false
+        refreshThumbnail(item)
+        save()
+        return true
+    }
+
+    func removeCustomImage(_ item: LibraryItem) {
+        write(nil, .custom, of: item)
+        item.usesCustomImage = false
         refreshThumbnail(item)
         save()
     }
