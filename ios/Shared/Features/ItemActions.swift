@@ -1,3 +1,4 @@
+import Photos
 import SwiftUI
 
 /// Actions available on a saved item, shared by the feed's long-press menu and the detail page.
@@ -8,7 +9,7 @@ final class ItemActions {
     var browser: BrowserLink?
     var tagTargets: [LibraryItem]?
     var pendingDelete: [LibraryItem]?
-    var copied: CopiedNotice?
+    var notice: Notice?
     /// While Private is unlocked, removing items from it doesn't ask for Face ID again.
     var privateUnlocked = false
     var showsPasscodeRequired = false
@@ -17,7 +18,7 @@ final class ItemActions {
 
     init(library: Library) { self.library = library }
 
-    enum CopiedNotice { case link, linkForImage }
+    enum Notice { case linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
 
     func shareLink(_ item: LibraryItem) {
         guard let url = shareURL(item) else { return }
@@ -27,7 +28,36 @@ final class ItemActions {
     func copyLink(_ item: LibraryItem) {
         guard let url = shareURL(item) else { return }
         Clipboard.copy(url)
-        copied = .link
+        notice = .linkCopied
+    }
+
+    func copyImage(_ item: LibraryItem) {
+        guard let image = library.fullImage(item) else { return }
+        Clipboard.copy(image)
+        notice = .imageCopied
+    }
+
+    func saveToPhotos(_ item: LibraryItem) async {
+        guard let image = library.fullImage(item) else { return }
+        switch await PHPhotoLibrary.requestAuthorization(for: .addOnly) {
+        case .authorized, .limited: break
+        default:
+            notice = .photosDenied
+            return
+        }
+        do {
+            try await Self.addToPhotos(image)
+            notice = .savedToPhotos
+        } catch {
+            notice = .photosSaveFailed
+        }
+    }
+
+    /// Photos runs the change block on its own queue, so it mustn't be main-actor isolated.
+    private nonisolated static func addToPhotos(_ image: UIImage) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }
     }
 
     func shareImage(_ item: LibraryItem) {
@@ -35,7 +65,7 @@ final class ItemActions {
         let url = shareURL(item)
         if let url {
             Clipboard.copy(url)
-            copied = .linkForImage
+            notice = .linkCopiedForImage
         }
         presenter.present([ShareItem(image: image, title: item.displayTitle, url: url, icon: library.favicon(item))])
         ShareSuggestion.share.donate()
