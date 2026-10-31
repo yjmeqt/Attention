@@ -39,6 +39,8 @@ xcodebuild test -project ios/Attention.xcodeproj -scheme Attention \
 
 The `Attention` scheme runs `AttentionTests` (Swift Testing suites in `ios/Tests/`). Add `-only-testing:AttentionTests/<Suite>` to run one suite.
 
+Unit tests don't touch the network. The live unfurl smoke tests ("Unfurling common sites" in `UnfurlTests.swift`) fetch real sites, so they're skipped unless you prefix the command with `TEST_RUNNER_ATTENTION_LIVE_NETWORK=1`.
+
 ### Worktrees
 
 Worktrees you create by hand go in `.worktrees/` (git-ignored). Register the helpers once per clone:
