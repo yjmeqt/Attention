@@ -4,7 +4,8 @@ import UIKit
 
 /// Live-network smoke tests: unfurl links people commonly share, render a card for each,
 /// and write the PNGs to `cards/` in the test's temporary directory for visual review.
-@Suite("Unfurling common sites")
+/// Unit tests stay offline, so these run only with `TEST_RUNNER_ATTENTION_LIVE_NETWORK=1 xcodebuild test …`.
+@Suite("Unfurling common sites", .enabled(if: ProcessInfo.processInfo.environment["ATTENTION_LIVE_NETWORK"] != nil))
 struct UnfurlTests {
     nonisolated static let chinese = [
         "https://www.bilibili.com/video/BV1xx411c7mD?spm_id_from=333.1007&vd_source=abc",

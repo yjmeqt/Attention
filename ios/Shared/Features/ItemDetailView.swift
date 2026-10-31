@@ -223,7 +223,7 @@ struct ItemDetailView: View {
     }
 
     private var share: some View {
-        ShareMenu(item: item, actions: actions) {
+        ShareMenu(item: item, actions: actions, sharesOnTap: true) {
             Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
         }
         .disabled(item.isImage && image == nil)

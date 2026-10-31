@@ -26,6 +26,7 @@ enum Brand {
     static let name = "Attention"
     /// Apple Music stands in until Attention has its own App Store page.
     static let appStoreURL = URL(string: "https://apps.apple.com/app/apple-music/id1108187390")!
+    static let privacyPolicyURL = URL(string: "https://yjmeqt.github.io/Attention/privacy-policy.html")!
 }
 
 enum LinkKind: String, Codable {

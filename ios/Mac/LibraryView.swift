@@ -14,11 +14,7 @@ struct LibraryView: View {
     @State private var notice: String?
     @State private var showsPasscodeRequired = false
 
-    enum Section: Hashable {
-        case all, archived, locked
-        case site(String)
-        case tag(String)
-    }
+    typealias Section = FeedFilter.Scope
 
     private var visible: [LibraryItem] { filter.apply(library.items) }
     private var selectedItem: LibraryItem? { selection.flatMap { id in library.items.first { $0.id == id } } }
@@ -83,14 +79,14 @@ struct LibraryView: View {
     // MARK: - Sidebar
 
     private var sidebar: some View {
-        let live = library.items.filter { !$0.isPrivate && !$0.isArchived }
+        let live = library.items.filter(FeedFilter.isLive)
         return List(selection: $section) {
             SwiftUI.Section {
                 Label("All Items", systemImage: "square.grid.2x2").tag(Section.all)
                 Label("Archived", systemImage: "archivebox").tag(Section.archived)
                 Label("Private", systemImage: filter.privateUnlocked ? "lock.open" : "lock").tag(Section.locked)
             }
-            let sites = FilterBar.ranked(live.map(\.domain))
+            let sites = FeedFilter.ranked(live.map(\.domain))
             if !sites.isEmpty {
                 SwiftUI.Section("Sites") {
                     ForEach(sites.prefix(30), id: \.self) { domain in
@@ -108,7 +104,7 @@ struct LibraryView: View {
                     }
                 }
             }
-            let tags = FilterBar.ranked(live.flatMap(\.tags))
+            let tags = FeedFilter.ranked(live.flatMap(\.tags))
             if !tags.isEmpty {
                 SwiftUI.Section("Tags") {
                     ForEach(tags, id: \.self) { tag in
@@ -130,20 +126,17 @@ struct LibraryView: View {
     }
 
     private func select(_ new: Section?, from old: Section?) {
-        if new != .locked { lockPrivate() }
-        filter.reset()
-        switch new {
-        case .all, nil: break
-        case .archived: filter.showsArchived = true
-        case .locked: unlockPrivate(fallback: old)
-        case let .site(domain): filter.domains = [domain]
-        case let .tag(tag): filter.tags = [tag]
+        if new == .locked {
+            unlockPrivate(fallback: old)
+        } else {
+            lockPrivate()
+            filter.scope = new ?? .all
         }
         if let selectedItem, !visible.contains(where: { $0.id == selectedItem.id }) { selection = nil }
     }
 
     private func unlockPrivate(fallback: Section?) {
-        filter.showsPrivate = true
+        filter.scope = .locked
         Task {
             switch await DeviceOwner.authenticate(reason: String(localized: "Show your private items")) {
             case .authenticated:
