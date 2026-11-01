@@ -81,8 +81,10 @@ struct FeedTile: View {
     private func card(_ photo: PlatformImage) -> some View {
         let tint = library.tint(item)
         return VStack(alignment: .leading, spacing: 0) {
+            // Full width in a cell of a set height: the photo takes whatever the band leaves.
             Color.clear
                 .aspectRatio(item.thumbnailAspect, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay { Image(platformImage: photo).resizable().scaledToFill() }
                 .clipped()
             VStack(alignment: .leading, spacing: 4) {
@@ -97,6 +99,7 @@ struct FeedTile: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
             .background(tint.map(\.color) ?? .secondaryBackground)
             .environment(\.colorScheme, tint.map { $0.isDark ? .dark : .light } ?? colorScheme)
         }
@@ -166,14 +169,5 @@ private struct Eyebrow: View {
         }
         .font(.caption2.weight(.semibold))
         .foregroundStyle(.secondary)
-    }
-}
-
-/// Shrinks a little while pressed, like App Store cards.
-struct PressableStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(duration: 0.25), value: configuration.isPressed)
     }
 }

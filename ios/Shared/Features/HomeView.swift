@@ -127,6 +127,7 @@ struct HomeView: View {
             if !seenShareGuide { showsGuide = true }
             HistoryImport.run(into: library)
             #if DEBUG
+            DemoLibrary.bulk(into: library)
             await DemoLibrary.run(into: library)
             if DemoLibrary.unlocksPrivate {
                 filter.scope = .locked
@@ -165,23 +166,7 @@ struct HomeView: View {
 
     private var stack: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Inline, as a popover tip on the More menu never shows.
-                    TipView(guideTip)
-                        .frame(maxWidth: 520)
-                        .padding(.horizontal)
-                    if library.items.isEmpty {
-                        EmptyState(showsPaste: false, paste: paste, onSample: openSample)
-                            .frame(maxWidth: 520)
-                            .padding(.horizontal)
-                    } else {
-                        feed
-                    }
-                }
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity)
-            }
+            feedContainer
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if clipboardHasLink && !selecting {
@@ -214,9 +199,15 @@ struct HomeView: View {
                 }
             }
             .animation(.snappy, value: notice)
-            .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
-            .searchFocused($searchFocused)
-            .searchToolbarBehavior(.minimize)
+            // Selecting has no search. On a background, removing it doesn't rebuild the feed.
+            .background {
+                if !selecting {
+                    Color.clear
+                        .searchable(text: $filter.search, isPresented: $searching, placement: .toolbar)
+                        .searchFocused($searchFocused)
+                        .searchToolbarBehavior(.minimize)
+                }
+            }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UUID.self) { id in
@@ -251,53 +242,92 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private var feed: some View {
-        if filter.showsPrivate && !filter.privateUnlocked {
-            ContentUnavailableView("Private is locked", systemImage: "lock.fill")
-        } else if visible.isEmpty {
-            if filter.isAll && filter.search.isEmpty {
-                EmptyState(showsPaste: false, paste: paste, onSample: openSample)
-                    .frame(maxWidth: 520)
-                    .padding(.horizontal)
-            } else if filter.search.isEmpty {
-                ContentUnavailableView(
-                    filter.showsArchived ? "No archived items" : filter.showsPrivate ? "No private items" : "Nothing here",
-                    systemImage: filter.showsArchived ? "archivebox" : "tray"
-                )
-            } else {
-                ContentUnavailableView.search(text: filter.search)
-            }
-        } else {
-            Waterfall(items: visible, columns: columns) { item in
-                tile(item)
-            }
+    /// Inline, as a popover tip on the More menu never shows.
+    private var guideTipView: some View {
+        TipView(guideTip)
+            .frame(maxWidth: 520)
             .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var feedContainer: some View {
+        let visible = visible
+        if !visible.isEmpty, !(filter.showsPrivate && !filter.privateUnlocked) {
+            let firstID = visible.first?.id
+            FeedCollection(items: visible, columns: columns, tileRevision: tileRevision, onSelect: openTile) { [scroll] offset in
+                let scrolled = offset > 12
+                if scroll.scrolled != scrolled { scroll.scrolled = scrolled }
+            } tile: { item, highlighted in
+                tile(item, highlighted: highlighted, isFirst: item.id == firstID)
+            } header: {
+                guideTipView
+            }
+            .ignoresSafeArea(.container, edges: .vertical)
+        } else {
+            ScrollView {
+                VStack(spacing: 16) {
+                    guideTipView
+                    emptyFeed
+                }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private var tileRevision: Int {
+        var hasher = Hasher()
+        hasher.combine(selecting)
+        hasher.combine(selection)
+        return hasher.finalize()
+    }
+
+    private func openTile(_ item: LibraryItem) {
+        if !selecting {
+            path = [item.id]
+        } else if selection.contains(item.id) {
+            selection.remove(item.id)
+        } else {
+            selection.insert(item.id)
         }
     }
 
     @ViewBuilder
-    private func tile(_ item: LibraryItem) -> some View {
-        if selecting {
-            Button {
-                if selection.contains(item.id) { selection.remove(item.id) } else { selection.insert(item.id) }
-            } label: {
+    private func tile(_ item: LibraryItem, highlighted: Bool, isFirst: Bool) -> some View {
+        Group {
+            if selecting {
                 FeedTile(item: item, library: library, isSelecting: true, isSelected: selection.contains(item.id))
-            }
-            .buttonStyle(PressableStyle())
-        } else {
-            NavigationLink(value: item.id) {
+            } else {
                 FeedTile(item: item, library: library) { actions.openInApp(item) }
+                    .matchedTransitionSource(id: item.id, in: zoom)
+                    .popoverTip(isFirst ? longPressTip : nil, arrowEdge: .top)
+                    .contextMenu {
+                        ItemMenu(item: item, actions: actions)
+                            .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
+                    } preview: {
+                        FeedTile(item: item, library: library).frame(width: 280)
+                    }
             }
-            .buttonStyle(PressableStyle())
-            .matchedTransitionSource(id: item.id, in: zoom)
-            .popoverTip(item.id == visible.first?.id ? longPressTip : nil, arrowEdge: .top)
-            .contextMenu {
-                ItemMenu(item: item, actions: actions)
-                    .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
-            } preview: {
-                FeedTile(item: item, library: library).frame(width: 280)
-            }
+        }
+        .scaleEffect(highlighted ? 0.97 : 1)
+        .animation(.spring(duration: 0.25), value: highlighted)
+    }
+
+    @ViewBuilder
+    private var emptyFeed: some View {
+        if filter.showsPrivate && !filter.privateUnlocked {
+            ContentUnavailableView("Private is locked", systemImage: "lock.fill")
+        } else if filter.isAll && filter.search.isEmpty {
+            EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+                .frame(maxWidth: 520)
+                .padding(.horizontal)
+        } else if filter.search.isEmpty {
+            ContentUnavailableView(
+                filter.showsArchived ? "No archived items" : filter.showsPrivate ? "No private items" : "Nothing here",
+                systemImage: filter.showsArchived ? "archivebox" : "tray"
+            )
+        } else {
+            ContentUnavailableView.search(text: filter.search)
         }
     }
 
