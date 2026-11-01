@@ -127,6 +127,11 @@ final class Library {
         reload()
     }
 
+    #if DEBUG
+    /// For bulk demo data: inserts without saving, so thousands don't each refetch the library.
+    func insertUnsaved(_ item: LibraryItem) { context.insert(item) }
+    #endif
+
     func delete(_ doomed: [LibraryItem]) {
         for item in doomed {
             try? FileManager.default.removeItem(at: folder(item))

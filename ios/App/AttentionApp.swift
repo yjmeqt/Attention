@@ -8,7 +8,10 @@ struct AttentionApp: App {
     init() {
         #if DEBUG
         if UserDefaults.standard.bool(forKey: "resetTips") { try? Tips.resetDatastore() }
-        if UserDefaults.standard.string(forKey: "demoLinks") != nil { Tips.hideAllTipsForTesting() }
+        if UserDefaults.standard.string(forKey: "demoLinks") != nil || UserDefaults.standard.integer(forKey: "demoBulk") > 0 {
+            Tips.hideAllTipsForTesting()
+        }
+        FrameMeter.shared.startIfRequested()
         #endif
         try? Tips.configure()
     }
