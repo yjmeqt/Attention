@@ -208,6 +208,36 @@ struct LibraryTests {
         #expect(item.matches(search: " "))
     }
 
+    @Test func searchFindsKeywordsAndVisualLabels() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://www.xiaohongshu.com/explore/2")!, image: nil))
+        item.keywords = ["穿搭", "outfit"]
+        item.visualLabels = ["clothing", ImageAnalysis.portrait]
+        #expect(item.matches(search: "穿搭"))
+        #expect(item.matches(search: "clothing"))
+        #expect(item.matches(search: "人像"))
+        #expect(!item.matches(search: "美食"))
+    }
+
+    @Test func mergingKeepsTheNewerAnalysis() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        b.key = a.key
+        let (keeper, other) = a.id.uuidString < b.id.uuidString ? (a, b) : (b, a)
+        keeper.visualLabels = ["old"]
+        keeper.analysisVersion = Library.Analysis.labels
+        other.visualLabels = ["food"]
+        other.keywords = ["美食"]
+        other.analysisVersion = Library.Analysis.keywords
+        library.save()
+        library.mergeDuplicates()
+        #expect(library.items.count == 1)
+        #expect(keeper.visualLabels == ["food"])
+        #expect(keeper.keywords == ["美食"])
+        #expect(keeper.analysisVersion == Library.Analysis.keywords)
+    }
+
     @Test func importsOldHistory() throws {
         let history = directory.appending(path: "History")
         try FileManager.default.createDirectory(at: history, withIntermediateDirectories: true)
