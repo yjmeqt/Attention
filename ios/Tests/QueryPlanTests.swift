@@ -1,0 +1,57 @@
+import Foundation
+import Testing
+@testable import Attention
+
+@MainActor
+@Suite("QueryPlan")
+struct QueryPlanTests {
+    let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+
+    func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
+
+    @Test func filtersByTimeSiteTagsAndKeywords() {
+        let library = makeLibrary()
+        let recent = library.save(.link(URL(string: "https://www.xiaohongshu.com/a")!, image: nil))
+        let old = library.save(.link(URL(string: "https://www.xiaohongshu.com/b")!, image: nil))
+        let other = library.save(.link(URL(string: "https://youtube.com/c")!, image: nil))
+        recent.title = "周末穿搭"
+        old.title = "上周穿搭"
+        other.title = "穿搭教程"
+        old.createdAt = .now.addingTimeInterval(-48 * 3600)
+        library.addTag("fashion", to: [recent, old])
+        library.save()
+
+        var plan = QueryPlan()
+        plan.intent = .count
+        plan.sinceHours = 12
+        plan.site = "xiaohongshu.com"
+        plan.tags = ["fashion"]
+        plan.keywords = ["穿搭"]
+
+        let found = plan.apply(to: library.items)
+        #expect(found.map(\.id) == [recent.id])
+        #expect(plan.summaryChips.contains("xiaohongshu.com"))
+        #expect(plan.summaryChips.contains("12h"))
+    }
+
+    @Test func visualConceptUsesScoresOrLabels() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        b.visualLabels = [ImageAnalysis.portrait]
+        var plan = QueryPlan()
+        plan.visualConcept = "portrait"
+        let byLabel = plan.apply(to: library.items)
+        #expect(byLabel.map(\.id) == [b.id])
+        let byScore = plan.apply(to: library.items, visualScores: [a.id: 0.5], visualThreshold: 0.22)
+        #expect(Set(byScore.map(\.id)) == Set([a.id, b.id]))
+    }
+
+    @Test func looksLikeQuestionDetectsChineseAndEnglish() {
+        #expect(Assistant.looksLikeQuestion("我12h内一共收藏了多少个小红书的美女？"))
+        #expect(Assistant.looksLikeQuestion("how many xiaohongshu posts?"))
+        #expect(Assistant.looksLikeQuestion("多少条小红书"))
+        #expect(!Assistant.looksLikeQuestion("swift"))
+        #expect(!Assistant.looksLikeQuestion("?"))
+    }
+}

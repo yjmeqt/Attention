@@ -41,6 +41,9 @@ struct HomeView: View {
     @State private var drawerOpen = false
     @State private var showsSettings = false
     @State private var visualScores: [UUID: Float] = [:]
+    #if os(iOS) && !SHARE_EXTENSION
+    @State private var assistant = Assistant()
+    #endif
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     private let guideTip = GuideTip()
@@ -166,7 +169,10 @@ struct HomeView: View {
         }
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
         #if os(iOS) && !SHARE_EXTENSION
-        .onChange(of: filter.search) { _, _ in Task { await refreshVisualScores() } }
+        .onChange(of: filter.search) { _, _ in
+            assistant.reset()
+            Task { await refreshVisualScores() }
+        }
         .onChange(of: ClipModel.shared.status) { _, _ in
             Task {
                 await library.embedPending()
@@ -290,23 +296,38 @@ struct HomeView: View {
     }
 
     @ViewBuilder
+    private var feedHeader: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            guideTipView
+            #if os(iOS) && !SHARE_EXTENSION
+            if showingAsk {
+                AskCard(assistant: assistant) {
+                    Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                }
+                .padding(.horizontal)
+            }
+            #endif
+        }
+    }
+
+    @ViewBuilder
     private var feedContainer: some View {
-        let visible = visible
-        if !visible.isEmpty, !(filter.showsPrivate && !filter.privateUnlocked) {
-            let firstID = visible.first?.id
-            FeedCollection(items: visible, columns: columns, tileRevision: tileRevision, onSelect: openTile) { [scroll] offset in
+        let items = askItems
+        if !items.isEmpty, !(filter.showsPrivate && !filter.privateUnlocked) {
+            let firstID = items.first?.id
+            FeedCollection(items: items, columns: columns, tileRevision: tileRevision, onSelect: openTile) { [scroll] offset in
                 let scrolled = offset > 12
                 if scroll.scrolled != scrolled { scroll.scrolled = scrolled }
             } tile: { item, highlighted in
                 tile(item, highlighted: highlighted, isFirst: item.id == firstID)
             } header: {
-                guideTipView
+                feedHeader
             }
             .ignoresSafeArea(.container, edges: .vertical)
         } else {
             ScrollView {
                 VStack(spacing: 16) {
-                    guideTipView
+                    feedHeader
                     emptyFeed
                 }
                 .padding(.vertical, 8)
@@ -319,6 +340,10 @@ struct HomeView: View {
         var hasher = Hasher()
         hasher.combine(selecting)
         hasher.combine(selection)
+        #if os(iOS) && !SHARE_EXTENSION
+        hasher.combine(String(describing: assistant.phase))
+        hasher.combine(assistant.count)
+        #endif
         return hasher.finalize()
     }
 
@@ -330,6 +355,31 @@ struct HomeView: View {
         } else {
             selection.insert(item.id)
         }
+    }
+
+    private var showingAskDone: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        showingAsk && assistant.phase == .done
+        #else
+        false
+        #endif
+    }
+
+    private var showingAsk: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        Assistant.isAvailable && Assistant.looksLikeQuestion(filter.search)
+        #else
+        false
+        #endif
+    }
+
+    private var askItems: [LibraryItem] {
+        #if os(iOS) && !SHARE_EXTENSION
+        if assistant.phase == .matching || assistant.phase == .answering || assistant.phase == .done {
+            return assistant.matches
+        }
+        #endif
+        return visible
     }
 
     @ViewBuilder
@@ -357,6 +407,10 @@ struct HomeView: View {
     private var emptyFeed: some View {
         if filter.showsPrivate && !filter.privateUnlocked {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
+        } else if showingAskDone {
+            ContentUnavailableView.search(text: filter.search)
+        } else if showingAsk {
+            EmptyView()
         } else if filter.isAll && filter.search.isEmpty {
             EmptyState(showsPaste: false, paste: paste, onSample: openSample)
                 .frame(maxWidth: 520)
