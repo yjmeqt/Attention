@@ -22,6 +22,7 @@ final class Library {
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
     @ObservationIgnored var retriedPreviews: Set<UUID> = []
+    @ObservationIgnored var analyzing = false
     @ObservationIgnored private var remoteChanges: (any NSObjectProtocol)?
     @ObservationIgnored private var pendingReload: Task<Void, Never>?
 
@@ -80,6 +81,11 @@ final class Library {
                 keeper.isPrivate = keeper.isPrivate || other.isPrivate
                 if keeper.title.isEmpty { keeper.title = other.title }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
+                if keeper.analysisVersion < other.analysisVersion {
+                    keeper.visualLabels = other.visualLabels
+                    keeper.keywords = other.keywords
+                    keeper.analysisVersion = other.analysisVersion
+                }
                 if keeper.coverData == nil { keeper.coverData = other.coverData }
                 if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
                 if keeper.iconData == nil { keeper.iconData = other.iconData }
@@ -274,6 +280,7 @@ final class Library {
         guard self.cover(of: item) != cover else { return }
         item.usesCustomImage = cover == .custom
         item.usesSharedImage = cover == .shared
+        item.analysisVersion = 0
         refreshThumbnail(item)
         save()
     }
@@ -286,6 +293,7 @@ final class Library {
         write(jpeg, .custom, of: item)
         item.usesCustomImage = true
         item.usesSharedImage = false
+        item.analysisVersion = 0
         refreshThumbnail(item)
         save()
         return true
@@ -294,6 +302,7 @@ final class Library {
     func removeCustomImage(_ item: LibraryItem) {
         write(nil, .custom, of: item)
         item.usesCustomImage = false
+        item.analysisVersion = 0
         refreshThumbnail(item)
         save()
     }

@@ -16,6 +16,12 @@ final class LibraryItem {
     var authorName: String?
     var authorHandle: String?
     var ocrText: String?
+    /// What Vision sees in the item's image, as Vision's own English identifiers.
+    var visualLabels: [String] = []
+    /// Chinese and English search keywords the on-device model wrote for the item.
+    var keywords: [String] = []
+    /// Which `Library.Analysis` pass the labels and keywords come from; 0 until analyzed.
+    var analysisVersion = 0
     var templateRaw = CardTemplate.auto.rawValue
     var tags: [String] = []
     var isPrivate = false
@@ -79,7 +85,8 @@ extension LibraryItem {
     }
 
     private var searchableFields: [String] {
-        [title, urlString ?? "", ocrText ?? "", site, domainLabel, authorName ?? "", authorHandle ?? ""] + tags
+        [title, urlString ?? "", ocrText ?? "", site, domainLabel, authorName ?? "", authorHandle ?? ""]
+            + tags + keywords + visualLabels + visualLabels.flatMap { ImageAnalysis.aliases[$0] ?? [] }
     }
 }
 
