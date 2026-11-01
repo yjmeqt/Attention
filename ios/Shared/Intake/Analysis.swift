@@ -37,6 +37,9 @@ extension Library {
             for item in batch { await analyze(item) }
             save()
         }
+        #if os(iOS)
+        await embedPending()
+        #endif
     }
     #endif
 }
