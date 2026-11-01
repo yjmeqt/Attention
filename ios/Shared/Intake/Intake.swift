@@ -74,6 +74,9 @@ extension Library {
             }
             _ = await enrich(item)
         }
+        #if !SHARE_EXTENSION
+        await analyzePending()
+        #endif
     }
 
     /// Fetches the link preview and reads text from the shared image, updating the saved item.
@@ -81,7 +84,17 @@ extension Library {
     @discardableResult
     func enrich(_ item: LibraryItem) async -> String? {
         enriching.insert(item.id)
-        defer { enriching.remove(item.id) }
+        let notice = await fetchPreview(item)
+        enriching.remove(item.id)
+        item.analysisVersion = 0
+        save()
+        #if !SHARE_EXTENSION
+        Task { await analyzePending() }
+        #endif
+        return notice
+    }
+
+    private func fetchPreview(_ item: LibraryItem) async -> String? {
         let source = data(.source, of: item)
         async let text: TextReader.Result? = if let source { await TextReader.read(source) } else { nil }
         guard let url = item.url else {
