@@ -87,6 +87,7 @@ extension Library {
         let notice = await fetchPreview(item)
         enriching.remove(item.id)
         item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         save()
         #if !SHARE_EXTENSION
         Task { await analyzePending() }

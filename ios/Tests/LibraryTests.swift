@@ -208,6 +208,23 @@ struct LibraryTests {
         #expect(item.matches(search: " "))
     }
 
+    @Test func visualScoresWidenAndSortSearch() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        a.title = "noodles"
+        b.title = "unrelated"
+        let filter = FeedFilter()
+        filter.search = "portrait"
+        #expect(filter.apply(library.items).isEmpty)
+        let scores = [a.id: Float(0.1), b.id: Float(0.4)]
+        let found = filter.apply(library.items, visualScores: scores, visualThreshold: 0.22)
+        #expect(found.map(\.id) == [b.id])
+        filter.search = "noodles"
+        let both = filter.apply(library.items, visualScores: [b.id: 0.5], visualThreshold: 0.22)
+        #expect(both.map(\.id) == [b.id, a.id])
+    }
+
     @Test func searchFindsKeywordsAndVisualLabels() {
         let library = makeLibrary()
         let item = library.save(.link(URL(string: "https://www.xiaohongshu.com/explore/2")!, image: nil))

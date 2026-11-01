@@ -40,6 +40,7 @@ struct HomeView: View {
     @State private var searching = false
     @State private var drawerOpen = false
     @State private var showsSettings = false
+    @State private var visualScores: [UUID: Float] = [:]
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     private let guideTip = GuideTip()
@@ -53,7 +54,13 @@ struct HomeView: View {
         _actions = State(initialValue: ItemActions(library: library))
     }
 
-    private var visible: [LibraryItem] { filter.apply(library.items) }
+    private var visible: [LibraryItem] {
+        #if os(iOS) && !SHARE_EXTENSION
+        filter.apply(library.items, visualScores: visualScores, visualThreshold: ClipModel.matchThreshold)
+        #else
+        filter.apply(library.items)
+        #endif
+    }
     /// iPhone, and an iPad app in a narrow window: the sidebar is a drawer instead of a split view column.
     private var usesDrawer: Bool { sizeClass != .regular }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
@@ -158,11 +165,41 @@ struct HomeView: View {
             clipboardHasLink = await Clipboard.hasNewLink()
         }
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
+        #if os(iOS) && !SHARE_EXTENSION
+        .onChange(of: filter.search) { _, _ in Task { await refreshVisualScores() } }
+        .onChange(of: ClipModel.shared.status) { _, _ in
+            Task {
+                await library.embedPending()
+                await refreshVisualScores()
+            }
+        }
+        #endif
         .onAppear {
             actions.onDeleted = { deleted in selection.subtract(deleted.map(\.id)) }
             actions.onArchived = { archived in selection.subtract(archived.map(\.id)) }
         }
     }
+
+    #if os(iOS) && !SHARE_EXTENSION
+    private func refreshVisualScores() async {
+        let query = filter.search.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty, ClipModel.shared.isReady else {
+            visualScores = [:]
+            return
+        }
+        let prompt = await ClipPrompt.english(for: query)
+        guard let text = await ClipModel.shared.textEmbedding(prompt) else {
+            visualScores = [:]
+            return
+        }
+        var scores: [UUID: Float] = [:]
+        for item in library.items {
+            guard let image = library.embedding(of: item) else { continue }
+            scores[item.id] = ClipModel.cosine(text, image)
+        }
+        visualScores = scores
+    }
+    #endif
 
     private var stack: some View {
         NavigationStack {
