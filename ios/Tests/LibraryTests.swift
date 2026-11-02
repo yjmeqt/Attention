@@ -208,6 +208,13 @@ struct LibraryTests {
         #expect(item.matches(search: " "))
     }
 
+    @Test func clipPromptTreatsLatinAsAlreadyEnglish() {
+        #expect(ClipPrompt.looksMostlyLatin("a photo of noodles"))
+        #expect(ClipPrompt.looksMostlyLatin("SwiftUI"))
+        #expect(!ClipPrompt.looksMostlyLatin("小红书美女"))
+        #expect(!ClipPrompt.looksMostlyLatin("週末穿搭"))
+    }
+
     @Test func visualScoresWidenAndSortSearch() {
         let library = makeLibrary()
         let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))

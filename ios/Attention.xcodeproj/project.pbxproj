@@ -130,6 +130,7 @@
 		D502EDB2B1BFC869C8E65252 /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */; };
 		D7C5DE86C16F3004828B4CD2 /* ImageAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DFFE82D650B8C3D49D4285 /* ImageAnalysis.swift */; };
 		D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA25D6EE15580CAF8E3954D /* EmptyState.swift */; };
+		DA00B1DC2421E67F837FF211 /* ClipPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC4897790B67BE3D21A34B /* ClipPrompt.swift */; };
 		DA1230E1AAFAE2E539A7D6A0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A2F728FC507EA853909873C /* InfoPlist.strings */; };
 		DEAB54B27CFB6902EEA2059F /* CardComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79265311867F9A8EC6A1D66 /* CardComponents.swift */; };
 		DFA500B0F32CE3438A11A2FB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */; };
@@ -206,6 +207,7 @@
 		236301C39C52D5FA004AD1CA /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		267ABBE0C867B4B6ECD1B1F0 /* Keywords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keywords.swift; sourceTree = "<group>"; };
 		2ED4CF2A6F680BC7488413F1 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		32FC4897790B67BE3D21A34B /* ClipPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipPrompt.swift; sourceTree = "<group>"; };
 		33DFFE82D650B8C3D49D4285 /* ImageAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnalysis.swift; sourceTree = "<group>"; };
 		370075CD22DCAED23F786BF1 /* FeedFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFilter.swift; sourceTree = "<group>"; };
 		3C7A42650D73081334C9072A /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -309,6 +311,7 @@
 				0751CDF050DE3C88A7F13BF9 /* AskCard.swift */,
 				5A42364C5A1C3DA679EC841C /* Assistant.swift */,
 				8811F6C3F4949FEC3B825642 /* ClipModel.swift */,
+				32FC4897790B67BE3D21A34B /* ClipPrompt.swift */,
 				8C114954FAE70B8E09C825B8 /* ClipSearch.swift */,
 				DFC1B226F7BB993B8361EAB8 /* ClipSettingsRow.swift */,
 				CB48988FC880DF5292691D21 /* CLIPTokenizer.swift */,
@@ -738,6 +741,7 @@
 				0E5A766358D25359C5FB6B29 /* CardPalette.swift in Sources */,
 				B53E9B5C9D4672829D874EF6 /* CardView.swift in Sources */,
 				098C1335C7CFD30BC11313EE /* ClipModel.swift in Sources */,
+				DA00B1DC2421E67F837FF211 /* ClipPrompt.swift in Sources */,
 				F2A098DA36F9F3B95166568D /* ClipSearch.swift in Sources */,
 				789A259EF4FE839C446D4916 /* ClipSettingsRow.swift in Sources */,
 				88C47DF88A43C2987672EA93 /* DemoLibrary.swift in Sources */,

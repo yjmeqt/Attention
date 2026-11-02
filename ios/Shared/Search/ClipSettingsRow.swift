@@ -28,6 +28,10 @@ struct ClipSettingsRow: View {
             VStack(alignment: .leading, spacing: 8) {
                 Label(message, systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("If GitHub is blocked, try another network or VPN, then tap Try Again.")
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
                 Button("Try Again") { clip.download() }
             }
         }
