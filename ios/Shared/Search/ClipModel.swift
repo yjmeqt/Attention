@@ -27,7 +27,7 @@ final class ClipModel {
     /// GitHub release that hosts the compiled models and tokenizer files.
     static let archiveURL = URL(string: "https://github.com/yjmeqt/Attention/releases/download/mobileclip-s0-v1/mobileclip-s0.aar")!
     /// Filled by `ios/Tools/mobileclip/package.zsh` after it builds the archive.
-    static let archiveSHA256 = "REPLACE_AFTER_PACKAGING"
+    static let archiveSHA256 = "096d73559ed998a84eb5db594f9f857a84293ce1f279093397fc3f72ab969feb"
 
     private let directory: URL
     private var imageModel: MLModel?
@@ -136,7 +136,7 @@ final class ClipModel {
     private func install(from archive: URL) throws {
         let data = try Data(contentsOf: archive)
         let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-        guard Self.archiveSHA256 == "REPLACE_AFTER_PACKAGING" || digest == Self.archiveSHA256 else {
+        guard digest == Self.archiveSHA256 else {
             throw ClipError.checksumMismatch
         }
         try? FileManager.default.removeItem(at: directory)
