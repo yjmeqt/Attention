@@ -207,7 +207,7 @@ private struct ItemActionPresentations: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(ShareAnchor(presenter: actions.presenter))
-            .fullScreenCover(item: $actions.browser) { link in
+            .sheet(item: $actions.browser) { link in
                 SafariView(url: link.url).ignoresSafeArea()
             }
             .sheet(isPresented: Binding(get: { actions.tagTargets != nil }, set: { if !$0 { actions.tagTargets = nil } })) {

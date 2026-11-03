@@ -12,6 +12,8 @@ struct ItemDetailView: View {
     @State private var image: UIImage?
     /// A link's preview image, the image it was shared as and the one the user picked, each if it has one.
     @State private var covers: (preview: UIImage?, shared: UIImage?, custom: UIImage?)?
+    /// Set when Reload Preview can't fetch a usable card.
+    @State private var enrichNotice: String?
     @Environment(\.dismiss) private var dismiss
 
     init(item: LibraryItem, library: Library, privateUnlocked: Bool = false, autoShare: Bool = false, onDone: (() -> Void)? = nil) {
@@ -162,6 +164,12 @@ struct ItemDetailView: View {
                     Text("Template").font(.headline)
                     TemplatePicker(meta: meta, style: styleBinding)
                     if !isLoading { SourceImageInfo(meta: meta) }
+                    Button {
+                        reloadPreview()
+                    } label: {
+                        Label("Reload Preview", systemImage: "arrow.clockwise")
+                    }
+                    .disabled(isLoading)
                 }
             }
 
@@ -190,6 +198,11 @@ struct ItemDetailView: View {
 
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
+        if onDone == nil {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(role: .close) { dismiss() }
+            }
+        }
         ToolbarItem(placement: .primaryAction) {
             Menu("More", systemImage: "ellipsis") {
                 if item.url != nil {
@@ -197,6 +210,8 @@ struct ItemDetailView: View {
                         Button("Open in App", systemImage: "arrow.up.forward.app") { actions.openInApp(item) }
                     }
                     Button("Open in Browser", systemImage: "safari") { actions.openInBrowser(item) }
+                    Button("Reload Preview", systemImage: "arrow.clockwise") { reloadPreview() }
+                        .disabled(isLoading)
                 }
                 Button("Edit Tags…", systemImage: "tag") { actions.editTags([item]) }
                 if item.isPrivate {
@@ -211,31 +226,14 @@ struct ItemDetailView: View {
 
     private var bottomBar: some View {
         VStack(spacing: 8) {
-            Group {
-                switch actions.notice {
-                case .linkCopied:
-                    Label("Link copied", systemImage: "doc.on.clipboard")
-                case .linkCopiedForImage:
-                    Label("Link copied — paste it after the image.", systemImage: "doc.on.clipboard")
-                case .imageCopied:
-                    Label("Image copied", systemImage: "doc.on.clipboard")
-                case .savedToPhotos:
-                    Label("Saved to Photos", systemImage: "checkmark.circle.fill")
-                case .photosDenied:
-                    Label("Allow Photos access in Settings to save.", systemImage: "exclamationmark.triangle")
-                case .photosSaveFailed:
-                    Label("Couldn't save to Photos.", systemImage: "exclamationmark.triangle")
-                case nil:
-                    if onDone != nil {
-                        Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
-                    }
-                }
+            if showsStatus {
+                statusLabel
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.regularMaterial, in: .capsule)
             }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.regularMaterial, in: .capsule)
             HStack(spacing: 12) {
                 if let onDone {
                     share.buttonStyle(.glassProminent)
@@ -267,6 +265,43 @@ struct ItemDetailView: View {
             Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
         }
         .disabled(item.isImage && image == nil)
+    }
+
+    private var showsStatus: Bool {
+        actions.notice != nil || enrichNotice != nil || onDone != nil
+    }
+
+    @ViewBuilder
+    private var statusLabel: some View {
+        switch actions.notice {
+        case .linkCopied:
+            Label("Link copied", systemImage: "doc.on.clipboard")
+        case .linkCopiedForImage:
+            Label("Link copied — paste it after the image.", systemImage: "doc.on.clipboard")
+        case .imageCopied:
+            Label("Image copied", systemImage: "doc.on.clipboard")
+        case .savedToPhotos:
+            Label("Saved to Photos", systemImage: "checkmark.circle.fill")
+        case .photosDenied:
+            Label("Allow Photos access in Settings to save.", systemImage: "exclamationmark.triangle")
+        case .photosSaveFailed:
+            Label("Couldn't save to Photos.", systemImage: "exclamationmark.triangle")
+        case nil:
+            if let enrichNotice {
+                Label(enrichNotice, systemImage: "exclamationmark.triangle")
+            } else {
+                Label("Saved to \(Brand.name)", systemImage: "checkmark.circle.fill")
+            }
+        }
+    }
+
+    private func reloadPreview() {
+        guard !isLoading else { return }
+        actions.notice = nil
+        enrichNotice = nil
+        Task {
+            enrichNotice = await library.enrich(item)
+        }
     }
 }
 

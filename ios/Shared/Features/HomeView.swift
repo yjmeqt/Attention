@@ -24,7 +24,7 @@ struct HomeView: View {
 
     @State private var filter = FeedFilter()
     @State private var actions: ItemActions
-    @State private var path: [UUID] = []
+    @State private var detailID: UUID?
     @State private var notice: String?
     @State private var clipboardHasLink = false
     @State private var columns = 2
@@ -61,7 +61,7 @@ struct HomeView: View {
     var body: some View {
         Group {
             if usesDrawer {
-                Drawer(isOpen: $drawerOpen, isEnabled: path.isEmpty && !selecting) {
+                Drawer(isOpen: $drawerOpen, isEnabled: detailID == nil && !selecting) {
                     sidebar
                 } content: {
                     stack
@@ -152,7 +152,7 @@ struct HomeView: View {
                 try? await Task.sleep(for: .seconds(1))
                 searchFocused = false
             }
-            if let index = DemoLibrary.open, library.items.indices.contains(index) { path = [library.items[index].id] }
+            if let index = DemoLibrary.open, library.items.indices.contains(index) { detailID = library.items[index].id }
             #endif
             Task { await library.retryMissingPreviews() }
             clipboardHasLink = await Clipboard.hasNewLink()
@@ -165,7 +165,7 @@ struct HomeView: View {
     }
 
     private var stack: some View {
-        NavigationStack(path: $path) {
+        NavigationStack {
             feedContainer
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -210,17 +210,20 @@ struct HomeView: View {
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: UUID.self) { id in
-                if let item = library.items.first(where: { $0.id == id }) {
-                    ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
-                        .navigationTransition(.zoom(sourceID: id, in: zoom))
-                }
-            }
             .toolbar { toolbar }
             .itemActionPresentations(actions)
             .onDrop(of: ItemProviders.pasteTypes, isTargeted: nil) { providers in
                 paste(providers)
                 return true
+            }
+        }
+        .sheet(isPresented: Binding(get: { detailID != nil }, set: { if !$0 { detailID = nil } })) {
+            if let detailID, let item = library.items.first(where: { $0.id == detailID }) {
+                NavigationStack {
+                    ItemDetailView(item: item, library: library, privateUnlocked: filter.privateUnlocked)
+                }
+                .presentationSizing(.page)
+                .navigationTransition(.zoom(sourceID: detailID, in: zoom))
             }
         }
     }
@@ -284,7 +287,7 @@ struct HomeView: View {
 
     private func openTile(_ item: LibraryItem) {
         if !selecting {
-            path = [item.id]
+            detailID = item.id
         } else if selection.contains(item.id) {
             selection.remove(item.id)
         } else {
@@ -475,7 +478,7 @@ struct HomeView: View {
             notice = String(localized: "Already saved in Private.")
             return
         }
-        path = [item.id]
+        detailID = item.id
     }
 
     // MARK: - Private
@@ -503,7 +506,7 @@ struct HomeView: View {
         actions.privateUnlocked = false
         if wasShowingPrivate { filter.reset() }
         let privateIDs = Set(library.items.filter(\.isPrivate).map(\.id))
-        if path.contains(where: privateIDs.contains) { path = [] }
+        if let detailID, privateIDs.contains(detailID) { self.detailID = nil }
         selection.subtract(privateIDs)
     }
 }
