@@ -18,7 +18,15 @@ struct AttentionApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            if UserDefaults.standard.bool(forKey: "shareProbe") {
+                ShareProbeView()
+            } else {
+                HomeView(library: library)
+            }
+            #else
             HomeView(library: library)
+            #endif
         }
     }
 }

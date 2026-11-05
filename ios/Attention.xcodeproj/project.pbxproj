@@ -45,6 +45,7 @@
 		33F700B6D8B0A58DD62C6511 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */; };
 		34F499FBFBFB3B907A7A44E8 /* LibraryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA564C94D6880C88D7F54585 /* LibraryItem.swift */; };
 		35D479FAFB01DD38C616E09A /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */; };
+		36E1686E5B0CE35EE5AF77F9 /* ShareProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68F349D53F9A793C6743928 /* ShareProbe.swift */; };
 		39BA2C980D957433517EE81D /* FrameMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655ACD6F1FF9F4DE8C052B4D /* FrameMeter.swift */; };
 		39EEFA7B42B6DD7B7E90676F /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8EF56438FBF82574D6E180 /* Feed.swift */; };
 		3A631649B560FE49DC65DADC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E50AE3F00A589DE5E00A2F1B /* PrivacyInfo.xcprivacy */; };
@@ -228,6 +229,7 @@
 		ACE3A99FD286CA9E07E0085B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		B2F939F274BC9DFD6C090703 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B5D373591C6BA544F936EDDC /* ItemActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemActions.swift; sourceTree = "<group>"; };
+		B68F349D53F9A793C6743928 /* ShareProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProbe.swift; sourceTree = "<group>"; };
 		B79265311867F9A8EC6A1D66 /* CardComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardComponents.swift; sourceTree = "<group>"; };
 		B7DC9B623AEB2161D327DF20 /* AttentionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AttentionExtension.entitlements; sourceTree = "<group>"; };
 		BA181F2D79A532BBC91F6014 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -420,6 +422,7 @@
 				8A2F728FC507EA853909873C /* InfoPlist.strings */,
 				78D52C48A3992485AFE59EAB /* InfoPlist.strings */,
 				E50AE3F00A589DE5E00A2F1B /* PrivacyInfo.xcprivacy */,
+				B68F349D53F9A793C6743928 /* ShareProbe.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -702,6 +705,7 @@
 				5E92145300F60B3BA2D03F70 /* QRScanner.swift in Sources */,
 				11439DAF98CE599F18B38FD3 /* QRTemplate.swift in Sources */,
 				919B78A56308C6B78A6D0C86 /* SettingsView.swift in Sources */,
+				36E1686E5B0CE35EE5AF77F9 /* ShareProbe.swift in Sources */,
 				0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */,
 				FA1CCA192835C0D9CDE91283 /* ShareSuggestions.swift in Sources */,
 				9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */,

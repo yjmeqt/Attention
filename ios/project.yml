@@ -67,6 +67,12 @@ targets:
         NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         NSUserActivityTypes: [INSendMessageIntent]
+        # Test-only origin subtypes; each representation contains the actual URL/PNG.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-url
+            UTTypeConformsTo: [public.url]
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-image
+            UTTypeConformsTo: [public.png]
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
@@ -176,10 +182,22 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
           NSExtensionAttributes:
             IntentsSupported: [INSendMessageIntent]
-            NSExtensionActivationRule:
-              NSExtensionActivationSupportsWebURLWithMaxCount: 1
-              NSExtensionActivationSupportsText: true
-              NSExtensionActivationSupportsImageWithMaxCount: 1
+            # Experimental only: reject items marked by the outgoing-share probe.
+            NSExtensionActivationRule: >-
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.share-origin" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image"
+                ).@count > 0
+              ).@count == 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count > 0
+              ).@count > 0
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).share
