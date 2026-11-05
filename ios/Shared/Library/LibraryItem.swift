@@ -70,10 +70,16 @@ extension LibraryItem {
         return createdAt.formatted(date: .abbreviated, time: .shortened)
     }
 
+    /// Every word of the search has to appear in one of the item's fields, in any order.
     func matches(search: String) -> Bool {
-        let query = search.trimmingCharacters(in: .whitespaces)
-        guard !query.isEmpty else { return true }
-        return [title, urlString ?? "", ocrText ?? "", site].contains { $0.localizedStandardContains(query) }
+        let words = search.split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !words.isEmpty else { return true }
+        let fields = searchableFields
+        return words.allSatisfy { word in fields.contains { $0.localizedStandardContains(word) } }
+    }
+
+    private var searchableFields: [String] {
+        [title, urlString ?? "", ocrText ?? "", site, domainLabel, authorName ?? "", authorHandle ?? ""] + tags
     }
 }
 

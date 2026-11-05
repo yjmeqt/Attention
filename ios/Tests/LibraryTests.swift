@@ -193,6 +193,21 @@ struct LibraryTests {
         #expect(filter.apply(library.items).isEmpty)
     }
 
+    @Test func searchMatchesEveryWordAcrossFields() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://www.xiaohongshu.com/explore/1")!, image: nil))
+        item.title = "SwiftUI 布局技巧"
+        item.authorName = "旅行的猫"
+        item.authorHandle = "catwalks"
+        library.addTag("design", to: [item])
+        #expect(item.matches(search: "布局 swiftui"))
+        #expect(item.matches(search: "  猫  "))
+        #expect(item.matches(search: "catwalks design"))
+        #expect(item.matches(search: "xiaohongshu 技巧"))
+        #expect(!item.matches(search: "swiftui 美食"))
+        #expect(item.matches(search: " "))
+    }
+
     @Test func importsOldHistory() throws {
         let history = directory.appending(path: "History")
         try FileManager.default.createDirectory(at: history, withIntermediateDirectories: true)
