@@ -39,18 +39,31 @@ enum Clipboard {
 
 /// A shared image or link plus the title and icon the share sheet's header shows for it,
 /// so the header reads like the card instead of "PNG Image".
-final class ShareItem: NSObject, UIActivityItemSource {
-    private let item: Any
+final class ShareItem {
+    let provider: NSItemProvider
     private let metadata: LPLinkMetadata
 
     init(image: UIImage, title: String, url: URL?, icon: UIImage?) {
-        item = image
+        provider = NSItemProvider(object: image)
+        // A subtype carries real PNG bytes, so receivers can still use standard image types.
+        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-image", visibility: .all) { completion in
+            if let data = image.pngData() {
+                completion(data, nil)
+            } else {
+                completion(nil, CocoaError(.fileReadCorruptFile))
+            }
+            return nil
+        }
         metadata = Self.metadata(title: title, url: url, icon: icon)
         metadata.imageProvider = NSItemProvider(object: image)
     }
 
     init(url: URL, title: String, icon: UIImage?) {
-        item = url
+        provider = NSItemProvider(object: url as NSURL)
+        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-url", visibility: .all) { completion in
+            completion(Data(url.absoluteString.utf8), nil)
+            return nil
+        }
         metadata = Self.metadata(title: title, url: url, icon: icon)
     }
 
@@ -63,11 +76,18 @@ final class ShareItem: NSObject, UIActivityItemSource {
         return metadata
     }
 
-    func activityViewControllerPlaceholderItem(_ controller: UIActivityViewController) -> Any { item }
-
-    func activityViewController(_ controller: UIActivityViewController, itemForActivityType type: UIActivity.ActivityType?) -> Any? { item }
-
-    func activityViewControllerLinkMetadata(_ controller: UIActivityViewController) -> LPLinkMetadata? { metadata }
+    static func configuration(for items: [ShareItem]) -> UIActivityItemsConfiguration {
+        let configuration = UIActivityItemsConfiguration(itemProviders: items.map(\.provider))
+        configuration.perItemMetadataProvider = { index, key in
+            guard items.indices.contains(index) else { return nil }
+            switch key {
+            case .linkPresentationMetadata: return items[index].metadata
+            case .title: return items[index].metadata.title
+            default: return nil
+            }
+        }
+        return configuration
+    }
 }
 
 /// Presents `UIActivityViewController` from the view hierarchy, anchored to a SwiftUI view
@@ -78,10 +98,10 @@ final class SharePresenter {
     /// Actions that make no sense for a link or a link card.
     private static let excluded: [UIActivity.ActivityType] = [.assignToContact, .print, .openInIBooks, .markupAsPDF]
 
-    func present(_ items: [Any]) {
+    func present(_ items: [ShareItem]) {
         guard let anchor, var host = anchor.nearestViewController else { return }
         while let presented = host.presentedViewController { host = presented }
-        let sheet = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let sheet = UIActivityViewController(activityItemsConfiguration: ShareItem.configuration(for: items))
         sheet.excludedActivityTypes = Self.excluded
         sheet.popoverPresentationController?.sourceView = anchor
         sheet.popoverPresentationController?.sourceRect = anchor.bounds
