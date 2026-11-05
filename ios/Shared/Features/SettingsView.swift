@@ -23,6 +23,15 @@ struct SettingsView: View {
                 } footer: {
                     Text("Touch and hold Share for the other options.")
                 }
+                #if os(iOS) && !SHARE_EXTENSION
+                Section {
+                    ClipSettingsRow()
+                } header: {
+                    Text("Smart Image Search")
+                } footer: {
+                    Text("Downloads Apple's MobileCLIP so you can search by what's in a picture. About 100 MB, kept only on this device.")
+                }
+                #endif
                 Section {
                     Button {
                         requestReview()

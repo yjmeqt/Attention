@@ -35,8 +35,21 @@ final class FeedFilter {
         }
     }
 
-    func apply(_ items: [LibraryItem]) -> [LibraryItem] {
-        items.filter { contains($0) && $0.matches(search: search) }
+    /// Items in scope that match the text search, plus any whose visual score clears the threshold.
+    /// When `visualScores` is set, results are ordered by score (then recency).
+    func apply(_ items: [LibraryItem], visualScores: [UUID: Float] = [:], visualThreshold: Float = 0) -> [LibraryItem] {
+        let scoped = items.filter(contains)
+        guard !search.trimmingCharacters(in: .whitespaces).isEmpty else { return scoped }
+        let matched = scoped.filter {
+            $0.matches(search: search) || (visualScores[$0.id] ?? 0) >= visualThreshold
+        }
+        guard !visualScores.isEmpty else { return matched }
+        return matched.sorted {
+            let left = visualScores[$0.id] ?? ($0.matches(search: search) ? visualThreshold : 0)
+            let right = visualScores[$1.id] ?? ($1.matches(search: search) ? visualThreshold : 0)
+            if left != right { return left > right }
+            return $0.updatedAt > $1.updatedAt
+        }
     }
 
     /// Neither archived nor private: the items that sites and tags are counted from.

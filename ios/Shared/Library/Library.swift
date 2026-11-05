@@ -190,7 +190,8 @@ final class Library {
     // MARK: - Files
 
     /// The thumbnail is a local cache each device makes from the synced images; the rest sync with the item.
-    enum File: String { case cover, avatar, icon, source, custom, thumbnail = "tile" }
+    /// `embedding` is a local Float16 vector each device computes; it does not sync.
+    enum File: String { case cover, avatar, icon, source, custom, thumbnail = "tile", embedding }
 
     /// Holds the item's local cache.
     func folder(_ item: LibraryItem) -> URL {
@@ -204,7 +205,7 @@ final class Library {
         case .icon: item.iconData
         case .source: item.sourceData
         case .custom: item.customData
-        case .thumbnail: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
+        case .thumbnail, .embedding: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
         }
     }
 
@@ -215,7 +216,7 @@ final class Library {
         case .icon: item.iconData = data
         case .source: item.sourceData = data
         case .custom: item.customData = data
-        case .thumbnail:
+        case .thumbnail, .embedding:
             let url = folder(item).appending(path: file.rawValue)
             guard let data else {
                 try? FileManager.default.removeItem(at: url)
@@ -281,6 +282,7 @@ final class Library {
         item.usesCustomImage = cover == .custom
         item.usesSharedImage = cover == .shared
         item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
     }
@@ -294,6 +296,7 @@ final class Library {
         item.usesCustomImage = true
         item.usesSharedImage = false
         item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
         return true
@@ -303,6 +306,7 @@ final class Library {
         write(nil, .custom, of: item)
         item.usesCustomImage = false
         item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
     }

@@ -157,7 +157,10 @@ targets:
   AttentionExtension:
     type: app-extension
     platform: iOS
-    sources: [ShareExtension, Shared]
+    sources:
+      - ShareExtension
+      - path: Shared
+        excludes: [Search]
     entitlements:
       path: ShareExtension/AttentionExtension.entitlements
       properties:
