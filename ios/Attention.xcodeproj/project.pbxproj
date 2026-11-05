@@ -18,6 +18,7 @@
 		0B04D26888FE8917FB09B581 /* MacClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AF2B9FFA867D69887A1FF3 /* MacClipboard.swift */; };
 		0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
 		0E5A766358D25359C5FB6B29 /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7465AC0D67046C8C505116 /* CardPalette.swift */; };
+		0F91EEED9E8F289E2DD19FCB /* SharingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8F928D1B956834DBE7AA17 /* SharingTests.swift */; };
 		1058DD43019BE0DED8EA70E3 /* LibraryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA564C94D6880C88D7F54585 /* LibraryItem.swift */; };
 		10DE2ABF446C72C52FEFD3F1 /* FeedCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2D35747DB2725DE907A498 /* FeedCollection.swift */; };
 		11439DAF98CE599F18B38FD3 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A3FADEEC30FFD8606052 /* QRTemplate.swift */; };
@@ -226,6 +227,7 @@
 		AB4CA1D0F66EE6F25B2809D7 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		AB62E4296F1EED134B56DB97 /* Vision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision.swift; sourceTree = "<group>"; };
 		ACE3A99FD286CA9E07E0085B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AE8F928D1B956834DBE7AA17 /* SharingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingTests.swift; sourceTree = "<group>"; };
 		B2F939F274BC9DFD6C090703 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B5D373591C6BA544F936EDDC /* ItemActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemActions.swift; sourceTree = "<group>"; };
 		B79265311867F9A8EC6A1D66 /* CardComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardComponents.swift; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				C257256ECFF03867390921EC /* LibraryTests.swift */,
+				AE8F928D1B956834DBE7AA17 /* SharingTests.swift */,
 				4C2727A28BE0D218D5ED70BD /* UnfurlTests.swift */,
 			);
 			path = Tests;
@@ -630,6 +633,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54AF54C1ED74471A1245D6E3 /* LibraryTests.swift in Sources */,
+				0F91EEED9E8F289E2DD19FCB /* SharingTests.swift in Sources */,
 				7FAEB0C5AF81F16DDF0FEC53 /* UnfurlTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

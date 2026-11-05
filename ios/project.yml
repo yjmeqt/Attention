@@ -67,6 +67,12 @@ targets:
         NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         NSUserActivityTypes: [INSendMessageIntent]
+        # Outgoing representations retain standard URL/PNG conformance for other receivers.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-url
+            UTTypeConformsTo: [public.url]
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-image
+            UTTypeConformsTo: [public.png]
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
@@ -176,10 +182,43 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
           NSExtensionAttributes:
             IntentsSupported: [INSendMessageIntent]
-            NSExtensionActivationRule:
-              NSExtensionActivationSupportsWebURLWithMaxCount: 1
-              NSExtensionActivationSupportsText: true
-              NSExtensionActivationSupportsImageWithMaxCount: 1
+            # Reject our outgoing subtypes while accepting external links, text and images.
+            # Use nested SUBQUERYs: the extension matcher rejects @unionOfArrays.
+            NSExtensionActivationRule: >-
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image"
+                ).@count > 0
+              ).@count == 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count == $item.attachments.@count
+              ).@count == extensionItems.@count AND
+              SUBQUERY(extensionItems, $item, $item.attachments.@count > 0).@count > 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+                ).@count > 0
+              ).@count <= 1 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+                ).@count > 1
+              ).@count == 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count > 0
+              ).@count <= 1 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count > 1
+              ).@count == 0
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).share
