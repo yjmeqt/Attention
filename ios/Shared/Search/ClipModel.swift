@@ -24,8 +24,13 @@ final class ClipModel {
     static let embeddingDimensions = 512
     static let imageSize = CGSize(width: 256, height: 256)
 
-    /// GitHub release that hosts the compiled models and tokenizer files.
-    static let archiveURL = URL(string: "https://github.com/yjmeqt/Attention/releases/download/mobileclip-s0-v1/mobileclip-s0.aar")!
+    /// GitHub release first; mirrors help when github.com is slow or blocked.
+    static let archiveURLs: [URL] = [
+        URL(string: "https://github.com/yjmeqt/Attention/releases/download/mobileclip-s0-v1/mobileclip-s0.aar")!,
+        URL(string: "https://ghfast.top/https://github.com/yjmeqt/Attention/releases/download/mobileclip-s0-v1/mobileclip-s0.aar")!,
+        URL(string: "https://mirror.ghproxy.com/https://github.com/yjmeqt/Attention/releases/download/mobileclip-s0-v1/mobileclip-s0.aar")!,
+    ]
+    static let archiveURL = archiveURLs[0]
     /// Filled by `ios/Tools/mobileclip/package.zsh` after it builds the archive.
     static let archiveSHA256 = "096d73559ed998a84eb5db594f9f857a84293ce1f279093397fc3f72ab969feb"
 
@@ -35,6 +40,7 @@ final class ClipModel {
     private var tokenizer: CLIPTokenizer?
     private var downloadTask: URLSessionDownloadTask?
     private var progressObservation: NSKeyValueObservation?
+    private var downloadIndex = 0
     private let session = URLSession(configuration: .default)
 
     init(directory: URL = AppGroup.container.appending(path: "MobileCLIP", directoryHint: .isDirectory)) {
@@ -54,25 +60,46 @@ final class ClipModel {
         case .downloading, .ready: return
         case .missing, .failed: break
         }
+        downloadIndex = 0
         status = .downloading(0)
-        let task = session.downloadTask(with: Self.archiveURL) { [weak self] temp, _, error in
+        startDownload(at: 0)
+    }
+
+    private func startDownload(at index: Int) {
+        guard Self.archiveURLs.indices.contains(index) else {
+            status = .failed(String(localized: "Couldn't reach GitHub to download the model. Check your network or try again on Wi‑Fi."))
+            return
+        }
+        downloadIndex = index
+        let url = Self.archiveURLs[index]
+        let task = session.downloadTask(with: url) { [weak self] temp, response, error in
             Task { @MainActor in
                 guard let self else { return }
                 self.progressObservation = nil
                 self.downloadTask = nil
                 if let error {
-                    self.status = .failed(error.localizedDescription)
+                    if (error as? URLError)?.code == .cancelled {
+                        if case .missing = self.status { return }
+                        return
+                    }
+                    self.retryOrFail(Self.message(for: error))
+                    return
+                }
+                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                    self.retryOrFail(String(localized: "Download failed (HTTP \(http.statusCode))."))
                     return
                 }
                 guard let temp else {
-                    self.status = .failed(String(localized: "Download failed."))
+                    self.retryOrFail(String(localized: "Download failed."))
                     return
                 }
                 do {
                     try self.install(from: temp)
                     await self.load()
                 } catch {
+                    // Checksum / extract failures are about the file itself — don't burn mirrors on a bad build.
                     self.status = .failed(error.localizedDescription)
+                    try? FileManager.default.removeItem(at: self.directory)
                 }
             }
         }
@@ -81,6 +108,32 @@ final class ClipModel {
         }
         downloadTask = task
         task.resume()
+    }
+
+    private func retryOrFail(_ message: String) {
+        let next = downloadIndex + 1
+        if Self.archiveURLs.indices.contains(next) {
+            status = .downloading(0)
+            startDownload(at: next)
+        } else {
+            status = .failed(message)
+        }
+    }
+
+    private static func message(for error: Error) -> String {
+        let urlError = error as? URLError
+        switch urlError?.code {
+        case .notConnectedToInternet:
+            return String(localized: "No Internet connection.")
+        case .timedOut:
+            return String(localized: "The download timed out. GitHub can be slow in some regions — try again.")
+        case .cannotFindHost, .dnsLookupFailed, .cannotConnectToHost:
+            return String(localized: "Couldn't reach the download server. GitHub may be blocked on this network.")
+        case .networkConnectionLost:
+            return String(localized: "The connection dropped. Try again on a more stable network.")
+        default:
+            return error.localizedDescription
+        }
     }
 
     func delete() {

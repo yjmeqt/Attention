@@ -41,6 +41,9 @@ struct HomeView: View {
     @State private var drawerOpen = false
     @State private var showsSettings = false
     @State private var visualScores: [UUID: Float] = [:]
+    #if os(iOS) && !SHARE_EXTENSION
+    @State private var assistant = Assistant()
+    #endif
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     private let guideTip = GuideTip()
@@ -165,7 +168,10 @@ struct HomeView: View {
         }
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
         #if os(iOS) && !SHARE_EXTENSION
-        .onChange(of: filter.search) { _, _ in Task { await refreshVisualScores() } }
+        .onChange(of: filter.search) { _, _ in
+            assistant.reset()
+            Task { await refreshVisualScores() }
+        }
         .onChange(of: ClipModel.shared.status) { _, _ in
             Task {
                 await library.embedPending()
@@ -292,7 +298,7 @@ struct HomeView: View {
     private var feed: some View {
         if filter.showsPrivate && !filter.privateUnlocked {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
-        } else if visible.isEmpty {
+        } else if visible.isEmpty && !showingAsk {
             if filter.isAll && filter.search.isEmpty {
                 EmptyState(showsPaste: false, paste: paste, onSample: openSample)
                     .frame(maxWidth: 520)
@@ -306,11 +312,52 @@ struct HomeView: View {
                 ContentUnavailableView.search(text: filter.search)
             }
         } else {
-            Waterfall(items: visible, columns: columns) { item in
-                tile(item)
+            VStack(alignment: .leading, spacing: 12) {
+                #if os(iOS) && !SHARE_EXTENSION
+                if showingAsk {
+                    AskCard(assistant: assistant) {
+                        Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                    }
+                    .padding(.horizontal)
+                }
+                #endif
+                let items = askItems
+                if !items.isEmpty {
+                    Waterfall(items: items, columns: columns) { item in
+                        tile(item)
+                    }
+                    .padding(.horizontal)
+                } else if showingAskDone {
+                    ContentUnavailableView.search(text: filter.search)
+                        .padding(.horizontal)
+                }
             }
-            .padding(.horizontal)
         }
+    }
+
+    private var showingAskDone: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        showingAsk && assistant.phase == .done
+        #else
+        false
+        #endif
+    }
+
+    private var showingAsk: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        Assistant.isAvailable && Assistant.looksLikeQuestion(filter.search)
+        #else
+        false
+        #endif
+    }
+
+    private var askItems: [LibraryItem] {
+        #if os(iOS) && !SHARE_EXTENSION
+        if assistant.phase == .matching || assistant.phase == .answering || assistant.phase == .done {
+            return assistant.matches
+        }
+        #endif
+        return visible
     }
 
     @ViewBuilder

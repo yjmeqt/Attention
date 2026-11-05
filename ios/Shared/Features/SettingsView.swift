@@ -29,7 +29,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Smart Image Search")
                 } footer: {
-                    Text("Downloads Apple's MobileCLIP so you can search by what's in a picture. About 100 MB, kept only on this device.")
+                    Text("Downloads Apple's MobileCLIP (~100 MB) from GitHub so you can search by what's in a picture. Kept only on this device. Needs a network that can reach GitHub; if Apple Intelligence isn't available, Chinese queries use the Translate languages already on this device.")
                 }
                 #endif
                 Section {
