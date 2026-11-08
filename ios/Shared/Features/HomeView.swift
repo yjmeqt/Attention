@@ -135,7 +135,11 @@ struct HomeView: View {
         }
         .task {
             if !seenShareGuide { showsGuide = true }
+            #if DEBUG
+            if !DemoLibrary.searchCorpus { HistoryImport.run(into: library) }
+            #else
             HistoryImport.run(into: library)
+            #endif
             #if DEBUG
             DemoLibrary.bulk(into: library)
             await DemoLibrary.run(into: library)

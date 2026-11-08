@@ -95,6 +95,7 @@ enum DemoLibrary {
     /// `-demoOpen 0` opens that item, `-demoSearch text` fills the search field, `-demoTagFilter Music` turns a tag on.
     static var open: Int? { UserDefaults.standard.object(forKey: "demoOpen") != nil ? UserDefaults.standard.integer(forKey: "demoOpen") : nil }
     static var search: String? { UserDefaults.standard.string(forKey: "demoSearch") }
+    static var searchCorpus: Bool { UserDefaults.standard.bool(forKey: "demoSearchCorpus") }
     static var tagFilter: String? { UserDefaults.standard.string(forKey: "demoTagFilter") }
     /// `-demoUnlockPrivate YES` opens Private, still locked, and asks for Face ID.
     static var unlocksPrivate: Bool { UserDefaults.standard.bool(forKey: "demoUnlockPrivate") }
