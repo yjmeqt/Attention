@@ -73,6 +73,17 @@ struct LibraryView: View {
         }
         .overlay(alignment: .bottom) { noticeView }
         .task { await library.retryMissingPreviews() }
+        .onAppear {
+            #if DEBUG
+            if UserDefaults.standard.bool(forKey: "macStoreShots") {
+                switch UserDefaults.standard.string(forKey: "macShotScene") {
+                case "search": filter.search = "Apple"
+                case "detail": selection = library.items.first?.id
+                default: break
+                }
+            }
+            #endif
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSWorkspace.screensDidSleepNotification)) { _ in lockPrivate() }
     }
 

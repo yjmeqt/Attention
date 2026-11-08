@@ -1,0 +1,5 @@
+Gardez les liens à retrouver dans une seule bibliothèque sur Mac. Collez un lien dans Attention pour enregistrer son titre et son aperçu. Retrouvez vos éléments par recherche, organisez-les avec des tags et protégez les éléments privés avec Touch ID ou le mot de passe de votre Mac.
+
+Depuis la barre des menus, créez une carte avec titre, image et code QR. Choisissez le style Carte, Texte ou QR, puis copiez l’image, enregistrez-la en PNG ou glissez-la dans une autre app. Copiez un lien et appuyez sur Contrôle–Option–Commande–A pour placer sa carte dans le presse-papiers.
+
+Votre bibliothèque se synchronise via iCloud entre les appareils utilisant le même compte Apple. Aucun compte Attention n’est nécessaire.

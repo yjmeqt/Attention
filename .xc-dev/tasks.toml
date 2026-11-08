@@ -91,6 +91,16 @@ echo "No simulator UI found under $XCODE_APP" >&2
 """
 
 # ── Mac ───────────────────────────────────────────────────────────────────────
+[tasks.build-mac-store-shots]
+depends = ["generate"]
+desc = "Build the Debug-only Mac screenshot capture entry point with the store display name."
+cmd = """
+set -o pipefail
+xcodebuild -project {{project_root}}/{{path}} -scheme AttentionMac \
+  -configuration Debug -destination 'platform=macOS' \
+  APP_DISPLAY_NAME=Attention -allowProvisioningUpdates build | {{xcb}}
+"""
+
 # The menu bar app (AttentionMac). Same DerivedData folder as the iOS build, under Products/<config>.
 [tasks.build-mac]
 args    = ["config=Debug"]

@@ -16,7 +16,7 @@ struct AttentionMacApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let library = Library(syncs: true)
+    private lazy var library = Library(syncs: true)
     private lazy var maker = CardMaker(library: library)
     private lazy var libraryWindow = LibraryWindow(library: library)
     private let popover = NSPopover()
@@ -30,6 +30,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "macStoreShots") {
+            Task { await MacStoreShots.run() }
+            return
+        }
+        #endif
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.target = self
         item.button?.action = #selector(togglePanel)
@@ -50,6 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Opening the app again from the Finder or Launchpad brings the library back.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "macStoreShots") { return false }
+        #endif
         libraryWindow.show()
         return false
     }
