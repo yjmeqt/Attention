@@ -38,6 +38,7 @@ enum Intake {
 
 extension Library {
     /// Saves a capture right away so nothing is lost if the share extension is closed early.
+    @discardableResult
     func save(_ capture: Capture) -> LibraryItem {
         switch capture {
         case let .link(url, image):
@@ -58,12 +59,14 @@ extension Library {
 
     /// Retries links saved without a preview, e.g. when the share extension closed before the page
     /// loaded. Each item is retried once per launch so pages that never preview don't refetch forever.
-    func retryMissingPreviews() async {
+    func retryMissingPreviews(fetchPreview: (URL) async -> Unfurler.Result = Unfurler.unfurlWithFallback) async {
         let stale = items.filter {
             !$0.isImage && $0.title.isEmpty && data(.cover, of: $0) == nil
                 && !enriching.contains($0.id) && retriedPreviews.insert($0.id).inserted
         }
         for item in stale.prefix(20) {
+            guard !Task.isCancelled else { return }
+            guard contains(item) else { continue }
             if let url = item.url, url.upgradedToHTTPS != url {
                 let key = DomainTag.key(for: url.upgradedToHTTPS)
                 if self.item(forKey: key) == nil {
@@ -72,27 +75,33 @@ extension Library {
                     save()
                 }
             }
-            _ = await enrich(item)
+            _ = await enrich(item, fetchPreview: fetchPreview)
         }
     }
 
     /// Fetches the link preview and reads text from the shared image, updating the saved item.
     /// Returns a notice to show when only a basic card could be made.
     @discardableResult
-    func enrich(_ item: LibraryItem) async -> String? {
-        enriching.insert(item.id)
-        defer { enriching.remove(item.id) }
+    func enrich(_ item: LibraryItem,
+                fetchPreview: (URL) async -> Unfurler.Result = Unfurler.unfurlWithFallback,
+                readText: @Sendable (Data) async -> TextReader.Result? = TextReader.read) async -> String? {
+        guard !Task.isCancelled, contains(item) else { return nil }
+        let id = item.id
+        guard enriching.insert(id).inserted else { return nil }
+        defer { enriching.remove(id) }
         let source = data(.source, of: item)
-        async let text: TextReader.Result? = if let source { await TextReader.read(source) } else { nil }
+        async let text: TextReader.Result? = if let source { await readText(source) } else { nil }
         guard let url = item.url else {
             let result = await text
+            guard !Task.isCancelled, contains(item) else { return nil }
             item.title = result?.title ?? ""
             item.ocrText = result?.fullText
             save()
             return nil
         }
-        let result = await Unfurler.unfurlWithFallback(url)
+        let result = await fetchPreview(url)
         let read = await text
+        guard !Task.isCancelled, contains(item) else { return nil }
         item.ocrText = read?.fullText
         var meta = result.meta
         // On the first fetch, a link with no usable preview image starts out showing the image it was shared as.

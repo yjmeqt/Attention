@@ -21,23 +21,27 @@ final class ItemActions {
     enum Notice { case linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
 
     func shareLink(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let url = shareURL(item) else { return }
         presenter.present([ShareItem(url: url, title: item.displayTitle, icon: library.favicon(item))])
     }
 
     func copyLink(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let url = shareURL(item) else { return }
         Clipboard.copy(url)
         notice = .linkCopied
     }
 
     func copyImage(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let image = library.fullImage(item) else { return }
         Clipboard.copy(image)
         notice = .imageCopied
     }
 
     func saveToPhotos(_ item: LibraryItem) async {
+        guard library.contains(item) else { return }
         guard let image = library.fullImage(item) else { return }
         switch await PHPhotoLibrary.requestAuthorization(for: .addOnly) {
         case .authorized, .limited: break
@@ -61,6 +65,7 @@ final class ItemActions {
     }
 
     func shareImage(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let image = library.fullImage(item) else { return }
         let url = shareURL(item)
         if let url {
@@ -73,6 +78,7 @@ final class ItemActions {
 
     /// What a plain Share does: the link or the image as Settings says; image items have only their image.
     func share(_ item: LibraryItem, _ preference: ShareDefault) {
+        guard library.contains(item) else { return }
         if item.url == nil || preference == .image { shareImage(item) } else { shareLink(item) }
     }
 
@@ -81,11 +87,13 @@ final class ItemActions {
     }
 
     func openInBrowser(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let url = item.url else { return }
         browser = BrowserLink(url: url)
     }
 
     func openInApp(_ item: LibraryItem) {
+        guard library.contains(item) else { return }
         guard let url = item.url else { return }
         Opening.openInApp(url) { [weak self] in self?.browser = BrowserLink(url: url) }
     }
@@ -102,7 +110,8 @@ final class ItemActions {
                 return
             }
         }
-        library.setPrivate(isPrivate, items)
+        guard !Task.isCancelled else { return }
+        library.setPrivate(isPrivate, items.filter { library.contains($0) })
     }
 
     func setArchived(_ isArchived: Bool, _ items: [LibraryItem]) {

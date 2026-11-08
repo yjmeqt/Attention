@@ -27,6 +27,7 @@ struct HomeView: View {
     @State private var detailID: UUID?
     @State private var notice: String?
     @State private var clipboardHasLink = false
+    @State private var sampleLinkCopied = false
     @State private var columns = 2
     @State private var selecting = false
     @State private var selection: Set<UUID> = []
@@ -321,7 +322,7 @@ struct HomeView: View {
         if filter.showsPrivate && !filter.privateUnlocked {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
         } else if filter.isAll && filter.search.isEmpty {
-            EmptyState(showsPaste: false, paste: paste, onSample: openSample)
+            EmptyState(showsPaste: false, showsSampleLink: !sampleLinkCopied, paste: paste, onSample: copySample)
                 .frame(maxWidth: 520)
                 .padding(.horizontal)
         } else if filter.search.isEmpty {
@@ -467,7 +468,11 @@ struct HomeView: View {
 
     private func scanned(_ url: URL) { open(.link(url, image: nil)) }
 
-    private func openSample(_ url: URL) { open(.link(url, image: nil)) }
+    private func copySample(_ url: URL) {
+        Clipboard.copy(url, offerToPaste: true)
+        sampleLinkCopied = true
+        clipboardHasLink = true
+    }
 
     private func open(_ capture: Capture) {
         notice = nil

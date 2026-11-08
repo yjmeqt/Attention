@@ -130,30 +130,18 @@ struct CoverPicker: View {
 
     @ViewBuilder
     private var chooser: some View {
-        let label = VStack(spacing: 6) {
-            Image(systemName: "plus")
-                .font(.title2)
-                .foregroundStyle(.secondary)
-                .frame(width: 96, height: 72)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .strokeBorder(Color.secondary.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                }
-            Text("Choose Image")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
         #if os(iOS)
-        PhotosPicker(selection: $photo, matching: .images) { label }
+        PhotosPicker(selection: $photo, matching: .images) { CoverChooserLabel() }
             .buttonStyle(.plain)
             .accessibilityLabel(Text("Choose Image"))
         #else
-        Button { importing = true } label: { label }
+        Button { importing = true } label: { CoverChooserLabel() }
             .buttonStyle(.plain)
             .help("Choose an image, or drop one here")
             .accessibilityLabel(Text("Choose Image"))
         #endif
     }
+
 
     #if os(macOS)
     private func pick(contentsOf url: URL) {
@@ -192,4 +180,25 @@ struct CoverPicker: View {
         .accessibilityLabel(title)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
+}
+
+private struct CoverChooserLabel: View {
+    nonisolated init() {}
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "plus")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+                .frame(width: 96, height: 72)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 6)
+                        .strokeBorder(Color.secondary.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                }
+            Text("Choose Image")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
 }

@@ -29,6 +29,17 @@ struct ItemDetailView: View {
     private var isLoading: Bool { library.enriching.contains(item.id) }
 
     var body: some View {
+        Group {
+            if library.contains(item) { content }
+        }
+        .onChange(of: library.contains(item)) { _, available in
+            if !available {
+                if let onDone { onDone() } else { dismiss() }
+            }
+        }
+    }
+
+    private var content: some View {
         GeometryReader { proxy in
             let isWide = proxy.size.width > proxy.size.height && proxy.size.width > 700
             ScrollView {
@@ -55,6 +66,7 @@ struct ItemDetailView: View {
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
         .task(id: "\(library.revision)-\(item.templateRaw)") {
+            guard !Task.isCancelled, library.contains(item) else { return }
             image = library.fullImage(item)
             covers = item.isImage ? nil
                 : (library.previewData(item).flatMap(Self.coverThumbnail),
@@ -64,7 +76,8 @@ struct ItemDetailView: View {
         .task {
             guard autoShare else { return }
             // The share anchor needs to be in the window before the sheet can present from it.
-            try? await Task.sleep(for: .milliseconds(400))
+            do { try await Task.sleep(for: .milliseconds(400)) } catch { return }
+            guard !Task.isCancelled, library.contains(item) else { return }
             actions.shareImage(item)
         }
         .onAppear {
@@ -180,7 +193,10 @@ struct ItemDetailView: View {
     }
 
     private var coverBinding: Binding<Library.Cover> {
-        Binding { library.cover(of: item) } set: { library.setCover($0, for: item) }
+        Binding { library.contains(item) ? library.cover(of: item) : .preview } set: {
+            guard library.contains(item) else { return }
+            library.setCover($0, for: item)
+        }
     }
 
     private static func coverThumbnail(_ data: Data) -> UIImage? {
@@ -189,8 +205,9 @@ struct ItemDetailView: View {
 
     private var styleBinding: Binding<CardStyle> {
         Binding {
-            item.style
+            library.contains(item) ? item.style : CardStyle()
         } set: { style in
+            guard library.contains(item) else { return }
             library.setStyle(style, for: item)
             style.save()
         }
@@ -296,7 +313,7 @@ struct ItemDetailView: View {
     }
 
     private func reloadPreview() {
-        guard !isLoading else { return }
+        guard library.contains(item), !isLoading else { return }
         actions.notice = nil
         enrichNotice = nil
         Task {
@@ -322,6 +339,10 @@ private struct TagRow: View {
     let actions: ItemActions
 
     var body: some View {
+        if actions.library.contains(item) { content }
+    }
+
+    private var content: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 TagChip(text: item.domainLabel,
