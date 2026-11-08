@@ -22,7 +22,7 @@ settings:
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
     SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
     MARKETING_VERSION: "1.0.2"
-    CURRENT_PROJECT_VERSION: "8"
+    CURRENT_PROJECT_VERSION: "9"
     APP_GROUP_ID: group.$(APP_BUNDLE_ID).shared
     # The library syncs through this container's private database, on iOS and macOS alike.
     CLOUDKIT_CONTAINER_ID: iCloud.$(APP_BUNDLE_ID)
@@ -40,8 +40,11 @@ targets:
     platform: iOS
     sources:
       - path: App
-        excludes: [Attention.icon]
+        excludes: [Attention.icon, SearchDemoCorpus.json]
       - path: App/Attention.icon
+        type: file
+        buildPhase: resources
+      - path: App/SearchDemoCorpus.json
         type: file
         buildPhase: resources
       - Shared
@@ -95,6 +98,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
         ASSETCATALOG_COMPILER_APPICON_NAME: Attention
+      configs:
+        Release:
+          EXCLUDED_SOURCE_FILE_NAMES: SearchDemoCorpus.json
     scheme:
       testTargets: [AttentionTests]
 
@@ -169,7 +175,10 @@ targets:
   AttentionExtension:
     type: app-extension
     platform: iOS
-    sources: [ShareExtension, Shared]
+    sources:
+      - ShareExtension
+      - path: Shared
+        excludes: [Search]
     entitlements:
       path: ShareExtension/AttentionExtension.entitlements
       properties:

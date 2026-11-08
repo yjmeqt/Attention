@@ -296,3 +296,7 @@ xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} \
   -configuration Debug -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath {{project_root}}/build/store-shots APP_DISPLAY_NAME=Attention build | {{xcb}}
 """
+
+[tasks.release-archive]
+desc = "Archive and export the current iOS release without uploading or changing its build number."
+cmd = "cd {{project_root}}/ios && zsh Tools/release.sh beta --no-upload"

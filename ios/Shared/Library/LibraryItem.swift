@@ -18,6 +18,12 @@ final class LibraryItem {
     /// Original plain-text body, independent of preview metadata and OCR.
     var text: String?
     var ocrText: String?
+    /// What Vision sees in the item's image, as Vision's own English identifiers.
+    var visualLabels: [String] = []
+    /// Chinese and English search keywords the on-device model wrote for the item.
+    var keywords: [String] = []
+    /// Which `Library.Analysis` pass the labels and keywords come from; 0 until analyzed.
+    var analysisVersion = 0
     var templateRaw = CardTemplate.auto.rawValue
     var tags: [String] = []
     var isPrivate = false
@@ -77,10 +83,17 @@ extension LibraryItem {
         return createdAt.formatted(date: .abbreviated, time: .shortened)
     }
 
+    /// Every word of the search has to appear in one of the item's fields, in any order.
     func matches(search: String) -> Bool {
-        let query = search.trimmingCharacters(in: .whitespaces)
-        guard !query.isEmpty else { return true }
-        return [title, text ?? "", urlString ?? "", ocrText ?? "", site].contains { $0.localizedStandardContains(query) }
+        let words = search.split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !words.isEmpty else { return true }
+        let fields = searchableFields
+        return words.allSatisfy { word in fields.contains { $0.localizedStandardContains(word) } }
+    }
+
+    private var searchableFields: [String] {
+        [title, text ?? "", urlString ?? "", ocrText ?? "", site, domainLabel, authorName ?? "", authorHandle ?? ""]
+            + tags + keywords + visualLabels + visualLabels.flatMap { ImageAnalysis.aliases[$0] ?? [] }
     }
 }
 

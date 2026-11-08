@@ -125,6 +125,9 @@ extension Library {
             }
             _ = await enrich(item, fetchPreview: fetchPreview)
         }
+        #if !SHARE_EXTENSION
+        await analyzePending()
+        #endif
     }
 
     /// Fetches the link preview and reads text from the shared image, updating the saved item.
@@ -136,7 +139,17 @@ extension Library {
         guard !Task.isCancelled, contains(item) else { return nil }
         let id = item.id
         guard enriching.insert(id).inserted else { return nil }
-        defer { enriching.remove(id) }
+        defer {
+            enriching.remove(id)
+            if !Task.isCancelled, contains(item) {
+                item.analysisVersion = 0
+                write(nil, .embedding, of: item)
+                save()
+                #if !SHARE_EXTENSION
+                Task { await analyzePending() }
+                #endif
+            }
+        }
         let source = data(.source, of: item)
         guard item.url != nil || source != nil else { return nil }
         async let text: TextReader.Result? = if let source { await readText(source) } else { nil }
@@ -153,6 +166,15 @@ extension Library {
         guard !Task.isCancelled, contains(item) else { return nil }
         item.ocrText = read?.fullText
         var meta = result.meta
+        if let read {
+            item.ocrText = read.fullText
+        } else if let cover = meta.imageData, !meta.imageIsIcon {
+            let coverText = await readText(cover)
+            guard !Task.isCancelled, contains(item) else { return nil }
+            item.ocrText = coverText?.fullText
+        } else {
+            item.ocrText = nil
+        }
         // On the first fetch, a link with no usable preview image starts out showing the image it was shared as.
         if meta.imageData == nil || meta.imageIsIcon, source != nil, item.title.isEmpty, !item.usesCustomImage {
             item.usesSharedImage = true

@@ -530,6 +530,75 @@ struct LibraryTests {
         #expect(filter.apply(library.items).isEmpty)
     }
 
+    @Test func searchMatchesEveryWordAcrossFields() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://www.xiaohongshu.com/explore/1")!, image: nil))
+        item.title = "SwiftUI 布局技巧"
+        item.authorName = "旅行的猫"
+        item.authorHandle = "catwalks"
+        library.addTag("design", to: [item])
+        #expect(item.matches(search: "布局 swiftui"))
+        #expect(item.matches(search: "  猫  "))
+        #expect(item.matches(search: "catwalks design"))
+        #expect(item.matches(search: "xiaohongshu 技巧"))
+        #expect(!item.matches(search: "swiftui 美食"))
+        #expect(item.matches(search: " "))
+    }
+
+    @Test func clipPromptTreatsLatinAsAlreadyEnglish() {
+        #expect(ClipPrompt.looksMostlyLatin("a photo of noodles"))
+        #expect(ClipPrompt.looksMostlyLatin("SwiftUI"))
+        #expect(!ClipPrompt.looksMostlyLatin("小红书美女"))
+        #expect(!ClipPrompt.looksMostlyLatin("週末穿搭"))
+    }
+
+    @Test func visualScoresWidenAndSortSearch() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        a.title = "noodles"
+        b.title = "unrelated"
+        let filter = FeedFilter()
+        filter.search = "portrait"
+        #expect(filter.apply(library.items).isEmpty)
+        let scores = [a.id: Float(0.1), b.id: Float(0.4)]
+        let found = filter.apply(library.items, visualScores: scores, visualThreshold: 0.22)
+        #expect(found.map(\.id) == [b.id])
+        filter.search = "noodles"
+        let both = filter.apply(library.items, visualScores: [b.id: 0.5], visualThreshold: 0.22)
+        #expect(both.map(\.id) == [b.id, a.id])
+    }
+
+    @Test func searchFindsKeywordsAndVisualLabels() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://www.xiaohongshu.com/explore/2")!, image: nil))
+        item.keywords = ["穿搭", "outfit"]
+        item.visualLabels = ["clothing", ImageAnalysis.portrait]
+        #expect(item.matches(search: "穿搭"))
+        #expect(item.matches(search: "clothing"))
+        #expect(item.matches(search: "人像"))
+        #expect(!item.matches(search: "美食"))
+    }
+
+    @Test func mergingKeepsTheNewerAnalysis() {
+        let library = makeLibrary()
+        let a = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let b = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        b.key = a.key
+        let (keeper, other) = a.id.uuidString < b.id.uuidString ? (a, b) : (b, a)
+        keeper.visualLabels = ["old"]
+        keeper.analysisVersion = Library.Analysis.labels
+        other.visualLabels = ["food"]
+        other.keywords = ["美食"]
+        other.analysisVersion = Library.Analysis.keywords
+        library.save()
+        library.mergeDuplicates()
+        #expect(library.items.count == 1)
+        #expect(keeper.visualLabels == ["food"])
+        #expect(keeper.keywords == ["美食"])
+        #expect(keeper.analysisVersion == Library.Analysis.keywords)
+    }
+
     @Test func importsOldHistory() throws {
         let history = directory.appending(path: "History")
         try FileManager.default.createDirectory(at: history, withIntermediateDirectories: true)

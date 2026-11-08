@@ -41,6 +41,10 @@ struct HomeView: View {
     @State private var searching = false
     @State private var drawerOpen = false
     @State private var showsSettings = false
+    @State private var visualScores: [UUID: Float] = [:]
+    #if os(iOS) && !SHARE_EXTENSION
+    @State private var assistant = Assistant()
+    #endif
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
     private let guideTip = GuideTip()
@@ -54,7 +58,13 @@ struct HomeView: View {
         _actions = State(initialValue: ItemActions(library: library))
     }
 
-    private var visible: [LibraryItem] { filter.apply(library.items) }
+    private var visible: [LibraryItem] {
+        #if os(iOS) && !SHARE_EXTENSION
+        filter.apply(library.items, visualScores: visualScores, visualThreshold: ClipModel.matchThreshold)
+        #else
+        filter.apply(library.items)
+        #endif
+    }
     /// iPhone, and an iPad app in a narrow window: the sidebar is a drawer instead of a split view column.
     private var usesDrawer: Bool { sizeClass != .regular }
     private var selectedItems: [LibraryItem] { library.items.filter { selection.contains($0.id) } }
@@ -126,7 +136,11 @@ struct HomeView: View {
         }
         .task {
             if !seenShareGuide { showsGuide = true }
+            #if DEBUG
+            if !DemoLibrary.searchCorpus { HistoryImport.run(into: library) }
+            #else
             HistoryImport.run(into: library)
+            #endif
             #if DEBUG
             DemoLibrary.bulk(into: library)
             await DemoLibrary.run(into: library)
@@ -159,17 +173,82 @@ struct HomeView: View {
             clipboardOffer = await Clipboard.newOffer()
         }
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
+        #if os(iOS) && !SHARE_EXTENSION
+        .onChange(of: filter.search) { _, _ in
+            assistant.reset()
+            #if targetEnvironment(simulator)
+            if !filter.search.isEmpty { Task { await assistant.verifyModelIfNeeded() } }
+            #endif
+            Task { await refreshVisualScores() }
+        }
+        #if targetEnvironment(simulator)
+        .onChange(of: searching) { _, open in
+            if open { Task { await assistant.verifyModelIfNeeded() } }
+        }
+        #endif
+        .onChange(of: ClipModel.shared.status) { _, _ in
+            Task {
+                await library.embedPending()
+                await refreshVisualScores()
+            }
+        }
+        #endif
         .onAppear {
             actions.onDeleted = { deleted in selection.subtract(deleted.map(\.id)) }
             actions.onArchived = { archived in selection.subtract(archived.map(\.id)) }
         }
     }
 
+    #if os(iOS) && !SHARE_EXTENSION
+    private func refreshVisualScores() async {
+        let query = filter.search.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty, ClipModel.shared.isReady else {
+            visualScores = [:]
+            return
+        }
+        let prompt = await ClipPrompt.english(for: query)
+        guard let text = await ClipModel.shared.textEmbedding(prompt) else {
+            visualScores = [:]
+            return
+        }
+        var scores: [UUID: Float] = [:]
+        for item in library.items {
+            guard let image = library.embedding(of: item) else { continue }
+            scores[item.id] = ClipModel.cosine(text, image)
+        }
+        visualScores = scores
+    }
+    #endif
+
     private var stack: some View {
         NavigationStack {
             feedContainer
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
+                #if os(iOS) && !SHARE_EXTENSION
+                if searching && !selecting && (assistant.showsAskEntry || assistant.availabilityMessage != nil) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if assistant.showsAskEntry {
+                            Button {
+                                searchFocused = false
+                                Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                            } label: {
+                                Label("Ask", systemImage: "sparkles")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(!assistant.canAsk || assistant.isBusy || filter.search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                        if let message = assistant.availabilityMessage {
+                            Text(message).font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(12)
+                    .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                }
+                #endif
                 if let clipboardOffer, !selecting {
                     ClipboardBanner(offer: clipboardOffer, paste: paste, dismiss: dismissClipboard)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -254,23 +333,38 @@ struct HomeView: View {
     }
 
     @ViewBuilder
+    private var feedHeader: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            guideTipView
+            #if os(iOS) && !SHARE_EXTENSION
+            if showingAsk {
+                AskCard(assistant: assistant) {
+                    Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                }
+                .padding(.horizontal)
+            }
+            #endif
+        }
+    }
+
+    @ViewBuilder
     private var feedContainer: some View {
-        let visible = visible
-        if !visible.isEmpty, !(filter.showsPrivate && !filter.privateUnlocked) {
-            let firstID = visible.first?.id
-            FeedCollection(items: visible, columns: columns, tileRevision: tileRevision, onSelect: openTile) { [scroll] offset in
+        let items = askItems
+        if !items.isEmpty, !(filter.showsPrivate && !filter.privateUnlocked) {
+            let firstID = items.first?.id
+            FeedCollection(items: items, columns: columns, tileRevision: tileRevision, onSelect: openTile) { [scroll] offset in
                 let scrolled = offset > 12
                 if scroll.scrolled != scrolled { scroll.scrolled = scrolled }
             } tile: { item, highlighted in
                 tile(item, highlighted: highlighted, isFirst: item.id == firstID)
             } header: {
-                guideTipView
+                feedHeader
             }
             .ignoresSafeArea(.container, edges: .vertical)
         } else {
             ScrollView {
                 VStack(spacing: 16) {
-                    guideTipView
+                    feedHeader
                     emptyFeed
                 }
                 .padding(.vertical, 8)
@@ -283,6 +377,10 @@ struct HomeView: View {
         var hasher = Hasher()
         hasher.combine(selecting)
         hasher.combine(selection)
+        #if os(iOS) && !SHARE_EXTENSION
+        hasher.combine(String(describing: assistant.phase))
+        hasher.combine(assistant.count)
+        #endif
         return hasher.finalize()
     }
 
@@ -294,6 +392,31 @@ struct HomeView: View {
         } else {
             selection.insert(item.id)
         }
+    }
+
+    private var showingAskDone: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        showingAsk && assistant.phase == .done
+        #else
+        false
+        #endif
+    }
+
+    private var showingAsk: Bool {
+        #if os(iOS) && !SHARE_EXTENSION
+        searching && assistant.phase != .idle && assistant.phase != .unavailable && !assistant.modelFailed
+        #else
+        false
+        #endif
+    }
+
+    private var askItems: [LibraryItem] {
+        #if os(iOS) && !SHARE_EXTENSION
+        if assistant.phase == .matching || assistant.phase == .answering || assistant.phase == .done {
+            return assistant.matches
+        }
+        #endif
+        return visible
     }
 
     @ViewBuilder
@@ -321,6 +444,10 @@ struct HomeView: View {
     private var emptyFeed: some View {
         if filter.showsPrivate && !filter.privateUnlocked {
             ContentUnavailableView("Private is locked", systemImage: "lock.fill")
+        } else if showingAskDone {
+            ContentUnavailableView.search(text: filter.search)
+        } else if showingAsk {
+            EmptyView()
         } else if filter.isAll && filter.search.isEmpty {
             EmptyState(showsPaste: false, showsSampleLink: !sampleLinkCopied, paste: paste, onSample: copySample)
                 .frame(maxWidth: 520)

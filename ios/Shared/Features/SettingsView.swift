@@ -29,6 +29,15 @@ struct SettingsView: View {
                 } footer: {
                     Text("Add a QR code linking to Attention in the App Store when sharing text as an image.")
                 }
+                #if os(iOS) && !SHARE_EXTENSION
+                Section {
+                    ClipSettingsRow()
+                } header: {
+                    Text("Smart Image Search")
+                } footer: {
+                    Text("Downloads Apple's MobileCLIP (~100 MB) from GitHub so you can search by what's in a picture. Kept only on this device. Needs a network that can reach GitHub; if Apple Intelligence isn't available, Chinese queries use the Translate languages already on this device.")
+                }
+                #endif
                 Section {
                     Button {
                         requestReview()

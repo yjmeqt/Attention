@@ -22,6 +22,7 @@ final class Library {
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
     @ObservationIgnored var retriedPreviews: Set<UUID> = []
+    @ObservationIgnored var analyzing = false
     @ObservationIgnored private var remoteChanges: (any NSObjectProtocol)?
     @ObservationIgnored private var pendingReload: Task<Void, Never>?
 
@@ -81,6 +82,11 @@ final class Library {
                 if keeper.title.isEmpty { keeper.title = other.title }
                 if keeper.text == nil { keeper.text = other.text }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
+                if keeper.analysisVersion < other.analysisVersion {
+                    keeper.visualLabels = other.visualLabels
+                    keeper.keywords = other.keywords
+                    keeper.analysisVersion = other.analysisVersion
+                }
                 if keeper.coverData == nil { keeper.coverData = other.coverData }
                 if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
                 if keeper.iconData == nil { keeper.iconData = other.iconData }
@@ -195,7 +201,8 @@ final class Library {
     // MARK: - Files
 
     /// The thumbnail is a local cache each device makes from the synced images; the rest sync with the item.
-    enum File: String { case cover, avatar, icon, source, custom, thumbnail = "tile" }
+    /// `embedding` is a local Float16 vector each device computes; it does not sync.
+    enum File: String { case cover, avatar, icon, source, custom, thumbnail = "tile", embedding }
 
     /// Holds the item's local cache.
     func folder(_ item: LibraryItem) -> URL {
@@ -209,7 +216,7 @@ final class Library {
         case .icon: item.iconData
         case .source: item.sourceData
         case .custom: item.customData
-        case .thumbnail: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
+        case .thumbnail, .embedding: try? Data(contentsOf: folder(item).appending(path: file.rawValue))
         }
     }
 
@@ -220,7 +227,7 @@ final class Library {
         case .icon: item.iconData = data
         case .source: item.sourceData = data
         case .custom: item.customData = data
-        case .thumbnail:
+        case .thumbnail, .embedding:
             let url = folder(item).appending(path: file.rawValue)
             guard let data else {
                 try? FileManager.default.removeItem(at: url)
@@ -285,6 +292,8 @@ final class Library {
         guard self.cover(of: item) != cover else { return }
         item.usesCustomImage = cover == .custom
         item.usesSharedImage = cover == .shared
+        item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
     }
@@ -297,6 +306,8 @@ final class Library {
         write(jpeg, .custom, of: item)
         item.usesCustomImage = true
         item.usesSharedImage = false
+        item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
         return true
@@ -306,6 +317,8 @@ final class Library {
         guard contains(item) else { return }
         write(nil, .custom, of: item)
         item.usesCustomImage = false
+        item.analysisVersion = 0
+        write(nil, .embedding, of: item)
         refreshThumbnail(item)
         save()
     }
