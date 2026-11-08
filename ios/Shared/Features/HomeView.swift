@@ -371,7 +371,7 @@ struct HomeView: View {
 
     private var showingAsk: Bool {
         #if os(iOS) && !SHARE_EXTENSION
-        Assistant.isAvailable && Assistant.looksLikeQuestion(filter.search)
+        Assistant.looksLikeQuestion(filter.search) && (assistant.canSuggest || assistant.hasFailure)
         #else
         false
         #endif

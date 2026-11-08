@@ -78,4 +78,14 @@ struct QueryPlanTests {
         #expect(!Assistant.looksLikeQuestion("swift"))
         #expect(!Assistant.looksLikeQuestion("?"))
     }
+
+    @Test func modelStartupFailureStopsFurtherAskSuggestions() {
+        let assistant = Assistant()
+        assistant.recordFailure(NSError(domain: "FoundationModels.LanguageModelError", code: -1))
+        #expect(assistant.modelFailed)
+        #expect(assistant.hasFailure)
+        #expect(!assistant.canSuggest)
+        assistant.reset()
+        #expect(!assistant.canSuggest)
+    }
 }

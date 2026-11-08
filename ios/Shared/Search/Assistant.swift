@@ -16,8 +16,15 @@ final class Assistant {
     private(set) var matches: [LibraryItem] = []
     private(set) var answer = ""
     private(set) var count = 0
+    /// A model startup failure makes availability's optimistic result untrustworthy for this session.
+    private(set) var modelFailed = false
 
     static var isAvailable: Bool { SystemLanguageModel.default.availability == .available }
+    var canSuggest: Bool { !modelFailed && Self.isAvailable }
+    var hasFailure: Bool {
+        if case .failed = phase { return true }
+        return false
+    }
 
     /// Looks like a question worth asking, not a plain keyword search.
     static func looksLikeQuestion(_ text: String) -> Bool {
@@ -103,8 +110,20 @@ final class Assistant {
             }
             phase = .done
         } catch {
-            phase = .failed(error.localizedDescription)
+            recordFailure(error)
         }
+    }
+
+    func recordFailure(_ error: Error) {
+        let nsError = error as NSError
+        #if targetEnvironment(simulator)
+        if nsError.code == -1 && nsError.domain.contains("FoundationModels") {
+            modelFailed = true
+            phase = .failed("Apple Intelligence couldn't start in this simulator (Foundation Models error -1). Check the macOS, Xcode, and simulator versions.")
+            return
+        }
+        #endif
+        phase = .failed(error.localizedDescription)
     }
 
     private static func materialize(_ partial: QueryPlan.PartiallyGenerated) -> QueryPlan {

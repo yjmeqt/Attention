@@ -20,4 +20,5 @@ xc-dev run
 sim_id="$(xc-dev :get sim_id)"
 bundle_id="$(xc-dev :get bundle_id)"
 xcrun simctl launch --terminate-running-process "$sim_id" "$bundle_id" \
-  -demoRealLinks YES -demoLinks "${(j: :)links}" -seenShareGuide YES
+  -demoRealLinks YES -demoLinks "${(j: :)links}" \
+  -demoSearch '我一共有多少 NASA 链接？' -seenShareGuide YES

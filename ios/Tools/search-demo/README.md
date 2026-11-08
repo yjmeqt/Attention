@@ -3,7 +3,8 @@
 For a live preview test, run `zsh ios/Tools/search-demo/run-real.zsh`. It launches a separate
 in-memory library with eight real NASA, GitHub, and Apple links. The app fetches each page and
 its OG image, so this mode needs network access. Try searching for `Mars`, `Swift`, `NASA`,
-`GitHub`, or `Apple`. Link content can change, so these results have no fixed expected count.
+`GitHub`, or `Apple`. Ask questions such as `我一共有多少 NASA 链接？` to test Apple Intelligence
+when it is available. Link content can change, so these results have no fixed expected count.
 The live mode uses the same worktree simulator and does not sync to iCloud.
 
 For deterministic search-count tests, use the offline corpus below.

@@ -23,7 +23,7 @@ struct AskCard: View {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                Button("Try Again", action: ask)
+                if !assistant.modelFailed { Button("Try Again", action: ask) }
             default:
                 if let plan = assistant.plan {
                     FlowChips(plan.summaryChips)
