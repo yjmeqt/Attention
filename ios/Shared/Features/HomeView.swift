@@ -176,10 +176,15 @@ struct HomeView: View {
         .onChange(of: filter.search) { _, _ in
             assistant.reset()
             #if targetEnvironment(simulator)
-            if Assistant.looksLikeQuestion(filter.search) { Task { await assistant.verifyModelIfNeeded() } }
+            if !filter.search.isEmpty { Task { await assistant.verifyModelIfNeeded() } }
             #endif
             Task { await refreshVisualScores() }
         }
+        #if targetEnvironment(simulator)
+        .onChange(of: searching) { _, open in
+            if open { Task { await assistant.verifyModelIfNeeded() } }
+        }
+        #endif
         .onChange(of: ClipModel.shared.status) { _, _ in
             Task {
                 await library.embedPending()
@@ -219,6 +224,28 @@ struct HomeView: View {
             feedContainer
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
+                #if os(iOS) && !SHARE_EXTENSION
+                if searching && !selecting {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Button {
+                            searchFocused = false
+                            Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                        } label: {
+                            Label("Ask", systemImage: "sparkles")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!assistant.canAsk || assistant.isBusy || filter.search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        if let message = assistant.availabilityMessage {
+                            Text(message).font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(12)
+                    .glassEffect(.regular, in: .rect(cornerRadius: 16))
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                }
+                #endif
                 if clipboardHasLink && !selecting {
                     ClipboardBanner(paste: paste, dismiss: dismissClipboard)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -374,7 +401,7 @@ struct HomeView: View {
 
     private var showingAsk: Bool {
         #if os(iOS) && !SHARE_EXTENSION
-        Assistant.looksLikeQuestion(filter.search) && (assistant.canSuggest || assistant.hasFailure)
+        searching && assistant.phase != .idle && !assistant.modelFailed
         #else
         false
         #endif

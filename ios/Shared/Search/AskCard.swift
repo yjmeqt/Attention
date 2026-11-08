@@ -10,11 +10,7 @@ struct AskCard: View {
         VStack(alignment: .leading, spacing: 10) {
             switch assistant.phase {
             case .idle:
-                Button(action: ask) {
-                    Label("Ask", systemImage: "sparkles")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
+                EmptyView()
             case .unavailable:
                 Text("On-device Apple Intelligence isn't available here.")
                     .font(.footnote)

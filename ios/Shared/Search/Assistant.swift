@@ -18,13 +18,14 @@ final class Assistant {
     private(set) var count = 0
     /// A model startup failure makes availability's optimistic result untrustworthy for this session.
     private(set) var modelFailed = false
+    private(set) var modelFailureMessage: String?
     #if targetEnvironment(simulator)
     private(set) var modelVerified = false
     private var checkingModel = false
     #endif
 
     static var isAvailable: Bool { SystemLanguageModel.default.availability == .available }
-    var canSuggest: Bool {
+    var canAsk: Bool {
         #if targetEnvironment(simulator)
         return modelVerified && !modelFailed && Self.isAvailable
         #else
@@ -36,20 +37,16 @@ final class Assistant {
         return false
     }
 
-    /// Looks like a question worth asking, not a plain keyword search.
-    static func looksLikeQuestion(_ text: String) -> Bool {
-        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard t.count >= 4 else { return false }
-        if t.hasSuffix("?") || t.hasSuffix("？") { return true }
-        let lower = t.lowercased()
-        for prefix in ["how many", "how much", "what did", "which", "when did", "show me", "find me"] {
-            if lower.hasPrefix(prefix) { return true }
-        }
-        for prefix in ["多少", "几个", "哪些", "什么时候", "帮我找", "找一下", "有没有"] {
-            if t.hasPrefix(prefix) { return true }
-        }
-        return false
+    var availabilityMessage: String? {
+        if let modelFailureMessage { return modelFailureMessage }
+        guard Self.isAvailable else { return "Apple Intelligence isn't available on this device." }
+        #if targetEnvironment(simulator)
+        if !modelVerified { return "Checking Apple Intelligence…" }
+        #endif
+        return nil
     }
+
+    var isBusy: Bool { phase == .planning || phase == .matching || phase == .answering }
 
     func reset() {
         phase = .idle
@@ -77,7 +74,7 @@ final class Assistant {
     #endif
 
     func ask(_ question: String, in library: Library, scope: FeedFilter) async {
-        guard Self.isAvailable else {
+        guard canAsk else {
             phase = .unavailable
             return
         }
@@ -146,7 +143,9 @@ final class Assistant {
         #if targetEnvironment(simulator)
         if nsError.code == -1 && nsError.domain.contains("FoundationModels") {
             modelFailed = true
-            phase = .failed("Apple Intelligence couldn't start in this simulator (Foundation Models error -1). Check the macOS, Xcode, and simulator versions.")
+            let message = "Apple Intelligence couldn't start in this simulator (Foundation Models error -1). Check the macOS, Xcode, and simulator versions."
+            modelFailureMessage = message
+            phase = .failed(message)
             return
         }
         #endif

@@ -5,6 +5,9 @@ in-memory library with eight real NASA, GitHub, and Apple links. The app fetches
 its OG image, so this mode needs network access. Try searching for `Mars`, `Swift`, `NASA`,
 `GitHub`, or `Apple`. Ask questions such as `我一共有多少 NASA 链接？` to test Apple Intelligence
 when it is available. Link content can change, so these results have no fixed expected count.
+Ask stays above the search field while searching. Enter a question or command and tap Ask;
+there is no question-mark or sentence-prefix requirement. An unavailable model disables the
+button and shows its status at the same location.
 The live mode uses the same worktree simulator and does not sync to iCloud.
 
 For deterministic search-count tests, use the offline corpus below.

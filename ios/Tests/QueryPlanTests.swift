@@ -71,24 +71,16 @@ struct QueryPlanTests {
         #expect(plan.apply(to: library.items).map(\.id) == [exact.id])
     }
 
-    @Test func looksLikeQuestionDetectsChineseAndEnglish() {
-        #expect(Assistant.looksLikeQuestion("我12h内一共收藏了多少个小红书的美女？"))
-        #expect(Assistant.looksLikeQuestion("how many xiaohongshu posts?"))
-        #expect(Assistant.looksLikeQuestion("多少条小红书"))
-        #expect(!Assistant.looksLikeQuestion("swift"))
-        #expect(!Assistant.looksLikeQuestion("?"))
-    }
-
-    @Test func modelStartupFailureStopsFurtherAskSuggestions() {
+    @Test func modelStartupFailureDisablesAsk() {
         let assistant = Assistant()
         #if targetEnvironment(simulator)
-        #expect(!assistant.canSuggest)
+        #expect(!assistant.canAsk)
         #endif
         assistant.recordFailure(NSError(domain: "FoundationModels.LanguageModelError", code: -1))
         #expect(assistant.modelFailed)
         #expect(assistant.hasFailure)
-        #expect(!assistant.canSuggest)
+        #expect(!assistant.canAsk)
         assistant.reset()
-        #expect(!assistant.canSuggest)
+        #expect(!assistant.canAsk)
     }
 }
