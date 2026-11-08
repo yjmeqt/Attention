@@ -12,6 +12,35 @@ struct LibraryTests {
 
     func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
 
+    @Test func shortTextRendersAnAdaptiveCard() throws {
+        let library = makeLibrary()
+        let item = library.save(Capture(text: "A small thought."))
+        let image = try #require(library.fullImage(item))
+        #expect(image.cgImage?.width == 1080)
+        #expect(image.size.height < 200)
+        let paragraphs = library.save(Capture(text: "First paragraph.\n\n第二段 👩🏽‍💻\n\n**Literal markdown**"))
+        let taller = try #require(library.fullImage(paragraphs))
+        #expect(taller.size.height > image.size.height)
+    }
+
+    @Test func longTextCardIsBoundedAndPreservesTheBody() throws {
+        let library = makeLibrary()
+        let body = String(repeating: "**Literal markdown** 中文 👩🏽‍💻\n\nA paragraph worth keeping.\n", count: 200)
+        let item = library.save(Capture(text: body))
+        let image = try #require(library.fullImage(item))
+        #expect(image.cgImage?.width == 1080)
+        #expect(image.size.height <= 720)
+        #expect(item.text == body)
+        #expect(item.url == nil)
+        #expect(library.data(.source, of: item) == nil)
+        let longer = library.save(Capture(text: body + body))
+        let longerImage = try #require(library.fullImage(longer))
+        #expect(longerImage.size == image.size)
+        let actions = ItemActions(library: library)
+        actions.copyText(item)
+        #expect(UIPasteboard.general.string == body)
+    }
+
     @Test func capturesPlainTextWithoutURL() async {
         let capture = await Intake.capture(from: [NSItemProvider(object: "A note without links" as NSString)])
         #expect(capture != nil)

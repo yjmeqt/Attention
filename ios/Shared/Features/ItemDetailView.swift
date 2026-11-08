@@ -78,7 +78,7 @@ struct ItemDetailView: View {
             // The share anchor needs to be in the window before the sheet can present from it.
             do { try await Task.sleep(for: .milliseconds(400)) } catch { return }
             guard !Task.isCancelled, library.contains(item) else { return }
-            actions.share(item, .image)
+            actions.shareImage(item)
         }
         .onAppear {
             actions.notice = nil
@@ -153,7 +153,7 @@ struct ItemDetailView: View {
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            if !item.isTextOnly { imageButtons }
+            imageButtons
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)

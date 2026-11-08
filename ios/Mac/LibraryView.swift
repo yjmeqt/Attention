@@ -359,10 +359,8 @@ struct ItemContextMenu: View {
             Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
             ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
         }
-        if !item.isTextOnly {
-            Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
-            Button("Save Image…", systemImage: "square.and.arrow.down") { actions.saveImage(item) }
-        }
+        Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
+        Button("Save Image…", systemImage: "square.and.arrow.down") { actions.saveImage(item) }
         Divider()
         Button("Edit Tags…", systemImage: "tag") { actions.tagTargets = [item] }
         if item.isPrivate {

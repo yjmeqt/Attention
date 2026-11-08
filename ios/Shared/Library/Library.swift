@@ -367,8 +367,9 @@ final class Library {
         return image
     }
 
-    /// The full-size card for links, the shared image for images.
+    /// A card for links or plain text, or the original shared image.
     func fullImage(_ item: LibraryItem) -> PlatformImage? {
+        if item.isTextOnly, let text = item.text { return TextCardRenderer.render(text) }
         if let meta = meta(for: item) { return CardRenderer.render(meta, style: item.style) }
         return data(.source, of: item).flatMap(PlatformImage.init(data:))
     }

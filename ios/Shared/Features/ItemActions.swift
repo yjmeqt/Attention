@@ -194,9 +194,7 @@ struct ShareMenu<MenuLabel: View>: View {
     @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
 
     var body: some View {
-        if item.isTextOnly {
-            Button { actions.shareText(item) } label: { label() }
-        } else if item.url == nil && !item.hasText {
+        if item.url == nil && !item.hasText {
             Button { actions.shareImage(item) } label: { label() }
         } else if sharesOnTap {
             Menu {
@@ -225,9 +223,7 @@ struct ShareMenu<MenuLabel: View>: View {
             Button("Share Link", systemImage: "link") { actions.shareLink(item) }
             Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
         }
-        if !item.isTextOnly {
-            Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
-        }
+        Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
     }
 }
 

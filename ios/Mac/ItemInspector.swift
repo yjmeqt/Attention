@@ -79,17 +79,15 @@ struct ItemInspector: View {
 
     private var buttons: some View {
         HStack {
-            if !item.isTextOnly {
-                Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
-                    .disabled(image == nil)
-            }
+            Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
+                .disabled(image == nil)
             if item.url != nil {
                 Button("Copy Link", systemImage: "link") { actions.copyLink(item) }
             }
             Spacer()
             if let image {
                 ShareLink(item: Image(nsImage: image), preview: SharePreview(item.displayTitle, image: Image(nsImage: image))) {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Share as Image", systemImage: "square.and.arrow.up")
                 }
                 .labelStyle(.iconOnly)
             }

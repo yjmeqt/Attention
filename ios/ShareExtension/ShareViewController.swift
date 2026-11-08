@@ -32,7 +32,6 @@ private struct ShareRoot: View {
     /// Set when opened from the Save suggestion: the item, shown briefly as a confirmation.
     @State private var savedOnly: LibraryItem?
     @State private var failed = false
-    @State private var needsCardContent = false
 
     var body: some View {
         NavigationStack {
@@ -48,9 +47,6 @@ private struct ShareRoot: View {
                     .symbolEffect(.bounce, value: savedOnly.id)
                 } else if let item {
                     ItemDetailView(item: item, library: library, autoShare: suggestion == .share, onDone: onDone)
-                } else if needsCardContent {
-                    ContentUnavailableView("Unable to share a card", systemImage: "rectangle.on.rectangle",
-                                           description: Text("A link or image is needed to share a card."))
                 } else if failed {
                     ContentUnavailableView("Nothing to save", systemImage: "link.badge.plus",
                                            description: Text("No link, image or text was shared."))
@@ -70,10 +66,6 @@ private struct ShareRoot: View {
         .task {
             guard let capture = await Intake.capture(from: items) else {
                 failed = true
-                return
-            }
-            guard suggestion != .share || capture.url != nil || capture.image != nil else {
-                needsCardContent = true
                 return
             }
             let saved = library.save(capture)
