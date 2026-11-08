@@ -19,7 +19,7 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
     func makeUIView(context: Context) -> UICollectionView {
         let coordinator = context.coordinator
         let layout = StaggeredLayout()
-        layout.height = { [unowned coordinator] index, width in coordinator.height(at: index, width: width) }
+        layout.height = { [weak coordinator] index, width in coordinator?.height(at: index, width: width) ?? 0 }
         coordinator.layout = layout
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .clear
@@ -28,17 +28,21 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
         view.topEdgeEffect.isHidden = true
         view.bottomEdgeEffect.isHidden = true
         view.delegate = coordinator
-        let registration = UICollectionView.CellRegistration<UICollectionViewCell, UUID> { [unowned coordinator] cell, _, id in
-            cell.configurationUpdateHandler = { [unowned coordinator] cell, state in
-                guard let item = coordinator.byID[id], let tile = coordinator.tile else { return }
+        let registration = UICollectionView.CellRegistration<UICollectionViewCell, UUID> { [weak coordinator] cell, _, id in
+            cell.configurationUpdateHandler = { [weak coordinator] cell, state in
+                guard let coordinator, let item = coordinator.byID[id],
+                      item.modelContext != nil, !item.isDeleted, let tile = coordinator.tile else {
+                    cell.contentConfiguration = nil
+                    return
+                }
                 cell.contentConfiguration = UIHostingConfiguration { tile(item, state.isHighlighted) }
                     .margins(.all, 0)
             }
         }
         let headerRegistration = UICollectionView.SupplementaryRegistration<UICollectionViewCell>(
             elementKind: StaggeredLayout.headerKind
-        ) { [unowned coordinator] cell, _, _ in
-            coordinator.configureHeader(cell)
+        ) { [weak coordinator] cell, _, _ in
+            coordinator?.configureHeader(cell)
         }
         coordinator.dataSource = UICollectionViewDiffableDataSource(collectionView: view) { view, indexPath, id in
             view.dequeueConfiguredReusableCell(using: registration, for: indexPath, item: id)
@@ -47,6 +51,23 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
             view.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
         return view
+    }
+
+    static func dismantleUIView(_ view: UICollectionView, coordinator: Coordinator) {
+        view.delegate = nil
+        view.dataSource = nil
+        for cell in view.visibleCells {
+            cell.configurationUpdateHandler = nil
+            cell.contentConfiguration = nil
+        }
+        coordinator.layout?.height = { _, _ in 0 }
+        coordinator.dataSource = nil
+        coordinator.items = []
+        coordinator.byID = [:]
+        coordinator.tile = nil
+        coordinator.header = nil
+        coordinator.onSelect = { _ in }
+        coordinator.onScroll = { _ in }
     }
 
     func updateUIView(_ view: UICollectionView, context: Context) {
@@ -100,6 +121,7 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
         /// The header reports its ideal height, which the layout then gives it; a tip that
         /// appears or is closed later moves the tiles with it.
         func configureHeader(_ cell: UICollectionViewCell) {
+            let header = header
             cell.contentConfiguration = UIHostingConfiguration {
                 (header ?? AnyView(EmptyView()))
                     .fixedSize(horizontal: false, vertical: true)
@@ -129,6 +151,7 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
         func height(at index: Int, width: CGFloat) -> CGFloat {
             guard items.indices.contains(index) else { return 0 }
             let item = items[index]
+            guard item.modelContext != nil, !item.isDeleted else { return 0 }
             let key = HeightKey(id: item.id, title: item.displayTitle, aspect: item.thumbnailAspect, width: width)
             if let cached = heights[key] { return cached }
             let height = TileMetrics.height(of: item, width: width)
@@ -138,7 +161,8 @@ struct FeedCollection<Tile: View, Header: View>: UIViewRepresentable {
 
         func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
             collectionView.deselectItem(at: indexPath, animated: false)
-            if let id = dataSource.itemIdentifier(for: indexPath), let item = byID[id] { onSelect(item) }
+            if let id = dataSource?.itemIdentifier(for: indexPath), let item = byID[id],
+               item.modelContext != nil, !item.isDeleted { onSelect(item) }
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {

@@ -41,6 +41,10 @@ PRODUCTS=$(xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} -con
 echo "$PRODUCTS/{{product_name}}.app" > {{xc_dev_dir}}/app-path
 """
 
+[tasks.beta]
+desc = "Archive iOS, increment the build number, and upload to TestFlight; wait for processing."
+cmd = "zsh {{project_root}}/ios/Tools/release.sh beta"
+
 # ── Run ───────────────────────────────────────────────────────────────────────
 [tasks.run]
 depends = ["build", "sim-open", "sim-register"]

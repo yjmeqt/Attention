@@ -1,4 +1,5 @@
 import Testing
+import SwiftUI
 import UIKit
 import CoreImage.CIFilterBuiltins
 @testable import Attention
@@ -9,6 +10,100 @@ struct LibraryTests {
     let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
 
     func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
+
+    @Test func previewCompletionIgnoresDeletedItemAndReplacement() async throws {
+        let library = makeLibrary()
+        let url = URL(string: "https://example.com/pending")!
+        let item = library.save(.link(url, image: nil))
+        let folder = library.folder(item)
+        let preview = try jpeg(400, 300, .blue)
+        var replacement: Attention.LibraryItem?
+        let notice = await library.enrich(item, fetchPreview: { url in
+            library.delete([item])
+            replacement = library.save(.link(url, image: nil))
+            return Unfurler.Result(meta: LinkMeta(url: url, site: "Example", title: "Late result", imageData: preview), isFallback: false)
+        })
+        #expect(notice == nil)
+        #expect(library.enriching.isEmpty)
+        #expect(library.items.count == 1)
+        #expect(replacement?.title == "")
+        #expect(!FileManager.default.fileExists(atPath: folder.path))
+    }
+
+    @Test func ocrCompletionIgnoresDeletedImage() async throws {
+        let library = makeLibrary()
+        let item = library.save(.image(try jpeg(200, 200, .blue)))
+        let id = item.id
+        let folder = library.folder(item)
+        let notice = await library.enrich(item, readText: { _ in
+            await MainActor.run { library.delete(library.items.filter { $0.id == id }) }
+            return TextReader.Result(title: "Late OCR", fullText: "Late OCR")
+        })
+        #expect(notice == nil)
+        #expect(library.items.isEmpty)
+        #expect(library.enriching.isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: folder.path))
+    }
+
+    @Test func retrySkipsItemsDeletedWhileEarlierPreviewLoads() async {
+        let library = makeLibrary()
+        library.save(.link(URL(string: "https://example.com/one")!, image: nil))
+        library.save(.link(URL(string: "https://example.com/two")!, image: nil))
+        var fetches = 0
+        await library.retryMissingPreviews(fetchPreview: { url in
+            fetches += 1
+            library.delete(library.items)
+            return Unfurler.Result(meta: LinkMeta(url: url, site: "Example", title: "Late result"), isFallback: false)
+        })
+        #expect(fetches == 1)
+        #expect(library.items.isEmpty)
+        #expect(library.enriching.isEmpty)
+    }
+
+    @Test func delayedActionsIgnoreDeletedItem() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://example.com/deleted")!, image: nil))
+        let actions = ItemActions(library: library)
+        library.delete([item])
+        actions.copyLink(item)
+        actions.shareImage(item)
+        actions.openInBrowser(item)
+        #expect(actions.notice == nil)
+        #expect(actions.browser == nil)
+    }
+
+    @Test func deletedDetailDoesNotRender() {
+        let library = makeLibrary()
+        let item = library.save(.link(URL(string: "https://example.com/deleted")!, image: nil))
+        library.delete([item])
+        let host = UIHostingController(rootView: ItemDetailView(item: item, library: library))
+        #expect(host.sizeThatFits(in: CGSize(width: 280, height: 600)).height == 0)
+    }
+
+    @Test func collectionTeardownDetachesCallbacks() {
+        typealias Feed = FeedCollection<EmptyView, EmptyView>
+        let coordinator = Feed.Coordinator()
+        let layout = StaggeredLayout()
+        layout.height = { _, _ in 100 }
+        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        view.delegate = coordinator
+        coordinator.layout = layout
+        Feed.dismantleUIView(view, coordinator: coordinator)
+        #expect(view.delegate == nil)
+        #expect(layout.height(0, 280) == 0)
+    }
+
+    @Test func deletedLastTileCanFinishRendering() {
+        let library = Library(directory: directory)
+        let item = library.save(.link(URL(string: "https://example.com/deleted")!, image: nil))
+        library.delete([item])
+        #expect(library.items.isEmpty)
+
+        // A collection cell or context-menu preview can outlive its deleted model.
+        let host = UIHostingController(rootView: FeedTile(item: item, library: library))
+        let size = host.sizeThatFits(in: CGSize(width: 280, height: 600))
+        #expect(size.height == 0)
+    }
 
     @Test(arguments: [
         ("https://www.youtube.com/watch?v=1", "youtube.com"),

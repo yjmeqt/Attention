@@ -107,6 +107,11 @@ final class Library {
         return try? context.fetch(descriptor).first
     }
 
+    /// Check identity without reading persisted fields from a possibly deleted model.
+    func contains(_ item: LibraryItem) -> Bool {
+        item.modelContext === context && !item.isDeleted && items.contains { $0 === item }
+    }
+
     /// Returns the existing item for `key`, moved to the top, or inserts a new one.
     @discardableResult
     func upsert(key: String, url: URL?, site: String, style: CardStyle) -> LibraryItem {
@@ -286,7 +291,7 @@ final class Library {
     /// Keeps a picked image as the link's custom image and shows it. False when it isn't an image.
     @discardableResult
     func setCustomImage(_ data: Data, for item: LibraryItem) -> Bool {
-        guard let cgImage = ImageData.downsample(data, maxPixel: Intake.maxImagePixel),
+        guard contains(item), let cgImage = ImageData.downsample(data, maxPixel: Intake.maxImagePixel),
               let jpeg = ImageData.jpeg(cgImage) else { return false }
         write(jpeg, .custom, of: item)
         item.usesCustomImage = true
@@ -297,6 +302,7 @@ final class Library {
     }
 
     func removeCustomImage(_ item: LibraryItem) {
+        guard contains(item) else { return }
         write(nil, .custom, of: item)
         item.usesCustomImage = false
         refreshThumbnail(item)

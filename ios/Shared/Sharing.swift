@@ -23,12 +23,12 @@ enum Clipboard {
         }
     }
 
-    static func copy(_ url: URL) {
+    static func copy(_ url: URL, offerToPaste: Bool = false) {
         UIPasteboard.general.setItems([[
             UTType.url.identifier: url,
             UTType.plainText.identifier: url.absoluteString,
         ]])
-        ignoreCurrent()
+        if !offerToPaste { ignoreCurrent() }
     }
 
     static func copy(_ image: UIImage) {

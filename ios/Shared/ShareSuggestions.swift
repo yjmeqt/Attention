@@ -48,7 +48,7 @@ enum ShareSuggestion: String, CaseIterable {
     /// The prototype first donated these as Watson and Sherlock; drops those conversations once per launch.
     private static let removeOldNames: Void = INInteraction.delete(with: ["watson", "sherlock"])
 
-    private static let log = Logger(subsystem: "com.yjmeqt.attn", category: "ShareSuggestions")
+    nonisolated private static let log = Logger(subsystem: "com.yjmeqt.attn", category: "ShareSuggestions")
 
     /// A stand-in avatar until there's artwork: the job's symbol on a colored circle.
     private var avatar: INImage? {
