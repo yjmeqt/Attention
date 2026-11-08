@@ -8,6 +8,8 @@ Mac version `1.0.1`, version ID `05ee4003-0335-4ec3-bb2a-aacf01643cf5`, is confi
 
 Mac descriptions and keywords are stored in `ios/fastlane/mac-metadata/` for all 11 existing Mac locales: en-US, zh-Hans, ja, ko, ru, vi, ar-SA, fr-FR, de-DE, es-ES and es-MX. Mac review instructions are in `review-notes.txt` beside them. These have been uploaded to the Mac version, preserving review contact details and shared app information.
 
+Traditional Chinese (`zh-Hant`) descriptions, keywords and three screenshots are prepared locally for the next version. Mac 1.0.1 entered review on 8 November before this version locale could be added; keep its current review submission intact. Shared app information (name, subtitle and privacy URL) already includes Traditional Chinese.
+
 There are three real application screenshots per locale: library, search and card inspector. The exported PNGs are 2880×1800, opaque, and use localized headings. Some Mac UI strings currently fall back to English; the captures show the actual shipped UI rather than replacing those labels. Sample website previews and tags are demonstration content.
 
 ## Verification

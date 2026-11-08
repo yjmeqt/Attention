@@ -6,6 +6,7 @@ const { chromium } = require('playwright-core');
 const headings = {
   'en-US': ['All your links. One library.', 'Find the link you saved.', 'Turn links into cards.'],
   'zh-Hans': ['想留下的链接，都在这里。', '收藏过的链接，轻松找到。', '把链接，变成图片卡片。'],
+  'zh-Hant': ['想留下的連結，都在這裡。', '收藏過的連結，輕鬆找到。', '把連結，變成圖片卡片。'],
   'ja': ['リンクを、ひとつの場所に。', '保存したリンクを、すぐに。', 'リンクを画像カードに。'],
   'ko': ['모든 링크를 한곳에.', '저장한 링크를 빠르게.', '링크를 이미지 카드로.'],
   'ru': ['Все ссылки в одной библиотеке.', 'Находите сохранённые ссылки.', 'Превратите ссылку в карточку.'],
@@ -33,6 +34,7 @@ const root = path.resolve(__dirname, '../../fastlane');
           main{height:720px;margin:0 72px;display:flex;align-items:center;justify-content:center}
           img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 20px 45px #0003;border-radius:12px}
           </style><header><h1>${headings[locale][index]}</h1><span>Attention / Mac</span></header><main><img src="data:image/png;base64,${image}"></main></html>`);
+        await page.evaluate(() => document.fonts.ready);
         await page.locator('img').evaluate(img => img.decode());
         const coverage = await page.locator('img').evaluate(img => {
           const canvas = document.createElement('canvas');
