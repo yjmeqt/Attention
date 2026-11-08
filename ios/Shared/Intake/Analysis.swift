@@ -33,7 +33,7 @@ extension Library {
         while true {
             let target = Analysis.target
             let batch = items.filter { $0.analysisVersion < target && !enriching.contains($0.id) }.prefix(8)
-            guard !batch.isEmpty else { return }
+            guard !batch.isEmpty else { break }
             for item in batch { await analyze(item) }
             save()
         }

@@ -23,10 +23,16 @@ extension Library {
     /// Embeds items that still need a vector, when MobileCLIP is ready.
     func embedPending() async {
         guard ClipModel.shared.isReady else { return }
+        await embedPending { await ClipModel.shared.imageEmbedding(data: $0) }
+    }
+
+    /// The injected embedder lets tests verify the queue without downloading the model.
+    func embedPending(using embed: (Data) async -> [Float]?) async {
         let pending = items.filter { data(.embedding, of: $0) == nil }
-        for item in pending.prefix(16) {
+        for item in pending {
+            if Task.isCancelled { return }
             let image = item.isImage ? data(.source, of: item) : coverData(item)
-            guard let image, let values = await ClipModel.shared.imageEmbedding(data: image) else { continue }
+            guard let image, let values = await embed(image) else { continue }
             writeEmbedding(values, of: item)
         }
     }
