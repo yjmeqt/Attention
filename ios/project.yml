@@ -278,7 +278,7 @@ targets:
     info:
       path: ActionExtension/Card/Info.plist
       properties:
-        CFBundleDisplayName: Create and Share Attention Card
+        CFBundleDisplayName: Share Attention Card
         CFBundleIcons:
           CFBundlePrimaryIcon:
             CFBundleSymbolName: square.and.arrow.up
