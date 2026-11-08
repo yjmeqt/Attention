@@ -282,3 +282,13 @@ for pl in "$HOME"/Library/Developer/Xcode/DerivedData/*/info.plist; do
 done
 [ "{{mode}}" = "delete" ] || echo "(dry run — pass mode=delete to delete)"
 """
+
+[tasks.build-store-shots]
+depends = ["generate"]
+desc = "Build the iOS screenshot app with its App Store display name."
+cmd = """
+set -o pipefail
+xcodebuild -project {{project_root}}/{{path}} -scheme {{scheme}} \
+  -configuration Debug -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath {{project_root}}/build/store-shots APP_DISPLAY_NAME=Attention build | {{xcb}}
+"""

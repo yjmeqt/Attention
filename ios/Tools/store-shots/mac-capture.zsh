@@ -4,7 +4,7 @@ set -euo pipefail
 APP=${1:?Pass the Debug Attention.app path}; shift
 cd "${0:A:h}/../.."
 locales=("$@")
-(( ${#locales} )) || locales=(en-US zh-Hans ja ko ru vi ar-SA fr-FR de-DE es-ES es-MX)
+(( ${#locales} )) || locales=(en-US zh-Hans zh-Hant ja ko ru vi ar-SA fr-FR de-DE es-ES es-MX)
 ROOT="$HOME/Library/Containers/com.yjmeqt.attn.dev/Data/Documents/MacStoreShots"
 for locale in $locales; do
   case $locale in
