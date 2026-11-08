@@ -12,6 +12,8 @@ settings:
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
     SWIFT_APPROACHABLE_CONCURRENCY: YES
     SWIFT_EMIT_LOC_STRINGS: YES
+    # Uses SiriKit donations, with no App Intents metadata to extract.
+    LM_SKIP_METADATA_EXTRACTION: YES
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     TARGETED_DEVICE_FAMILY: "1,2"
     CODE_SIGN_STYLE: Automatic
@@ -19,8 +21,8 @@ settings:
     SUPPORTS_MACCATALYST: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
     SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
-    MARKETING_VERSION: "1.0.1"
-    CURRENT_PROJECT_VERSION: "5"
+    MARKETING_VERSION: "1.0.2"
+    CURRENT_PROJECT_VERSION: "9"
     APP_GROUP_ID: group.$(APP_BUNDLE_ID).shared
     # The library syncs through this container's private database, on iOS and macOS alike.
     CLOUDKIT_CONTAINER_ID: iCloud.$(APP_BUNDLE_ID)
@@ -48,6 +50,8 @@ targets:
       - Shared
     dependencies:
       - target: AttentionExtension
+      - target: AttentionSaveAction
+      - target: AttentionCardAction
     entitlements:
       path: App/Attention.entitlements
       properties:
@@ -70,6 +74,14 @@ targets:
         NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         NSUserActivityTypes: [INSendMessageIntent]
+        # Outgoing representations retain standard URL/PNG/plain-text conformance for other receivers.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-text
+            UTTypeConformsTo: [public.utf8-plain-text]
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-url
+            UTTypeConformsTo: [public.url]
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-image
+            UTTypeConformsTo: [public.png]
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
@@ -185,11 +197,116 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
           NSExtensionAttributes:
             IntentsSupported: [INSendMessageIntent]
-            NSExtensionActivationRule:
-              NSExtensionActivationSupportsWebURLWithMaxCount: 1
-              NSExtensionActivationSupportsText: true
-              NSExtensionActivationSupportsImageWithMaxCount: 1
+            # Reject our outgoing subtypes while accepting external links, text and images.
+            # Use nested SUBQUERYs: the extension matcher rejects @unionOfArrays.
+            NSExtensionActivationRule: &captureActivationRule >-
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-text"
+                ).@count > 0
+              ).@count == 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text" OR
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count == $item.attachments.@count
+              ).@count == extensionItems.@count AND
+              SUBQUERY(extensionItems, $item, $item.attachments.@count > 0).@count > 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+                ).@count > 0
+              ).@count <= 1 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+                ).@count > 1
+              ).@count == 0 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count > 0
+              ).@count <= 1 AND
+              SUBQUERY(extensionItems, $item,
+                SUBQUERY($item.attachments, $attachment,
+                  ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+                ).@count > 1
+              ).@count == 0
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).share
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"
+
+  AttentionSaveAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ShareExtension/ShareViewController.swift
+      - ShareExtension/PrivacyInfo.xcprivacy
+      - ActionExtension/Save
+      - Shared
+    entitlements:
+      path: ShareExtension/AttentionExtension.entitlements
+      properties:
+        com.apple.security.application-groups: [$(APP_GROUP_ID)]
+    info:
+      path: ActionExtension/Save/Info.plist
+      properties:
+        CFBundleDisplayName: Save to Attention
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleSymbolName: tray.and.arrow.down
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        AttentionActionMode: save
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSFaceIDUsageDescription: Unlock your private items.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ui-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule: *captureActivationRule
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).save-action
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"
+
+  AttentionCardAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ShareExtension/ShareViewController.swift
+      - ShareExtension/PrivacyInfo.xcprivacy
+      - ActionExtension/Card
+      - Shared
+    entitlements:
+      path: ShareExtension/AttentionExtension.entitlements
+      properties:
+        com.apple.security.application-groups: [$(APP_GROUP_ID)]
+    info:
+      path: ActionExtension/Card/Info.plist
+      properties:
+        CFBundleDisplayName: Share Attention Card
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleSymbolName: square.and.arrow.up
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        AttentionActionMode: share
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSFaceIDUsageDescription: Unlock your private items.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ui-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionActionWantsFullScreenPresentation: true
+          NSExtensionAttributes:
+            NSExtensionActivationRule: *captureActivationRule
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).card-action
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"

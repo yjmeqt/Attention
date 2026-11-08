@@ -80,6 +80,7 @@ final class Library {
                 keeper.tags += other.tags.filter { !keeper.tags.contains($0) }
                 keeper.isPrivate = keeper.isPrivate || other.isPrivate
                 if keeper.title.isEmpty { keeper.title = other.title }
+                if keeper.text == nil { keeper.text = other.text }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
                 if keeper.analysisVersion < other.analysisVersion {
                     keeper.visualLabels = other.visualLabels
@@ -111,6 +112,11 @@ final class Library {
         var descriptor = FetchDescriptor<LibraryItem>(predicate: #Predicate { $0.key == key })
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
+    }
+
+    /// Check identity without reading persisted fields from a possibly deleted model.
+    func contains(_ item: LibraryItem) -> Bool {
+        item.modelContext === context && !item.isDeleted && items.contains { $0 === item }
     }
 
     /// Returns the existing item for `key`, moved to the top, or inserts a new one.
@@ -295,7 +301,7 @@ final class Library {
     /// Keeps a picked image as the link's custom image and shows it. False when it isn't an image.
     @discardableResult
     func setCustomImage(_ data: Data, for item: LibraryItem) -> Bool {
-        guard let cgImage = ImageData.downsample(data, maxPixel: Intake.maxImagePixel),
+        guard contains(item), let cgImage = ImageData.downsample(data, maxPixel: Intake.maxImagePixel),
               let jpeg = ImageData.jpeg(cgImage) else { return false }
         write(jpeg, .custom, of: item)
         item.usesCustomImage = true
@@ -308,6 +314,7 @@ final class Library {
     }
 
     func removeCustomImage(_ item: LibraryItem) {
+        guard contains(item) else { return }
         write(nil, .custom, of: item)
         item.usesCustomImage = false
         item.analysisVersion = 0
@@ -373,8 +380,9 @@ final class Library {
         return image
     }
 
-    /// The full-size card for links, the shared image for images.
+    /// A card for links or plain text, or the original shared image.
     func fullImage(_ item: LibraryItem) -> PlatformImage? {
+        if item.isTextOnly, let text = item.text { return TextCardRenderer.render(text, showsAppStoreQR: TextCardPromotion.isEnabled()) }
         if let meta = meta(for: item) { return CardRenderer.render(meta, style: item.style) }
         return data(.source, of: item).flatMap(PlatformImage.init(data:))
     }

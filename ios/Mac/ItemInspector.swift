@@ -2,6 +2,7 @@ import SwiftUI
 
 /// The selected item: its card, what to do with it, and its style, tags and text.
 struct ItemInspector: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     let item: LibraryItem
     let actions: LibraryActions
 
@@ -16,6 +17,20 @@ struct ItemInspector: View {
             VStack(alignment: .leading, spacing: 18) {
                 preview
                 buttons
+                if item.isTextOnly {
+                    Toggle("Show App Store QR on Text Images", isOn: $showsAppStoreQR)
+                        .help("Add a QR code linking to Attention in the App Store when sharing text as an image.")
+                }
+                if let text = item.text {
+                    HStack {
+                        Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                        ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
+                    }
+                    Text(verbatim: text)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 details
                 tags
                 if let meta = library.meta(for: item) {
@@ -37,7 +52,7 @@ struct ItemInspector: View {
             }
             .padding()
         }
-        .task(id: "\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
+        .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
             image = library.fullImage(item)
             covers = item.isImage ? nil
                 : (library.previewData(item).flatMap(Self.coverThumbnail),
@@ -54,7 +69,11 @@ struct ItemInspector: View {
                     .scaledToFit()
                     .clipShape(.rect(cornerRadius: 12))
                     .shadow(radius: 3)
-                    .onDrag { actions.dragProvider(item) ?? NSItemProvider() }
+                    .onDrag {
+                        guard item.isTextOnly else { return actions.dragProvider(item) ?? NSItemProvider() }
+                        guard let file = CardFile.write(image, for: item) else { return NSItemProvider(object: image) }
+                        return NSItemProvider(contentsOf: file) ?? NSItemProvider(object: image)
+                    }
                     .help("Drag into a chat, or copy it")
                     .accessibilityLabel(item.displayTitle)
             } else {
@@ -77,7 +96,7 @@ struct ItemInspector: View {
             Spacer()
             if let image {
                 ShareLink(item: Image(nsImage: image), preview: SharePreview(item.displayTitle, image: Image(nsImage: image))) {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Share as Image", systemImage: "square.and.arrow.up")
                 }
                 .labelStyle(.iconOnly)
             }
@@ -107,7 +126,7 @@ struct ItemInspector: View {
 
     private var tags: some View {
         FlowLayout(spacing: 6) {
-            chip(item.domainLabel, systemImage: item.isImage ? "photo" : "globe")
+            chip(item.domainLabel, systemImage: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe")
             if item.isPrivate { chip(String(localized: "Private"), systemImage: "lock.fill") }
             if item.isArchived { chip(String(localized: "Archived"), systemImage: "archivebox") }
             ForEach(item.tags, id: \.self) { chip("#\($0)", systemImage: nil) }

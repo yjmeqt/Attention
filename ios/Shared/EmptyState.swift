@@ -3,6 +3,7 @@ import SwiftUI
 struct EmptyState: View {
     var showsSample = true
     var showsPaste = true
+    var showsSampleLink = true
     let paste: ([NSItemProvider]) -> Void
     var onSample: ((URL) -> Void)?
 
@@ -31,8 +32,8 @@ struct EmptyState: View {
             }
 
             VStack(alignment: .leading, spacing: 16) {
-                StepRow(number: 1, symbol: "link", text: "Copy a link, or share it to \(Brand.name) from any app")
-                StepRow(number: 2, symbol: "photo.on.rectangle.angled", text: "Get a card with the title, cover and QR code")
+                StepRow(number: 1, symbol: "link", text: "Copy a link, image or text, or share it to \(Brand.name) from any app")
+                StepRow(number: 2, symbol: "photo.on.rectangle.angled", text: "For links, get a card with the title, cover and QR code")
                 StepRow(number: 3, symbol: "message", text: "Send the image anywhere, then paste the link — it's already copied")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,12 +42,12 @@ struct EmptyState: View {
 
             if seenShareGuide { pinGuideLink }
 
-            if let onSample { sampleLink(onSample) }
+            if showsSampleLink, let onSample { sampleLink(onSample) }
         }
     }
 
-    /// A first link to save, so the library is never a dead end.
-    private func sampleLink(_ save: @escaping (URL) -> Void) -> some View {
+    /// A first link to copy and paste into the library.
+    private func sampleLink(_ copy: @escaping (URL) -> Void) -> some View {
         HStack(spacing: 12) {
             AttentionGlyph(size: 44)
             VStack(alignment: .leading, spacing: 2) {
@@ -56,7 +57,7 @@ struct EmptyState: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            Button("Add") { save(Brand.appStoreURL) }
+            Button("Copy") { copy(Brand.appStoreURL) }
                 .font(.subheadline.weight(.bold))
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)

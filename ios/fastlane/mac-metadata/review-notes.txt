@@ -1,0 +1,10 @@
+No Attention account or app login is required. iCloud sync requires an Apple account signed into iCloud; local saving and card creation can be tested without it.
+
+1. Launch Attention. The library opens and a link icon appears in the menu bar.
+2. Copy a public website URL and click Paste Link in the library toolbar. Wait for the title and preview to load.
+3. Use the sidebar and search to find the saved item. Private items use Touch ID or the Mac login password.
+4. Click the menu bar icon. Paste a URL and press Return or the arrow button. Choose Card, Text or QR, then use Copy Image, Copy Link or Save. The preview can also be dragged to another app.
+5. Copy a URL, then press Control–Option–Command–A to create and copy a card without opening the panel.
+6. Closing the library leaves Attention in the menu bar. Open Library reopens it; Quit exits. Open at Login is optional.
+
+The app fetches public page metadata for saved links. It uses YouTube oEmbed, Bilibili and FxTwitter endpoints for supported previews and Google's favicon service for site icons. Library sync uses the user's private iCloud database.

@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A saved item: its card (or image), style, tags and actions. Used by the app and the share extension.
 struct ItemDetailView: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     let item: LibraryItem
     /// Set in the share extension: shows a Done button that closes it.
     var onDone: (() -> Void)?
@@ -29,6 +30,17 @@ struct ItemDetailView: View {
     private var isLoading: Bool { library.enriching.contains(item.id) }
 
     var body: some View {
+        Group {
+            if library.contains(item) { content }
+        }
+        .onChange(of: library.contains(item)) { _, available in
+            if !available {
+                if let onDone { onDone() } else { dismiss() }
+            }
+        }
+    }
+
+    private var content: some View {
         GeometryReader { proxy in
             let isWide = proxy.size.width > proxy.size.height && proxy.size.width > 700
             ScrollView {
@@ -54,7 +66,8 @@ struct ItemDetailView: View {
         .toolbar { toolbar }
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
-        .task(id: "\(library.revision)-\(item.templateRaw)") {
+        .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
+            guard !Task.isCancelled, library.contains(item) else { return }
             image = library.fullImage(item)
             covers = item.isImage ? nil
                 : (library.previewData(item).flatMap(Self.coverThumbnail),
@@ -64,7 +77,8 @@ struct ItemDetailView: View {
         .task {
             guard autoShare else { return }
             // The share anchor needs to be in the window before the sheet can present from it.
-            try? await Task.sleep(for: .milliseconds(400))
+            do { try await Task.sleep(for: .milliseconds(400)) } catch { return }
+            guard !Task.isCancelled, library.contains(item) else { return }
             actions.shareImage(item)
         }
         .onAppear {
@@ -130,6 +144,17 @@ struct ItemDetailView: View {
     private var details: some View {
         VStack(alignment: .leading, spacing: 20) {
             imageButtons
+            if let text = item.text {
+                HStack {
+                    Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                    Button("Share Text", systemImage: "square.and.arrow.up") { actions.shareText(item) }
+                }
+                .buttonStyle(.bordered)
+                Text(verbatim: text)
+                    .font(.body)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)
@@ -180,7 +205,10 @@ struct ItemDetailView: View {
     }
 
     private var coverBinding: Binding<Library.Cover> {
-        Binding { library.cover(of: item) } set: { library.setCover($0, for: item) }
+        Binding { library.contains(item) ? library.cover(of: item) : .preview } set: {
+            guard library.contains(item) else { return }
+            library.setCover($0, for: item)
+        }
     }
 
     private static func coverThumbnail(_ data: Data) -> UIImage? {
@@ -189,8 +217,9 @@ struct ItemDetailView: View {
 
     private var styleBinding: Binding<CardStyle> {
         Binding {
-            item.style
+            library.contains(item) ? item.style : CardStyle()
         } set: { style in
+            guard library.contains(item) else { return }
             library.setStyle(style, for: item)
             style.save()
         }
@@ -218,6 +247,9 @@ struct ItemDetailView: View {
                     Button("Remove from Private", systemImage: "lock.open") { Task { await actions.setPrivate(false, [item]) } }
                 } else {
                     Button("Move to Private", systemImage: "lock") { Task { await actions.setPrivate(true, [item]) } }
+                }
+                Button(item.isArchived ? "Unarchive" : "Archive", systemImage: "archivebox") {
+                    actions.setArchived(!item.isArchived, [item])
                 }
                 Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
             }
@@ -274,6 +306,8 @@ struct ItemDetailView: View {
     @ViewBuilder
     private var statusLabel: some View {
         switch actions.notice {
+        case .textCopied:
+            Label("Text copied", systemImage: "doc.on.clipboard")
         case .linkCopied:
             Label("Link copied", systemImage: "doc.on.clipboard")
         case .linkCopiedForImage:
@@ -296,7 +330,7 @@ struct ItemDetailView: View {
     }
 
     private func reloadPreview() {
-        guard !isLoading else { return }
+        guard library.contains(item), !isLoading else { return }
         actions.notice = nil
         enrichNotice = nil
         Task {
@@ -322,10 +356,14 @@ private struct TagRow: View {
     let actions: ItemActions
 
     var body: some View {
+        if actions.library.contains(item) { content }
+    }
+
+    private var content: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 TagChip(text: item.domainLabel,
-                        systemImage: item.isImage ? "photo" : "globe",
+                        systemImage: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe",
                         icon: item.isImage ? nil : actions.library.favicon(item),
                         isSelected: false)
                 if item.isPrivate {
@@ -354,7 +392,7 @@ private struct RecognizedText: View {
             HStack {
                 Text("Text in Image").font(.headline)
                 Spacer()
-                Button("Copy", systemImage: "doc.on.doc") { UIPasteboard.general.string = text }
+                Button("Copy", systemImage: "doc.on.doc") { Clipboard.copy(text) }
                     .labelStyle(.iconOnly)
             }
             Text(text)

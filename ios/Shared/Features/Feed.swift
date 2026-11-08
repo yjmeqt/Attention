@@ -45,6 +45,14 @@ struct FeedTile: View {
     var onOpen: (() -> Void)?
 
     var body: some View {
+        // Hosted cells and context-menu previews can outlive a deleted SwiftData model.
+        if item.modelContext != nil && !item.isDeleted {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         let _ = library.revision
         Group {
             if let photo = library.thumbnail(item) {
@@ -154,6 +162,12 @@ private struct Eyebrow: View {
     let library: Library
 
     var body: some View {
+        if item.modelContext != nil && !item.isDeleted {
+            content
+        }
+    }
+
+    private var content: some View {
         HStack(spacing: 4) {
             if let icon = library.favicon(item) {
                 Image(platformImage: icon)
@@ -161,7 +175,7 @@ private struct Eyebrow: View {
                     .frame(width: 14, height: 14)
                     .clipShape(.rect(cornerRadius: 3))
             } else {
-                Image(systemName: item.isImage ? "photo" : "globe")
+                Image(systemName: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe")
             }
             Text(item.platformName)
                 .textCase(.uppercase)

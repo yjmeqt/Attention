@@ -10,6 +10,68 @@ enum ItemProviders {
     /// Some hosts never call back for a type they advertise, so every load is bounded.
     private static let loadTimeout: Duration = .seconds(3)
 
+    /// Load complete plain representations before looking for links within them.
+    /// Payloads retain their order; only one representation is read from each provider.
+    static func plainTexts(in providers: [NSItemProvider]) async -> [String] {
+        var result: [String] = []
+        for provider in providers {
+            var value: String?
+            if provider.canLoadObject(ofClass: String.self) {
+                value = await load("plain text") { done in
+                    _ = provider.loadObject(ofClass: String.self) { text, _ in done(text) }
+                }
+            }
+            if value == nil {
+                for type in provider.registeredTypeIdentifiers where UTType(type)?.conforms(to: .plainText) == true {
+                    value = await load("plain text data") { done in
+                        provider.loadItem(forTypeIdentifier: type) { item, _ in done(text(from: item)) }
+                    }
+                    if value != nil { break }
+                }
+            }
+            if let value, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { result.append(value) }
+        }
+        return result
+    }
+
+    static func explicitLink(in providers: [NSItemProvider]) async -> URL? {
+        for provider in providers where provider.registeredTypeIdentifiers.contains(where: { UTType($0)?.conforms(to: .url) == true })
+            && provider.canLoadObject(ofClass: URL.self) {
+            if let url = await load("URL", { done in
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in done(url) }
+            }), isWebURL(url) { return url }
+        }
+        return nil
+    }
+
+    /// Some hosts register a URL under an opaque identifier rather than public.url.
+    /// Only a complete standalone URL is safe to infer from such a representation.
+    static func standaloneLink(in providers: [NSItemProvider]) async -> URL? {
+        for provider in providers where !isImage(provider) {
+            for type in provider.registeredTypeIdentifiers {
+                if let known = UTType(type), known.conforms(to: .html) || known.conforms(to: .rtf) { continue }
+                let value = await load("standalone URL representation") { done in
+                    provider.loadItem(forTypeIdentifier: type) { item, _ in done(text(from: item)) }
+                }
+                if let value, let url = standaloneWebURL(in: value) { return url }
+            }
+        }
+        return nil
+    }
+
+    static func standaloneWebURL(in text: String) -> URL? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let range = NSRange(trimmed.startIndex..., in: trimmed)
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        guard !trimmed.isEmpty, let match = detector?.firstMatch(in: trimmed, range: range),
+              match.range == range, let url = match.url, isWebURL(url), url.host() != nil else { return nil }
+        return url
+    }
+
+    private static func isWebURL(_ url: URL) -> Bool {
+        ["http", "https"].contains(url.scheme?.lowercased() ?? "")
+    }
+
     /// Returns the first web link in a share request: attachments first (as a URL, as text, then as
     /// whatever raw type they registered), then the item's attributed text and title.
     static func firstLink(in items: [NSExtensionItem], skippingImages: Bool = false) async -> URL? {
@@ -90,7 +152,7 @@ enum ItemProviders {
         return nil
     }
 
-    private static func webLink(in text: String) -> URL? {
+    static func webLink(in text: String) -> URL? {
         guard let url = URL.extract(from: text), url.scheme?.hasPrefix("http") == true else { return nil }
         return url
     }

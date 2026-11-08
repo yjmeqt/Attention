@@ -19,7 +19,7 @@ const COPY = {
   "zh-Hant": [
     ["所有連結，<br><span>集中一處！</span>", "來自任何 App、任何網站", "feed"],
     ["任何 App<br>都能<span>儲存！</span>", "點一下分享，再選 Attention", "share"],
-    ["沒有演算法。<br><span>沒有追蹤！</span>", "沒有動態消息，只有你存下的。私密項目由 Face ID 保護", "private"],
+    ["無演算法。<br><span>無追蹤！</span>", "只看你的收藏，私密項目以 Face ID 保護", "private"],
     ["依網站<br><span>找回！</span>", "搜尋全部，或依網站篩選", "search"],
     ["想怎麼分享，<br><span>都可以！</span>", "卡片、文字或 QR Code", "detail"],
   ],

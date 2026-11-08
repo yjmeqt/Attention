@@ -5,7 +5,9 @@ final class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let items = extensionContext?.inputItems as? [NSExtensionItem] ?? []
-        let suggestion = ShareSuggestion(intent: extensionContext?.intent)
+        let actionMode = Bundle.main.object(forInfoDictionaryKey: "AttentionActionMode") as? String
+        let suggestion = actionMode.flatMap(ShareSuggestion.init(rawValue:))
+            ?? ShareSuggestion(intent: extensionContext?.intent)
         let root = ShareRoot(items: items, suggestion: suggestion) { [weak self] in
             self?.extensionContext?.completeRequest(returningItems: nil)
         }
@@ -47,7 +49,7 @@ private struct ShareRoot: View {
                     ItemDetailView(item: item, library: library, autoShare: suggestion == .share, onDone: onDone)
                 } else if failed {
                     ContentUnavailableView("Nothing to save", systemImage: "link.badge.plus",
-                                           description: Text("No link or image was shared."))
+                                           description: Text("No link, image or text was shared."))
                 } else {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

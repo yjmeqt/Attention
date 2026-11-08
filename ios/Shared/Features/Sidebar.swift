@@ -148,7 +148,7 @@ struct Sidebar: View {
                 .frame(width: 18, height: 18)
                 .clipShape(.rect(cornerRadius: 4, style: .continuous))
         } else {
-            Image(systemName: domain == DomainTag.images ? "photo" : "globe")
+            Image(systemName: domain == DomainTag.text ? "text.alignleft" : domain == DomainTag.images ? "photo" : "globe")
         }
     }
 }
