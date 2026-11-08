@@ -85,6 +85,7 @@ struct CoverPicker: View {
     @Binding var cover: Library.Cover
     let pick: (Data) -> Void
     let removeCustom: () -> Void
+    var onPreview: ((Library.Cover) -> Void)? = nil
 
     #if os(iOS)
     @State private var photo: PhotosPickerItem?
@@ -153,32 +154,47 @@ struct CoverPicker: View {
 
     private func option(_ title: String, image: PlatformImage?, for option: Library.Cover) -> some View {
         let selected = cover == option
-        return Button { cover = option } label: {
-            VStack(spacing: 6) {
-                Color.clear
-                    .frame(width: 96, height: 72)
-                    .overlay {
-                        if let image {
-                            Image(platformImage: image).resizable().scaledToFill()
-                        } else {
-                            Image(systemName: "photo").font(.title2).foregroundStyle(.tertiary)
+        return ZStack(alignment: .topTrailing) {
+            Button { cover = option } label: {
+                VStack(spacing: 6) {
+                    Color.clear
+                        .frame(width: 96, height: 72)
+                        .overlay {
+                            if let image {
+                                Image(platformImage: image).resizable().scaledToFill()
+                            } else {
+                                Image(systemName: "photo").font(.title2).foregroundStyle(.tertiary)
+                            }
                         }
-                    }
-                    .background(.fill.tertiary)
-                    .clipShape(.rect(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
-                    }
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(selected ? .primary : .secondary)
+                        .background(.fill.tertiary)
+                        .clipShape(.rect(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
+                        }
+                    Text(title)
+                        .font(.caption)
+                        .foregroundStyle(selected ? .primary : .secondary)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(title)
+            .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+
+            if image != nil, let onPreview {
+                Button { onPreview(option) } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        .font(.caption.weight(.semibold))
+                        .padding(6)
+                        .background(.regularMaterial, in: .circle)
+                        .frame(width: 44, height: 44)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("View \(title) full screen"))
             }
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

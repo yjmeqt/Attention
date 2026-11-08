@@ -11,6 +11,7 @@ struct ItemDetailView: View {
 
     @State private var actions: ItemActions
     @State private var image: UIImage?
+    @State private var presentedCover: PresentedCover?
     /// A link's preview image, the image it was shared as and the one the user picked, each if it has one.
     @State private var covers: (preview: UIImage?, shared: UIImage?, custom: UIImage?)?
     /// Set when Reload Preview can't fetch a usable card.
@@ -66,6 +67,9 @@ struct ItemDetailView: View {
         .toolbar { toolbar }
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
+        .fullScreenCover(item: $presentedCover) { cover in
+            FullScreenCoverImage(image: cover.image)
+        }
         .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
             guard !Task.isCancelled, library.contains(item) else { return }
             image = library.fullImage(item)
@@ -184,6 +188,8 @@ struct ItemDetailView: View {
                             library.setCustomImage($0, for: item)
                         } removeCustom: {
                             library.removeCustomImage(item)
+                        } onPreview: { cover in
+                            showCover(cover)
                         }
                     }
                     Text("Template").font(.headline)
@@ -213,6 +219,18 @@ struct ItemDetailView: View {
 
     private static func coverThumbnail(_ data: Data) -> UIImage? {
         ImageData.downsample(data, maxPixel: 300).map(UIImage.init(cgImage:))
+    }
+
+    private func showCover(_ cover: Library.Cover) {
+        guard library.contains(item) else { return }
+        let data: Data?
+        switch cover {
+        case .preview: data = library.previewData(item)
+        case .shared: data = library.data(.source, of: item)
+        case .custom: data = library.data(.custom, of: item)
+        }
+        guard let data, let image = ImageData.downsample(data, maxPixel: 4096) else { return }
+        presentedCover = PresentedCover(image: UIImage(cgImage: image))
     }
 
     private var styleBinding: Binding<CardStyle> {
@@ -336,6 +354,98 @@ struct ItemDetailView: View {
         Task {
             enrichNotice = await library.enrich(item)
         }
+    }
+}
+
+private struct PresentedCover: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
+private struct FullScreenCoverImage: View {
+    let image: UIImage
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            ZoomableImageView(image: image)
+                .ignoresSafeArea()
+            Button("Close", systemImage: "xmark") { dismiss() }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.glass)
+                .tint(.white)
+                .padding()
+        }
+        .background(.black)
+        .preferredColorScheme(.dark)
+    }
+}
+
+private struct ZoomableImageView: UIViewRepresentable {
+    let image: UIImage
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeUIView(context: Context) -> ZoomScrollView {
+        let scrollView = ZoomScrollView(frame: .zero)
+        scrollView.backgroundColor = .black
+        scrollView.minimumZoomScale = 1
+        scrollView.maximumZoomScale = 5
+        scrollView.delegate = context.coordinator
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+
+        scrollView.imageView.image = image
+
+        let doubleTap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.toggleZoom(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTap)
+        return scrollView
+    }
+
+    func updateUIView(_ scrollView: ZoomScrollView, context: Context) {
+        scrollView.imageView.image = image
+    }
+
+    final class Coordinator: NSObject, UIScrollViewDelegate {
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            (scrollView as? ZoomScrollView)?.imageView
+        }
+
+        @objc func toggleZoom(_ gesture: UITapGestureRecognizer) {
+            guard let scrollView = gesture.view as? ZoomScrollView else { return }
+            if scrollView.zoomScale > 1 {
+                scrollView.setZoomScale(1, animated: true)
+            } else {
+                let zoom: CGFloat = 2.5
+                let point = gesture.location(in: scrollView.imageView)
+                let size = CGSize(width: scrollView.bounds.width / zoom, height: scrollView.bounds.height / zoom)
+                scrollView.zoom(to: CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
+                                           width: size.width, height: size.height), animated: true)
+            }
+        }
+    }
+}
+
+private final class ZoomScrollView: UIScrollView {
+    let imageView = UIImageView()
+    private var laidOutSize: CGSize = .zero
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        imageView.contentMode = .scaleAspectFit
+        addSubview(imageView)
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard bounds.size != laidOutSize else { return }
+        laidOutSize = bounds.size
+        setZoomScale(1, animated: false)
+        imageView.frame = CGRect(origin: .zero, size: bounds.size)
+        contentSize = bounds.size
     }
 }
 
