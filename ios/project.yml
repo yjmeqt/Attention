@@ -47,6 +47,8 @@ targets:
       - Shared
     dependencies:
       - target: AttentionExtension
+      - target: AttentionSaveAction
+      - target: AttentionCardAction
     entitlements:
       path: App/Attention.entitlements
       properties:
@@ -186,7 +188,7 @@ targets:
             IntentsSupported: [INSendMessageIntent]
             # Reject our outgoing subtypes while accepting external links, text and images.
             # Use nested SUBQUERYs: the extension matcher rejects @unionOfArrays.
-            NSExtensionActivationRule: >-
+            NSExtensionActivationRule: &captureActivationRule >-
               SUBQUERY(extensionItems, $item,
                 SUBQUERY($item.attachments, $attachment,
                   ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
@@ -224,4 +226,75 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).share
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"
+
+  AttentionSaveAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ShareExtension/ShareViewController.swift
+      - ShareExtension/PrivacyInfo.xcprivacy
+      - ActionExtension/Save
+      - Shared
+    entitlements:
+      path: ShareExtension/AttentionExtension.entitlements
+      properties:
+        com.apple.security.application-groups: [$(APP_GROUP_ID)]
+    info:
+      path: ActionExtension/Save/Info.plist
+      properties:
+        CFBundleDisplayName: Save to Attention
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleSymbolName: tray.and.arrow.down
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        AttentionActionMode: save
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSFaceIDUsageDescription: Unlock your private items.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ui-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule: *captureActivationRule
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).save-action
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"
+
+  AttentionCardAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ShareExtension/ShareViewController.swift
+      - ShareExtension/PrivacyInfo.xcprivacy
+      - ActionExtension/Card
+      - Shared
+    entitlements:
+      path: ShareExtension/AttentionExtension.entitlements
+      properties:
+        com.apple.security.application-groups: [$(APP_GROUP_ID)]
+    info:
+      path: ActionExtension/Card/Info.plist
+      properties:
+        CFBundleDisplayName: Create Card and Share
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleSymbolName: square.and.arrow.up
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        AttentionActionMode: share
+        NSPhotoLibraryAddUsageDescription: Save link cards to your photo library.
+        NSFaceIDUsageDescription: Unlock your private items.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ui-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionActionWantsFullScreenPresentation: true
+          NSExtensionAttributes:
+            NSExtensionActivationRule: *captureActivationRule
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).card-action
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SHARE_EXTENSION"

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AppGroupID</key>
+	<string>$(APP_GROUP_ID)</string>
+	<key>AttentionActionMode</key>
+	<string>share</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Create Card and Share</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleSymbolName</key>
+			<string>square.and.arrow.up</string>
+		</dict>
+	</dict>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>XPC!</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionActionWantsFullScreenPresentation</key>
+		<true/>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>NSExtensionActivationRule</key>
+			<string>SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
+    ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image"
+  ).@count &gt; 0
+).@count == 0 AND SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url" OR
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text" OR
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+  ).@count == $item.attachments.@count
+).@count == extensionItems.@count AND SUBQUERY(extensionItems, $item, $item.attachments.@count &gt; 0).@count &gt; 0 AND SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+  ).@count &gt; 0
+).@count &lt;= 1 AND SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+  ).@count &gt; 1
+).@count == 0 AND SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+  ).@count &gt; 0
+).@count &lt;= 1 AND SUBQUERY(extensionItems, $item,
+  SUBQUERY($item.attachments, $attachment,
+    ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image"
+  ).@count &gt; 1
+).@count == 0</string>
+		</dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.ui-services</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
+	</dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your private items.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save link cards to your photo library.</string>
+</dict>
+</plist>
