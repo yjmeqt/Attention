@@ -1,0 +1,5 @@
+Lưu những liên kết bạn muốn xem lại vào một thư viện trên Mac. Dán liên kết vào Attention để lưu tiêu đề và bản xem trước. Tìm kiếm, sắp xếp bằng thẻ và bảo vệ mục riêng tư bằng Touch ID hoặc mật khẩu đăng nhập Mac.
+
+Từ thanh menu, tạo thẻ hình ảnh có tiêu đề, ảnh bìa và mã QR. Chọn kiểu Thẻ, Văn bản hoặc QR, rồi sao chép ảnh, lưu PNG hoặc kéo vào ứng dụng khác. Sao chép liên kết và nhấn Control–Option–Command–A để đưa thẻ vào bảng nhớ tạm.
+
+Thư viện đồng bộ qua iCloud trên các thiết bị dùng cùng Tài khoản Apple. Không cần tài khoản Attention.

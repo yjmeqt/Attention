@@ -116,6 +116,15 @@ metadata() {
   done
   require_auth
 
+  if [[ $PLATFORM == MAC_OS ]] && (( text_too )); then
+    local mac_version=$(setting MARKETING_VERSION)
+    local mac_id=$(asc versions list --app $APP_ID --platform MAC_OS --version $mac_version --output json | jq -r '.data[0].id // empty')
+    [[ -n $mac_id ]] || die "no MAC_OS App Store version $mac_version in App Store Connect"
+    local mac_mode=(); (( apply )) && mac_mode=(--apply)
+    python3 Tools/mac-metadata.py --version-id $mac_id $mac_mode
+    text_too=0
+  fi
+
   if (( text_too )); then
   step "Validate fastlane metadata"
   asc migrate validate --fastlane-dir $FASTLANE --output json | jq -e '.valid' >/dev/null \
@@ -154,7 +163,9 @@ metadata() {
   step "Screenshots"
   local localizations=$(asc localizations list --version $version_id --paginate --output json)
   local dir locale loc_id set prefix type staging failed=()
-  for dir in $FASTLANE/screenshots/*(/); do
+  local screenshot_root=$FASTLANE/screenshots
+  [[ $PLATFORM == MAC_OS ]] && screenshot_root=$FASTLANE/mac-screenshots
+  for dir in $screenshot_root/*(/); do
     locale=${dir:t}
     [[ -n ${ONLY:-} && " $ONLY " != *" $locale "* ]] && continue
     loc_id=$(jq -r --arg l $locale '.data[] | select(.attributes.locale == $l) | .id' <<< $localizations)

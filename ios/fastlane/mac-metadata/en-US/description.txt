@@ -1,0 +1,5 @@
+Keep the links you want to return to in one place on your Mac. Paste a link into Attention to save its title and preview. Search your library, organize links with tags, and protect private items with Touch ID or your Mac login password.
+
+From the menu bar, turn a link into an image card with a title, cover and QR code. Choose Card, Text or QR, then copy the image, save it as a PNG, or drag it into another app. Copy a link and press Control–Option–Command–A to put its card on the clipboard.
+
+Your library syncs through iCloud across devices using the same Apple account. No Attention account is required.
