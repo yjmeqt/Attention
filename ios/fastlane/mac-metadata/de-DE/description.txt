@@ -1,0 +1,5 @@
+Bewahre Links, die du wiederfinden möchtest, in einer Bibliothek auf deinem Mac auf. Füge einen Link in Attention ein, um Titel und Vorschau zu speichern. Suche in deiner Sammlung, ordne Links mit Tags und schütze private Einträge mit Touch ID oder deinem Mac-Anmeldepasswort.
+
+Erstelle über die Menüleiste Bildkarten mit Titel, Titelbild und QR-Code. Wähle Karte, Text oder QR und kopiere das Bild, speichere es als PNG oder ziehe es in eine andere App. Kopiere einen Link und drücke Control–Option–Command–A, um seine Karte in die Zwischenablage zu legen.
+
+Deine Bibliothek wird über iCloud auf Geräten mit demselben Apple Account synchronisiert. Ein Attention-Konto ist nicht erforderlich.

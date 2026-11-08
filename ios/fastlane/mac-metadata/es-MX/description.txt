@@ -1,0 +1,5 @@
+Guarda los enlaces que quieras volver a consultar en una biblioteca en tu Mac. Pega un enlace en Attention para guardar su título y vista previa. Busca en tu colección, organiza con etiquetas y protege los elementos privados con Touch ID o la contraseña de inicio de sesión de la Mac.
+
+Desde la barra de menús, crea una tarjeta con título, imagen y código QR. Elige Tarjeta, Texto o QR; copia la imagen, guárdala como PNG o arrástrala a otra app. Copia un enlace y presiona Control–Opción–Comando–A para colocar su tarjeta en el portapapeles.
+
+La biblioteca se sincroniza por iCloud entre dispositivos con la misma cuenta de Apple. No necesitas una cuenta de Attention.

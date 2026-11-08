@@ -29,6 +29,7 @@
 		11439DAF98CE599F18B38FD3 /* QRTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D604A3FADEEC30FFD8606052 /* QRTemplate.swift */; };
 		1177CAA88F4BF220497076CD /* Intake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF7324B5EBF1F088F7F36B0 /* Intake.swift */; };
 		13B3CC4C10011F3F2DED716E /* Attention.icon in Resources */ = {isa = PBXBuildFile; fileRef = 846AA8FA9D947B6EAF662FFC /* Attention.icon */; };
+		16B7ECA2A2FBAF02A4EBD4AC /* MacStoreShots.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC15AA34F74E31C9D8298992 /* MacStoreShots.swift */; };
 		1834366D2AF4EAD2743E18E6 /* AttentionMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99590A28A46FC25273771198 /* AttentionMacApp.swift */; };
 		1949F1BC4A05FF4D657E30D6 /* HistoryImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5337444CD9E33BADFDAE4840 /* HistoryImport.swift */; };
 		1B8DA7790DBB1EF07745F4D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EB7999EE2EA02C8F8C667D81 /* InfoPlist.strings */; };
@@ -396,6 +397,7 @@
 		F779F8FEDE5F763E3855138A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideTip.swift; sourceTree = "<group>"; };
+		FC15AA34F74E31C9D8298992 /* MacStoreShots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStoreShots.swift; sourceTree = "<group>"; };
 		FE3DEF7C8C0ACAC2230B113B /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -567,6 +569,7 @@
 				873D6516EF481D43954CD703 /* ItemInspector.swift */,
 				058199DB1D3A8B528047D93F /* LibraryView.swift */,
 				95AF2B9FFA867D69887A1FF3 /* MacClipboard.swift */,
+				FC15AA34F74E31C9D8298992 /* MacStoreShots.swift */,
 				A1E6571FA7129F841B033E4A /* MenuPanel.swift */,
 			);
 			path = Mac;
@@ -927,6 +930,7 @@
 				E20941AB18B0E7A0A59CC1DE /* LibraryItem.swift in Sources */,
 				0A17E0349C80D03303E834B2 /* LibraryView.swift in Sources */,
 				0B04D26888FE8917FB09B581 /* MacClipboard.swift in Sources */,
+				16B7ECA2A2FBAF02A4EBD4AC /* MacStoreShots.swift in Sources */,
 				BBE6C9E11DB1FC39EFD5C0E9 /* MenuPanel.swift in Sources */,
 				B28585E7E01A0B5949FE385A /* MinimalTemplate.swift in Sources */,
 				E9752642B8B3A41B0DCAC1EF /* Model.swift in Sources */,
