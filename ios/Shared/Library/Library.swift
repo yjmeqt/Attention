@@ -79,6 +79,7 @@ final class Library {
                 keeper.tags += other.tags.filter { !keeper.tags.contains($0) }
                 keeper.isPrivate = keeper.isPrivate || other.isPrivate
                 if keeper.title.isEmpty { keeper.title = other.title }
+                if keeper.text == nil { keeper.text = other.text }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
                 if keeper.coverData == nil { keeper.coverData = other.coverData }
                 if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
