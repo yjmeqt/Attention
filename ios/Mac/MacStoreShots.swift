@@ -39,6 +39,9 @@ enum MacStoreShots {
                 let window = NSWindow(contentViewController: controller)
                 window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
                 window.toolbarStyle = .unified
+                // Keep capture windows out of Stage Manager's scaled background strip.
+                window.level = .floating
+                window.collectionBehavior = [.canJoinAllApplications, .canJoinAllSpaces, .stationary]
                 window.title = "Attention"
                 window.setContentSize(CGSize(width: 1280, height: 760))
                 window.isReleasedWhenClosed = false
@@ -55,6 +58,8 @@ enum MacStoreShots {
                 configuration.height = Int(window.frame.height * 2)
                 configuration.showsCursor = false
                 configuration.ignoreShadowsSingleWindow = true
+                configuration.ignoreGlobalClipSingleWindow = true
+                configuration.scalesToFit = true
                 let image = try await SCScreenshotManager.captureImage(
                     contentFilter: SCContentFilter(desktopIndependentWindow: source), configuration: configuration)
                 let bitmap = NSBitmapImageRep(cgImage: image)

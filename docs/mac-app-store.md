@@ -29,7 +29,7 @@ npm ci --prefix ios/Tools/store-shots
 node ios/Tools/store-shots/mac-export.js
 ```
 
-The capture script also accepts a list of locale codes after the app path. Build products use this checkout's normal Xcode DerivedData directory. Screenshot mode is Debug-only, uses a separate non-syncing demonstration library under the Debug app sandbox's Documents/MacStoreShots directory, and captures only its own windows through ScreenCaptureKit's current-process API. It does not require screen recording access to other apps. Wait for capture completion before exporting.
+The capture script also accepts a list of locale codes after the app path. Build products use this checkout's normal Xcode DerivedData directory. Screenshot mode is Debug-only, uses a separate non-syncing demonstration library under the Debug app sandbox's Documents/MacStoreShots directory, and captures only its own windows through ScreenCaptureKit's current-process API. It does not require screen recording access to other apps. Capture windows stay out of Stage Manager’s background strip. The exporter rejects captures with less than 95% opaque window coverage, catching minimized or transitioning windows. Wait for capture completion before exporting, then visually inspect every final image before uploading.
 
 Raw files are copied into `ios/fastlane/raw/<locale>/mac-*.png`. Final images go to `ios/fastlane/mac-screenshots/<locale>/`, separate from the iOS images. Both are ignored by Git and can be regenerated.
 

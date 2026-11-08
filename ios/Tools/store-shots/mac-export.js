@@ -34,6 +34,17 @@ const root = path.resolve(__dirname, '../../fastlane');
           img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 20px 45px #0003;border-radius:12px}
           </style><header><h1>${headings[locale][index]}</h1><span>Attention / Mac</span></header><main><img src="data:image/png;base64,${image}"></main></html>`);
         await page.locator('img').evaluate(img => img.decode());
+        const coverage = await page.locator('img').evaluate(img => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160; canvas.height = 100;
+          const context = canvas.getContext('2d');
+          context.drawImage(img, 0, 0, 160, 100);
+          const pixels = context.getImageData(0, 0, 160, 100).data;
+          let opaque = 0;
+          for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 240) opaque++;
+          return opaque / 16000;
+        });
+        if (coverage < 0.95) throw new Error(`${locale}/${scene}: window occupies only ${(coverage * 100).toFixed(1)}% of capture; recapture outside window animations`);
         await page.screenshot({path:path.join(output,`mac-${index+1}-${scene}.png`),omitBackground:false});
       }
       await page.close();
