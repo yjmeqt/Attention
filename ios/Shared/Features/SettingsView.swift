@@ -2,6 +2,7 @@ import StoreKit
 import SwiftUI
 
 struct SettingsView: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
     @Environment(\.requestReview) private var requestReview
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +23,11 @@ struct SettingsView: View {
                     Text("Default Share Format")
                 } footer: {
                     Text("Share links as links and text as text, or share any item as an image. Touch and hold Share for the other options.")
+                }
+                Section {
+                    Toggle("Show App Store QR on Text Images", isOn: $showsAppStoreQR)
+                } footer: {
+                    Text("Add a QR code linking to Attention in the App Store when sharing text as an image.")
                 }
                 Section {
                     Button {

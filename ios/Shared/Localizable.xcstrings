@@ -1,6 +1,50 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Show App Store QR on Text Images" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show App Store QR on Text Images"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在文本图片中显示 App Store 二维码"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在文字圖片中顯示 App Store QR 碼"
+          }
+        }
+      }
+    },
+    "Add a QR code linking to Attention in the App Store when sharing text as an image." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a QR code linking to Attention in the App Store when sharing text as an image."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将文本分享为图片时，添加通往 App Store 中 Attention 的二维码。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將文字分享為圖片時，加入通往 App Store 中 Attention 的 QR 碼。"
+          }
+        }
+      }
+    },
     "Share links as links and text as text, or share any item as an image. Touch and hold Share for the other options." : {
       "localizations" : {
         "en" : {

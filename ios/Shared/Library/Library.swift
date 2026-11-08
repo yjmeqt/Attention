@@ -369,7 +369,7 @@ final class Library {
 
     /// A card for links or plain text, or the original shared image.
     func fullImage(_ item: LibraryItem) -> PlatformImage? {
-        if item.isTextOnly, let text = item.text { return TextCardRenderer.render(text) }
+        if item.isTextOnly, let text = item.text { return TextCardRenderer.render(text, showsAppStoreQR: TextCardPromotion.isEnabled()) }
         if let meta = meta(for: item) { return CardRenderer.render(meta, style: item.style) }
         return data(.source, of: item).flatMap(PlatformImage.init(data:))
     }

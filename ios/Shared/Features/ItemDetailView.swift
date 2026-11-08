@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A saved item: its card (or image), style, tags and actions. Used by the app and the share extension.
 struct ItemDetailView: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     let item: LibraryItem
     /// Set in the share extension: shows a Done button that closes it.
     var onDone: (() -> Void)?
@@ -65,7 +66,7 @@ struct ItemDetailView: View {
         .toolbar { toolbar }
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
-        .task(id: "\(library.revision)-\(item.templateRaw)") {
+        .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
             guard !Task.isCancelled, library.contains(item) else { return }
             image = library.fullImage(item)
             covers = item.isImage ? nil

@@ -2,6 +2,7 @@ import SwiftUI
 
 /// The selected item: its card, what to do with it, and its style, tags and text.
 struct ItemInspector: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     let item: LibraryItem
     let actions: LibraryActions
 
@@ -16,6 +17,10 @@ struct ItemInspector: View {
             VStack(alignment: .leading, spacing: 18) {
                 preview
                 buttons
+                if item.isTextOnly {
+                    Toggle("Show App Store QR on Text Images", isOn: $showsAppStoreQR)
+                        .help("Add a QR code linking to Attention in the App Store when sharing text as an image.")
+                }
                 if let text = item.text {
                     HStack {
                         Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
@@ -47,7 +52,7 @@ struct ItemInspector: View {
             }
             .padding()
         }
-        .task(id: "\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
+        .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
             image = library.fullImage(item)
             covers = item.isImage ? nil
                 : (library.previewData(item).flatMap(Self.coverThumbnail),

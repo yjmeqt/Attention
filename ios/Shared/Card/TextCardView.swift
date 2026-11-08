@@ -3,6 +3,7 @@ import SwiftUI
 /// A single readable excerpt. The saved body remains available through Copy/Share Text.
 struct TextCardView: View {
     let text: String
+    var showsAppStoreQR = true
 
     var body: some View {
         let tint = CardTint.neutral
@@ -15,11 +16,22 @@ struct TextCardView: View {
                 .truncationMode(.tail)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            HStack(spacing: 6) {
-                AttentionGlyph(size: 18)
-                Text("Made with \(Brand.name)")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(tint.secondary)
+            HStack {
+                HStack(spacing: 6) {
+                    AttentionGlyph(size: 18)
+                    Text("Made with \(Brand.name)")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(tint.secondary)
+                }
+                Spacer()
+                if showsAppStoreQR {
+                    Image(platformImage: QRCode.image(Brand.appStoreURL.absoluteString))
+                        .interpolation(.none)
+                        .resizable()
+                        .frame(width: 57, height: 57)
+                        .padding(7)
+                        .background(.white)
+                }
             }
         }
         .padding(24)
@@ -30,14 +42,23 @@ struct TextCardView: View {
 }
 
 enum TextCardRenderer {
-    static func render(_ text: String) -> PlatformImage? {
+    static func render(_ text: String, showsAppStoreQR: Bool = true) -> PlatformImage? {
         // Bound layout work even for book-length captures, without changing the stored body.
         let end = text.index(text.startIndex, offsetBy: 8_192, limitedBy: text.endIndex) ?? text.endIndex
         let excerpt = String(text[..<end]) + (end == text.endIndex ? "" : "…")
-        let renderer = ImageRenderer(content: TextCardView(text: excerpt))
+        let renderer = ImageRenderer(content: TextCardView(text: excerpt, showsAppStoreQR: showsAppStoreQR))
         renderer.proposedSize = ProposedViewSize(width: CardView.width, height: nil)
         renderer.scale = 3
         renderer.isOpaque = true
         return renderer.platformImage
+    }
+}
+
+/// Shared by text-image previews and exports, including the iOS share extension.
+enum TextCardPromotion {
+    static let key = "textCardShowsAppStoreQR"
+
+    static func isEnabled(in defaults: UserDefaults = AppGroup.defaults) -> Bool {
+        defaults.object(forKey: key) == nil || defaults.bool(forKey: key)
     }
 }

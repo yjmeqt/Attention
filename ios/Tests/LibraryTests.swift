@@ -27,6 +27,35 @@ struct LibraryTests {
         #expect(ShareDefault(rawValue: "image") == .image)
     }
 
+    @Test func textCardIncludesAppStoreQRCode() throws {
+        let image = try #require(TextCardRenderer.render("A small thought."))
+        let cgImage = try #require(image.cgImage)
+        let detector = try #require(CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
+                                             options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]))
+        let urls = detector.features(in: CIImage(cgImage: cgImage))
+            .compactMap { ($0 as? CIQRCodeFeature)?.messageString }
+        #expect(urls == [Brand.appStoreURL.absoluteString])
+    }
+
+    @Test func textCardCanOmitAppStoreQRCode() throws {
+        let image = try #require(TextCardRenderer.render("A small thought.", showsAppStoreQR: false))
+        let cgImage = try #require(image.cgImage)
+        let detector = try #require(CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
+                                             options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]))
+        #expect(detector.features(in: CIImage(cgImage: cgImage)).isEmpty)
+    }
+
+    @Test func textCardPromotionPreferenceDefaultsOnAndRespectsOptOut() throws {
+        let suite = "TextCardPromotionTests-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        #expect(TextCardPromotion.isEnabled(in: defaults))
+        defaults.set(false, forKey: TextCardPromotion.key)
+        #expect(!TextCardPromotion.isEnabled(in: defaults))
+        defaults.set(true, forKey: TextCardPromotion.key)
+        #expect(TextCardPromotion.isEnabled(in: defaults))
+    }
+
     @Test func shortTextRendersAnAdaptiveCard() throws {
         let library = makeLibrary()
         let item = library.save(Capture(text: "A small thought."))
