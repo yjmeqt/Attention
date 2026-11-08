@@ -80,7 +80,10 @@ struct QueryPlanTests {
         #expect(assistant.modelFailed)
         #expect(assistant.hasFailure)
         #expect(!assistant.canAsk)
+        #expect(!assistant.showsAskEntry)
         assistant.reset()
         #expect(!assistant.canAsk)
+        #expect(!assistant.showsAskEntry)
+        #expect(assistant.availabilityMessage != nil)
     }
 }

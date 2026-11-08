@@ -25,6 +25,7 @@ final class Assistant {
     #endif
 
     static var isAvailable: Bool { SystemLanguageModel.default.availability == .available }
+    var showsAskEntry: Bool { !modelFailed && Self.isAvailable }
     var canAsk: Bool {
         #if targetEnvironment(simulator)
         return modelVerified && !modelFailed && Self.isAvailable

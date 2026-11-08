@@ -227,15 +227,17 @@ struct HomeView: View {
                 #if os(iOS) && !SHARE_EXTENSION
                 if searching && !selecting {
                     VStack(alignment: .leading, spacing: 6) {
-                        Button {
-                            searchFocused = false
-                            Task { await assistant.ask(filter.search, in: library, scope: filter) }
-                        } label: {
-                            Label("Ask", systemImage: "sparkles")
-                                .frame(maxWidth: .infinity)
+                        if assistant.showsAskEntry {
+                            Button {
+                                searchFocused = false
+                                Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                            } label: {
+                                Label("Ask", systemImage: "sparkles")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(!assistant.canAsk || assistant.isBusy || filter.search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!assistant.canAsk || assistant.isBusy || filter.search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         if let message = assistant.availabilityMessage {
                             Text(message).font(.footnote).foregroundStyle(.secondary)
                         }
