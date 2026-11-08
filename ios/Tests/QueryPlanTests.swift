@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import Testing
 @testable import Attention
 
@@ -69,6 +70,16 @@ struct QueryPlanTests {
         plan.tags = ["art"]
 
         #expect(plan.apply(to: library.items).map(\.id) == [exact.id])
+    }
+
+    @Test func unsupportedDeviceIsSilentAndRecoverableStatesExplainWhy() {
+        #expect(Assistant.message(for: .unavailable(.deviceNotEligible)) == nil)
+        #expect(Assistant.message(for: .available) == nil)
+        let disabled = Assistant.message(for: .unavailable(.appleIntelligenceNotEnabled))
+        let preparing = Assistant.message(for: .unavailable(.modelNotReady))
+        #expect(disabled != nil)
+        #expect(preparing != nil)
+        #expect(disabled != preparing)
     }
 
     @Test func modelStartupFailureDisablesAsk() {

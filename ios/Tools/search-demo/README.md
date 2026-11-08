@@ -9,6 +9,9 @@ Ask appears above the search field while searching when the model is available. 
 question or command and tap Ask; there is no question-mark or sentence-prefix requirement.
 During verification the button is disabled. Confirmed unavailability hides the button and
 keeps the reason at the same location.
+Devices reported as ineligible show neither Ask nor a status panel. Apple Intelligence being
+turned off prompts the user to enable it in Settings; a model that is not ready gets a waiting
+message. Runtime failures continue to show the actual error.
 The live mode uses the same worktree simulator and does not sync to iCloud.
 
 For deterministic search-count tests, use the offline corpus below.

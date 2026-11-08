@@ -225,7 +225,7 @@ struct HomeView: View {
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 #if os(iOS) && !SHARE_EXTENSION
-                if searching && !selecting {
+                if searching && !selecting && (assistant.showsAskEntry || assistant.availabilityMessage != nil) {
                     VStack(alignment: .leading, spacing: 6) {
                         if assistant.showsAskEntry {
                             Button {
@@ -403,7 +403,7 @@ struct HomeView: View {
 
     private var showingAsk: Bool {
         #if os(iOS) && !SHARE_EXTENSION
-        searching && assistant.phase != .idle && !assistant.modelFailed
+        searching && assistant.phase != .idle && assistant.phase != .unavailable && !assistant.modelFailed
         #else
         false
         #endif

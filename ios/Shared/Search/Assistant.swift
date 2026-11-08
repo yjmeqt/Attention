@@ -39,12 +39,27 @@ final class Assistant {
     }
 
     var availabilityMessage: String? {
+        let availability = SystemLanguageModel.default.availability
+        if availability == .unavailable(.deviceNotEligible) { return nil }
         if let modelFailureMessage { return modelFailureMessage }
-        guard Self.isAvailable else { return "Apple Intelligence isn't available on this device." }
+        guard availability == .available else { return Self.message(for: availability) }
         #if targetEnvironment(simulator)
         if !modelVerified { return "Checking Apple Intelligence…" }
         #endif
         return nil
+    }
+
+    static func message(for availability: SystemLanguageModel.Availability) -> String? {
+        switch availability {
+        case .available, .unavailable(.deviceNotEligible):
+            return nil
+        case .unavailable(.appleIntelligenceNotEnabled):
+            return String(localized: "Turn on Apple Intelligence in Settings to use Ask.")
+        case .unavailable(.modelNotReady):
+            return String(localized: "Apple Intelligence's model isn't ready yet. It may still be downloading. Please try again later.")
+        case .unavailable:
+            return String(localized: "Apple Intelligence is temporarily unavailable. Please try again later.")
+        }
     }
 
     var isBusy: Bool { phase == .planning || phase == .matching || phase == .answering }
