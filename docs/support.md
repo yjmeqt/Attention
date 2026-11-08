@@ -8,6 +8,7 @@
 
 - **A link has no title or cover?** Some sites require a login or show a captcha, so Attention can't read their preview and makes a QR-only card instead. Please report such links.
 - **Attention isn't in the share sheet?** Scroll the app row to the end, tap More and turn on Attention; you can also drag it to the front.
+- **Where are Save to Attention and Share Attention Card?** Expand the actions below the app row and scroll down. iOS places new actions near the end of the list.
 - **Where is my data?** Links and cards stay on your device and are removed when you delete the app. See the [privacy policy](privacy-policy.html).
 
 ## 中文 {#zh}
@@ -18,6 +19,7 @@
 
 - **某个链接没有标题或封面？** 有些网站要求登录或会弹出验证码，Attention 读不到它们的预览信息，这时会生成只有二维码的卡片。欢迎把这类链接反馈给我们。
 - **分享菜单里找不到 Attention？** 在分享菜单最右侧点“更多”，打开 Attention，也可以把它拖到前面。
+- **找不到“保存到 Attention”和“分享 Attention 卡片”？** 展开 App 图标下方的操作列表，再向下滚动。iOS 通常把新操作放在列表末尾。
 - **数据存在哪里？** 所有链接和卡片只保存在你的设备上，卸载 App 会一并删除。详见[隐私政策](privacy-policy.html)。
 
 ## 繁體中文 {#zh-hant}
@@ -28,4 +30,5 @@
 
 - **某個連結沒有標題或封面？** 有些網站需要登入或會跳出驗證碼，Attention 讀不到它們的預覽資訊，這時會產生只有 QR Code 的卡片。歡迎回報這類連結。
 - **分享表單裡找不到 Attention？** 在 App 列滑到最後，點一下「更多」並開啟 Attention，也可以把它拖到前面。
+- **找不到「儲存到 Attention」和「分享 Attention 卡片」？** 展開 App 圖示下方的操作列表，再向下捲動。iOS 通常會把新操作放在列表末尾。
 - **資料存在哪裡？** 所有連結和卡片只儲存在你的裝置上，刪除 App 時會一併移除。詳見[隱私權政策](privacy-policy.html#zh-hant)。
