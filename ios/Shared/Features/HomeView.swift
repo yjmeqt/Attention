@@ -175,6 +175,9 @@ struct HomeView: View {
         #if os(iOS) && !SHARE_EXTENSION
         .onChange(of: filter.search) { _, _ in
             assistant.reset()
+            #if targetEnvironment(simulator)
+            if Assistant.looksLikeQuestion(filter.search) { Task { await assistant.verifyModelIfNeeded() } }
+            #endif
             Task { await refreshVisualScores() }
         }
         .onChange(of: ClipModel.shared.status) { _, _ in

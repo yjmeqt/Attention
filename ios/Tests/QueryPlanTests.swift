@@ -81,6 +81,9 @@ struct QueryPlanTests {
 
     @Test func modelStartupFailureStopsFurtherAskSuggestions() {
         let assistant = Assistant()
+        #if targetEnvironment(simulator)
+        #expect(!assistant.canSuggest)
+        #endif
         assistant.recordFailure(NSError(domain: "FoundationModels.LanguageModelError", code: -1))
         #expect(assistant.modelFailed)
         #expect(assistant.hasFailure)

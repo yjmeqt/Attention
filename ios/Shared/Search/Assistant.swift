@@ -18,9 +18,19 @@ final class Assistant {
     private(set) var count = 0
     /// A model startup failure makes availability's optimistic result untrustworthy for this session.
     private(set) var modelFailed = false
+    #if targetEnvironment(simulator)
+    private(set) var modelVerified = false
+    private var checkingModel = false
+    #endif
 
     static var isAvailable: Bool { SystemLanguageModel.default.availability == .available }
-    var canSuggest: Bool { !modelFailed && Self.isAvailable }
+    var canSuggest: Bool {
+        #if targetEnvironment(simulator)
+        return modelVerified && !modelFailed && Self.isAvailable
+        #else
+        return !modelFailed && Self.isAvailable
+        #endif
+    }
     var hasFailure: Bool {
         if case .failed = phase { return true }
         return false
@@ -48,6 +58,23 @@ final class Assistant {
         answer = ""
         count = 0
     }
+
+    #if targetEnvironment(simulator)
+    /// Simulator availability can be optimistic when its model assets don't match the host OS.
+    /// Make a real request once before offering Ask.
+    func verifyModelIfNeeded() async {
+        guard !modelVerified, !modelFailed, !checkingModel, Self.isAvailable else { return }
+        checkingModel = true
+        defer { checkingModel = false }
+        do {
+            let session = LanguageModelSession()
+            _ = try await session.respond(to: "Reply with OK.")
+            modelVerified = true
+        } catch {
+            recordFailure(error)
+        }
+    }
+    #endif
 
     func ask(_ question: String, in library: Library, scope: FeedFilter) async {
         guard Self.isAvailable else {
