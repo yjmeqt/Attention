@@ -162,4 +162,17 @@ struct SharingTests {
         #expect(UIPasteboard.general.string == body)
     }
 
+    @Test func clipboardOfferDistinguishesNewLinksAndText() async {
+        let pasteboard = UIPasteboard.withUniqueName()
+        defer { UIPasteboard.remove(withName: pasteboard.name) }
+        let initialChange = pasteboard.changeCount
+
+        pasteboard.string = "A note without a link"
+        #expect(await Clipboard.offer(on: pasteboard, since: initialChange) == .text)
+        #expect(await Clipboard.offer(on: pasteboard, since: pasteboard.changeCount) == nil)
+
+        pasteboard.string = "https://example.com/article"
+        #expect(await Clipboard.offer(on: pasteboard, since: initialChange) == .link)
+    }
+
 }

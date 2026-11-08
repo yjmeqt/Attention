@@ -26,7 +26,7 @@ struct HomeView: View {
     @State private var actions: ItemActions
     @State private var detailID: UUID?
     @State private var notice: String?
-    @State private var clipboardHasLink = false
+    @State private var clipboardOffer: Clipboard.Offer?
     @State private var sampleLinkCopied = false
     @State private var columns = 2
     @State private var selecting = false
@@ -85,7 +85,7 @@ struct HomeView: View {
             if phase == .active {
                 library.reload()
                 Task { await library.retryMissingPreviews() }
-                Task { clipboardHasLink = await Clipboard.hasNewLink() }
+                Task { clipboardOffer = await Clipboard.newOffer() }
             } else if phase == .background {
                 lockPrivate()
             }
@@ -156,7 +156,7 @@ struct HomeView: View {
             if let index = DemoLibrary.open, library.items.indices.contains(index) { detailID = library.items[index].id }
             #endif
             Task { await library.retryMissingPreviews() }
-            clipboardHasLink = await Clipboard.hasNewLink()
+            clipboardOffer = await Clipboard.newOffer()
         }
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
         .onAppear {
@@ -170,13 +170,13 @@ struct HomeView: View {
             feedContainer
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if clipboardHasLink && !selecting {
-                    ClipboardBanner(paste: paste, dismiss: dismissClipboard)
+                if let clipboardOffer, !selecting {
+                    ClipboardBanner(offer: clipboardOffer, paste: paste, dismiss: dismissClipboard)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .padding(.bottom, 4)
                 }
             }
-            .animation(.snappy, value: clipboardHasLink)
+            .animation(.snappy, value: clipboardOffer)
             .scrollEdgeEffectHidden(true, for: .vertical)
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { columns = Waterfall<EmptyView>.columns(for: $0) }
             .onScrollGeometryChange(for: Bool.self) {
@@ -451,7 +451,7 @@ struct HomeView: View {
 
     private func paste(_ providers: [NSItemProvider]) {
         Clipboard.ignoreCurrent()
-        clipboardHasLink = false
+        clipboardOffer = nil
         Task {
             guard let capture = await Intake.capture(from: providers) else {
                 notice = String(localized: "No link, image or text found on the clipboard.")
@@ -463,7 +463,7 @@ struct HomeView: View {
 
     private func dismissClipboard() {
         Clipboard.ignoreCurrent()
-        clipboardHasLink = false
+        clipboardOffer = nil
     }
 
     private func scanned(_ url: URL) { open(.link(url, image: nil)) }
@@ -471,7 +471,7 @@ struct HomeView: View {
     private func copySample(_ url: URL) {
         Clipboard.copy(url, offerToPaste: true)
         sampleLinkCopied = true
-        clipboardHasLink = true
+        clipboardOffer = .link
     }
 
     private func open(_ capture: Capture) {
@@ -516,17 +516,23 @@ struct HomeView: View {
     }
 }
 
-/// Offers a link the user copied elsewhere. Spotting it doesn't read the clipboard, and the system
+/// Offers text or a link the user copied elsewhere. Spotting it doesn't read the clipboard, and the system
 /// paste button reads it without the paste-permission prompt.
 private struct ClipboardBanner: View {
+    let offer: Clipboard.Offer
     let paste: ([NSItemProvider]) -> Void
     let dismiss: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
-            Label("You copied a link", systemImage: "link")
-                .font(.subheadline.weight(.medium))
-                .lineLimit(1)
+            Group {
+                switch offer {
+                case .link: Label("You copied a link", systemImage: "link")
+                case .text: Label("Text copied", systemImage: "text.alignleft")
+                }
+            }
+            .font(.subheadline.weight(.medium))
+            .lineLimit(1)
             Spacer(minLength: 0)
             PasteButton(supportedContentTypes: ItemProviders.pasteTypes, payloadAction: paste)
                 .buttonBorderShape(.capsule)
