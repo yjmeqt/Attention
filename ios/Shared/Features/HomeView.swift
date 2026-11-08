@@ -516,7 +516,7 @@ struct HomeView: View {
     }
 }
 
-/// Offers text or a link the user copied elsewhere. Spotting it doesn't read the clipboard, and the system
+/// Offers a link, image or text the user copied elsewhere. Spotting it doesn't read the clipboard, and the system
 /// paste button reads it without the paste-permission prompt.
 private struct ClipboardBanner: View {
     let offer: Clipboard.Offer
@@ -529,6 +529,7 @@ private struct ClipboardBanner: View {
                 switch offer {
                 case .link: Label("You copied a link", systemImage: "link")
                 case .text: Label("Text copied", systemImage: "text.alignleft")
+                case .image: Label("Image copied", systemImage: "photo")
                 }
             }
             .font(.subheadline.weight(.medium))

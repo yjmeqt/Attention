@@ -175,4 +175,17 @@ struct SharingTests {
         #expect(await Clipboard.offer(on: pasteboard, since: initialChange) == .link)
     }
 
+    @Test func clipboardOfferDetectsNewImage() async {
+        let pasteboard = UIPasteboard.withUniqueName()
+        defer { UIPasteboard.remove(withName: pasteboard.name) }
+        let initialChange = pasteboard.changeCount
+        pasteboard.image = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2)).image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 2, height: 2))
+        }
+
+        #expect(await Clipboard.offer(on: pasteboard, since: initialChange) == .image)
+        #expect(await Clipboard.offer(on: pasteboard, since: pasteboard.changeCount) == nil)
+    }
+
 }

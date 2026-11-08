@@ -6,14 +6,14 @@ import LinkPresentation
 enum Clipboard {
     private static let ignoredKey = "ignoredPasteboardChangeCount"
 
-    enum Offer: Equatable { case link, text }
+    enum Offer: Equatable { case link, text, image }
 
     /// Marks the current clipboard contents as already handled so they aren't offered again.
     static func ignoreCurrent() {
         AppGroup.defaults.set(UIPasteboard.general.changeCount, forKey: ignoredKey)
     }
 
-    /// Checks for new text or a link without reading the clipboard contents.
+    /// Checks for a new link, image or text without reading the clipboard contents.
     static func newOffer() async -> Offer? {
         await offer(on: .general, since: AppGroup.defaults.integer(forKey: ignoredKey))
     }
@@ -25,6 +25,8 @@ enum Clipboard {
                 let found = (try? result.get()) ?? []
                 if found.contains(\UIPasteboard.DetectedValues.probableWebURL) {
                     continuation.resume(returning: .link)
+                } else if pasteboard.hasImages {
+                    continuation.resume(returning: .image)
                 } else {
                     continuation.resume(returning: pasteboard.hasStrings ? .text : nil)
                 }
