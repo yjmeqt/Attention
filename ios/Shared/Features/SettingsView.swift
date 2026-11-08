@@ -44,7 +44,7 @@ struct SettingsView: View {
                         Label("Version", systemImage: "info.circle")
                     }
                     .contextMenu {
-                        Button("Copy", systemImage: "doc.on.doc") { UIPasteboard.general.string = Self.version }
+                        Button("Copy", systemImage: "doc.on.doc") { Clipboard.copy(Self.version) }
                     }
                 }
                 .foregroundStyle(.primary)
