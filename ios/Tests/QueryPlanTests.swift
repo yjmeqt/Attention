@@ -47,6 +47,30 @@ struct QueryPlanTests {
         #expect(Set(byScore.map(\.id)) == Set([a.id, b.id]))
     }
 
+    @Test func siteDoesNotMatchAnotherDomainContainingIt() {
+        let library = makeLibrary()
+        let exact = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        _ = library.save(.link(URL(string: "https://notexample.com/b")!, image: nil))
+
+        var plan = QueryPlan()
+        plan.site = "example.com"
+
+        #expect(plan.apply(to: library.items).map(\.id) == [exact.id])
+    }
+
+    @Test func tagDoesNotMatchAnotherTagContainingIt() {
+        let library = makeLibrary()
+        let exact = library.save(.link(URL(string: "https://example.com/a")!, image: nil))
+        let other = library.save(.link(URL(string: "https://example.com/b")!, image: nil))
+        library.addTag("art", to: [exact])
+        library.addTag("cart", to: [other])
+
+        var plan = QueryPlan()
+        plan.tags = ["art"]
+
+        #expect(plan.apply(to: library.items).map(\.id) == [exact.id])
+    }
+
     @Test func looksLikeQuestionDetectsChineseAndEnglish() {
         #expect(Assistant.looksLikeQuestion("我12h内一共收藏了多少个小红书的美女？"))
         #expect(Assistant.looksLikeQuestion("how many xiaohongshu posts?"))

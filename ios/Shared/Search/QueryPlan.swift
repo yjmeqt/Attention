@@ -29,11 +29,9 @@ struct QueryPlan: Equatable {
                 guard item.createdAt >= now.addingTimeInterval(Double(-hours) * 3600) else { return false }
             }
             if let site, !site.isEmpty {
-                let needle = site.lowercased()
-                let ok = item.domain == needle || item.site.lowercased().contains(needle) || item.domain.contains(needle)
-                guard ok else { return false }
+                guard item.domain.caseInsensitiveCompare(site) == .orderedSame else { return false }
             }
-            for tag in tags where !item.tags.contains(where: { $0.localizedStandardContains(tag) }) {
+            for tag in tags where !item.tags.contains(where: { $0.caseInsensitiveCompare(Library.normalizedTag(tag)) == .orderedSame }) {
                 return false
             }
             for word in keywords where !item.matches(search: word) {

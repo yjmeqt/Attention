@@ -41,7 +41,7 @@ final class FeedFilter {
         let scoped = items.filter(contains)
         guard !search.trimmingCharacters(in: .whitespaces).isEmpty else { return scoped }
         let matched = scoped.filter {
-            $0.matches(search: search) || (visualScores[$0.id] ?? 0) >= visualThreshold
+            $0.matches(search: search) || visualScores[$0.id].map { $0 >= visualThreshold } == true
         }
         guard !visualScores.isEmpty else { return matched }
         return matched.sorted {
