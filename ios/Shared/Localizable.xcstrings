@@ -1,6 +1,72 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Share links as links and text as text, or share any item as an image. Touch and hold Share for the other options." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share links as links and text as text, or share any item as an image. Touch and hold Share for the other options."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将链接分享为链接、文本分享为文本，或将任何内容分享为图片。长按“分享”可选择其他方式。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將連結分享為連結、文字分享為文字，或將任何內容分享為圖片。長按「分享」可選擇其他方式。"
+          }
+        }
+      }
+    },
+    "Link or Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link or Text"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "链接或文本"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連結或文字"
+          }
+        }
+      }
+    },
+    "Default Share Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Share Format"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认分享格式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預設分享格式"
+          }
+        }
+      }
+    },
     "No saved items yet" : {
       "localizations" : {
         "en" : {

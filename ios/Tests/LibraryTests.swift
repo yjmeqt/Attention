@@ -12,6 +12,21 @@ struct LibraryTests {
 
     func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
 
+    @Test func defaultShareFormatRespectsPreferenceAndAvailableContent() throws {
+        let library = makeLibrary()
+        let text = library.save(Capture(text: "Full text **including literal markup**"))
+        let link = library.save(Capture(url: URL(string: "https://example.com/article")!))
+        let image = library.save(Capture(image: try jpeg(200, 200, .blue)))
+        #expect(ShareDefault.link.format(for: text) == .text)
+        #expect(ShareDefault.image.format(for: text) == .image)
+        #expect(ShareDefault.link.format(for: link) == .link)
+        #expect(ShareDefault.image.format(for: link) == .image)
+        #expect(ShareDefault.link.format(for: image) == .image)
+        #expect(ShareDefault.image.format(for: image) == .image)
+        #expect(ShareDefault(rawValue: "link") == .link)
+        #expect(ShareDefault(rawValue: "image") == .image)
+    }
+
     @Test func shortTextRendersAnAdaptiveCard() throws {
         let library = makeLibrary()
         let item = library.save(Capture(text: "A small thought."))

@@ -43,7 +43,7 @@ struct ItemDetailView: View {
         GeometryReader { proxy in
             let isWide = proxy.size.width > proxy.size.height && proxy.size.width > 700
             ScrollView {
-                if isWide && !item.isTextOnly {
+                if isWide {
                     HStack(alignment: .top, spacing: 32) {
                         preview(maxHeight: proxy.size.height - 160)
                         details.frame(maxWidth: 420)
@@ -51,7 +51,7 @@ struct ItemDetailView: View {
                     .padding()
                 } else {
                     VStack(spacing: 20) {
-                        if !item.isTextOnly { preview(maxHeight: proxy.size.height * 0.62) }
+                        preview(maxHeight: proxy.size.height * 0.62)
                         details
                     }
                     .frame(maxWidth: 520)
@@ -142,6 +142,7 @@ struct ItemDetailView: View {
 
     private var details: some View {
         VStack(alignment: .leading, spacing: 20) {
+            imageButtons
             if let text = item.text {
                 HStack {
                     Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
@@ -153,7 +154,6 @@ struct ItemDetailView: View {
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            imageButtons
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)

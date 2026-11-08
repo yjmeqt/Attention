@@ -87,11 +87,14 @@ final class ItemActions {
         ShareSuggestion.share.donate()
     }
 
-    /// Text-only items share their body; media items follow the link/image preference.
+    /// Shares the link, full text or rendered image according to the saved preference.
     func share(_ item: LibraryItem, _ preference: ShareDefault) {
         guard library.contains(item) else { return }
-        if item.isTextOnly { shareText(item); return }
-        if item.url == nil || preference == .image { shareImage(item) } else { shareLink(item) }
+        switch preference.format(for: item) {
+        case .text: shareText(item)
+        case .link: shareLink(item)
+        case .image: shareImage(item)
+        }
     }
 
     private func shareURL(_ item: LibraryItem) -> URL? {
@@ -182,6 +185,14 @@ enum ShareDefault: String, CaseIterable {
     case link, image
 
     static let key = "shareDefault"
+
+    enum Format { case text, link, image }
+
+    func format(for item: LibraryItem) -> Format {
+        if self == .image { return .image }
+        if item.isTextOnly { return .text }
+        return item.url == nil ? .image : .link
+    }
 }
 
 /// Share Link, Copy Link and Share as Image; a single Share button for image items, which have no link.

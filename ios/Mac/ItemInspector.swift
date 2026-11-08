@@ -14,7 +14,8 @@ struct ItemInspector: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                if !item.isTextOnly { preview }
+                preview
+                buttons
                 if let text = item.text {
                     HStack {
                         Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
@@ -25,7 +26,6 @@ struct ItemInspector: View {
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                buttons
                 details
                 tags
                 if let meta = library.meta(for: item) {
@@ -64,7 +64,11 @@ struct ItemInspector: View {
                     .scaledToFit()
                     .clipShape(.rect(cornerRadius: 12))
                     .shadow(radius: 3)
-                    .onDrag { actions.dragProvider(item) ?? NSItemProvider() }
+                    .onDrag {
+                        guard item.isTextOnly else { return actions.dragProvider(item) ?? NSItemProvider() }
+                        guard let file = CardFile.write(image, for: item) else { return NSItemProvider(object: image) }
+                        return NSItemProvider(contentsOf: file) ?? NSItemProvider(object: image)
+                    }
                     .help("Drag into a chat, or copy it")
                     .accessibilityLabel(item.displayTitle)
             } else {

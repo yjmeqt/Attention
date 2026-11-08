@@ -5,19 +5,27 @@ struct TextCardView: View {
     let text: String
 
     var body: some View {
-        let palette = CardPalette(kind: .web)
-        Text(verbatim: text)
-            .font(.system(size: 22))
-            .foregroundStyle(palette.primary)
-            .lineSpacing(5)
-            .lineLimit(16)
-            .truncationMode(.tail)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(24)
-            .frame(width: CardView.width)
-            .background(palette.background)
-            .environment(\.dynamicTypeSize, .large)
+        let tint = CardTint.neutral
+        VStack(alignment: .leading, spacing: 24) {
+            Text(verbatim: text)
+                .font(.system(size: 22))
+                .foregroundStyle(tint.primary)
+                .lineSpacing(5)
+                .lineLimit(16)
+                .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 6) {
+                AttentionGlyph(size: 18)
+                Text("Made with \(Brand.name)")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(tint.secondary)
+            }
+        }
+        .padding(24)
+        .frame(width: CardView.width)
+        .background(tint.color)
+        .environment(\.dynamicTypeSize, .large)
     }
 }
 
