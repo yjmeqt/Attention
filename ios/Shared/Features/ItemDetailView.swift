@@ -43,7 +43,7 @@ struct ItemDetailView: View {
         GeometryReader { proxy in
             let isWide = proxy.size.width > proxy.size.height && proxy.size.width > 700
             ScrollView {
-                if isWide {
+                if isWide && !item.isTextOnly {
                     HStack(alignment: .top, spacing: 32) {
                         preview(maxHeight: proxy.size.height - 160)
                         details.frame(maxWidth: 420)
@@ -51,7 +51,7 @@ struct ItemDetailView: View {
                     .padding()
                 } else {
                     VStack(spacing: 20) {
-                        preview(maxHeight: proxy.size.height * 0.62)
+                        if !item.isTextOnly { preview(maxHeight: proxy.size.height * 0.62) }
                         details
                     }
                     .frame(maxWidth: 520)
@@ -78,7 +78,7 @@ struct ItemDetailView: View {
             // The share anchor needs to be in the window before the sheet can present from it.
             do { try await Task.sleep(for: .milliseconds(400)) } catch { return }
             guard !Task.isCancelled, library.contains(item) else { return }
-            actions.shareImage(item)
+            actions.share(item, .image)
         }
         .onAppear {
             actions.notice = nil
@@ -142,7 +142,18 @@ struct ItemDetailView: View {
 
     private var details: some View {
         VStack(alignment: .leading, spacing: 20) {
-            imageButtons
+            if let text = item.text {
+                HStack {
+                    Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                    Button("Share Text", systemImage: "square.and.arrow.up") { actions.shareText(item) }
+                }
+                .buttonStyle(.bordered)
+                Text(verbatim: text)
+                    .font(.body)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if !item.isTextOnly { imageButtons }
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)
@@ -236,6 +247,9 @@ struct ItemDetailView: View {
                 } else {
                     Button("Move to Private", systemImage: "lock") { Task { await actions.setPrivate(true, [item]) } }
                 }
+                Button(item.isArchived ? "Unarchive" : "Archive", systemImage: "archivebox") {
+                    actions.setArchived(!item.isArchived, [item])
+                }
                 Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
             }
         }
@@ -291,6 +305,8 @@ struct ItemDetailView: View {
     @ViewBuilder
     private var statusLabel: some View {
         switch actions.notice {
+        case .textCopied:
+            Label("Text copied", systemImage: "doc.on.clipboard")
         case .linkCopied:
             Label("Link copied", systemImage: "doc.on.clipboard")
         case .linkCopiedForImage:
@@ -346,7 +362,7 @@ private struct TagRow: View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 TagChip(text: item.domainLabel,
-                        systemImage: item.isImage ? "photo" : "globe",
+                        systemImage: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe",
                         icon: item.isImage ? nil : actions.library.favicon(item),
                         isSelected: false)
                 if item.isPrivate {

@@ -65,6 +65,14 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
+				<string>public.utf8-plain-text</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.yjmeqt.attn.shared-text</string>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
 				<string>public.url</string>
 			</array>
 			<key>UTTypeIdentifier</key>

@@ -35,9 +35,9 @@ struct SharingTests {
         try acceptsItems([attachments])
     }
 
-    private func acceptsItems(_ items: [[[String]]]) throws -> Bool {
+    private func acceptsItems(_ items: [[[String]]], extensionName: String = "AttentionExtension") throws -> Bool {
         let plugins = try #require(Bundle.main.builtInPlugInsURL)
-        let url = plugins.appending(path: "AttentionExtension.appex/Info.plist")
+        let url = plugins.appending(path: "\(extensionName).appex/Info.plist")
         let data = try Data(contentsOf: url)
         let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
         let ext = try #require(plist["NSExtension"] as? [String: Any])
@@ -69,6 +69,13 @@ struct SharingTests {
     @Test func excludesOurOwnShares() throws {
         #expect(try !accepts([["public.url", "com.yjmeqt.attn.shared-url"]]))
         #expect(try !accepts([["public.png", "com.yjmeqt.attn.shared-image"]]))
+    }
+
+    @Test func excludesOurOwnTextSharesInEveryExtension() throws {
+        for name in ["AttentionExtension", "AttentionSaveAction", "AttentionCardAction"] {
+            #expect(try acceptsItems([[["public.utf8-plain-text"]]], extensionName: name))
+            #expect(try !acceptsItems([[["public.utf8-plain-text", "com.yjmeqt.attn.shared-text"]]], extensionName: name))
+        }
     }
 
     private func load(_ provider: NSItemProvider, type: UTType) async throws -> Data {
@@ -125,6 +132,34 @@ struct SharingTests {
         #expect(metadata.title == "Image title")
         #expect(metadata.imageProvider != nil)
         #expect(config.perItemMetadataProvider?(0, .title) as? String == "Image title")
+    }
+
+    @Test func textRepresentationsPreserveCompleteBody() async throws {
+        let body = "  **literal** text\n\nSecond paragraph https://example.com/a\n\tEnd  "
+        let item = ShareItem(text: body, title: "Text preview")
+        let config = ShareItem.configuration(for: [item])
+        #expect(item.provider.canLoadObject(ofClass: NSString.self))
+        let standard: String? = await withCheckedContinuation { continuation in
+            _ = item.provider.loadObject(ofClass: NSString.self) { value, _ in
+                continuation.resume(returning: value as? String)
+            }
+        }
+        #expect(standard == body)
+        for type in [UTType.utf8PlainText, try #require(UTType("com.yjmeqt.attn.shared-text"))] {
+            #expect(String(data: try await load(item.provider, type: type), encoding: .utf8) == body)
+        }
+        #expect(UTType("com.yjmeqt.attn.shared-text")?.conforms(to: .utf8PlainText) == true)
+        let metadata = try #require(config.perItemMetadataProvider?(0, .linkPresentationMetadata) as? LPLinkMetadata)
+        #expect(metadata.title == "Text preview")
+        #expect(metadata.url == nil)
+        #expect(metadata.originalURL == nil)
+        #expect(metadata.imageProvider == nil)
+    }
+
+    @Test func copyTextPreservesWhitespace() {
+        let body = "  First paragraph\n\nSecond paragraph\n\tLast  "
+        Clipboard.copy(body)
+        #expect(UIPasteboard.general.string == body)
     }
 
 }

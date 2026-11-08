@@ -14,7 +14,17 @@ struct ItemInspector: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                preview
+                if !item.isTextOnly { preview }
+                if let text = item.text {
+                    HStack {
+                        Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                        ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
+                    }
+                    Text(verbatim: text)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 buttons
                 details
                 tags
@@ -69,8 +79,10 @@ struct ItemInspector: View {
 
     private var buttons: some View {
         HStack {
-            Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
-                .disabled(image == nil)
+            if !item.isTextOnly {
+                Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
+                    .disabled(image == nil)
+            }
             if item.url != nil {
                 Button("Copy Link", systemImage: "link") { actions.copyLink(item) }
             }
@@ -107,7 +119,7 @@ struct ItemInspector: View {
 
     private var tags: some View {
         FlowLayout(spacing: 6) {
-            chip(item.domainLabel, systemImage: item.isImage ? "photo" : "globe")
+            chip(item.domainLabel, systemImage: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe")
             if item.isPrivate { chip(String(localized: "Private"), systemImage: "lock.fill") }
             if item.isArchived { chip(String(localized: "Archived"), systemImage: "archivebox") }
             ForEach(item.tags, id: \.self) { chip("#\($0)", systemImage: nil) }

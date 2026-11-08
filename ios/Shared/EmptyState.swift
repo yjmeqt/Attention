@@ -32,8 +32,8 @@ struct EmptyState: View {
             }
 
             VStack(alignment: .leading, spacing: 16) {
-                StepRow(number: 1, symbol: "link", text: "Copy a link, or share it to \(Brand.name) from any app")
-                StepRow(number: 2, symbol: "photo.on.rectangle.angled", text: "Get a card with the title, cover and QR code")
+                StepRow(number: 1, symbol: "link", text: "Copy a link, image or text, or share it to \(Brand.name) from any app")
+                StepRow(number: 2, symbol: "photo.on.rectangle.angled", text: "For links, get a card with the title, cover and QR code")
                 StepRow(number: 3, symbol: "message", text: "Send the image anywhere, then paste the link — it's already copied")
             }
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -44,8 +44,8 @@ struct LibraryView: View {
         .navigationTitle(title)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Paste Link", systemImage: "plus") { pasteFromClipboard() }
-                    .help("Save the link or image on the clipboard (⌘V)")
+                Button("Paste", systemImage: "plus") { pasteFromClipboard() }
+                    .help("Save the link, image or text on the clipboard (⌘V)")
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("Inspector", systemImage: "sidebar.trailing") { showsInspector.toggle() }
@@ -108,7 +108,7 @@ struct LibraryView: View {
                                 Image(platformImage: icon).resizable().scaledToFit()
                                     .clipShape(.rect(cornerRadius: 3))
                             } else {
-                                Image(systemName: domain == DomainTag.images ? "photo" : "globe")
+                                Image(systemName: domain == DomainTag.text ? "text.alignleft" : domain == DomainTag.images ? "photo" : "globe")
                             }
                         }
                         .tag(Section.site(domain))
@@ -200,11 +200,11 @@ struct LibraryView: View {
             ContentUnavailableView.search(text: filter.search)
         } else if filter.isAll {
             ContentUnavailableView {
-                Label("No saved links yet", systemImage: "link")
+                Label("No saved items yet", systemImage: "tray")
             } description: {
-                Text("Paste a link with ⌘V, drop one here, or copy a link anywhere and press \(Hotkey.label).")
+                Text("Paste a link, image or text with ⌘V, or drop it here. To make a link card, copy a link and press \(Hotkey.label).")
             } actions: {
-                Button("Paste Link") { pasteFromClipboard() }
+                Button("Paste") { pasteFromClipboard() }
             }
         } else {
             ContentUnavailableView(filter.showsArchived ? "No archived items" : filter.showsPrivate ? "No private items" : "Nothing here",
@@ -244,7 +244,7 @@ struct LibraryView: View {
     private func save(_ providers: [NSItemProvider]) {
         Task {
             guard let capture = await Intake.capture(from: providers) else {
-                notice = String(localized: "No link found on the clipboard.")
+                notice = String(localized: "No link, image or text found on the clipboard.")
                 return
             }
             let item = library.save(capture)
@@ -303,6 +303,12 @@ struct LibraryActions {
         notice = String(localized: "Link copied")
     }
 
+    func copyText(_ item: LibraryItem) {
+        guard let text = item.text else { return }
+        MacClipboard.copy(text)
+        notice = String(localized: "Text copied")
+    }
+
     func copyImage(_ item: LibraryItem) {
         guard let image = library.fullImage(item) else { return }
         MacClipboard.copy(image)
@@ -316,6 +322,7 @@ struct LibraryActions {
 
     /// The card as a PNG file, plus the link, so a drop works in chats, Finder and browsers alike.
     func dragProvider(_ item: LibraryItem) -> NSItemProvider? {
+        if item.isTextOnly, let text = item.text { return NSItemProvider(object: text as NSString) }
         guard let image = library.fullImage(item), let file = CardFile.write(image, for: item) else { return nil }
         let provider = NSItemProvider(contentsOf: file) ?? NSItemProvider()
         if let url = shareURL(item) { provider.registerObject(url as NSURL, visibility: .all) }
@@ -348,8 +355,14 @@ struct ItemContextMenu: View {
             Divider()
             Button("Copy Link", systemImage: "link") { actions.copyLink(item) }
         }
-        Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
-        Button("Save Image…", systemImage: "square.and.arrow.down") { actions.saveImage(item) }
+        if let text = item.text {
+            Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+            ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
+        }
+        if !item.isTextOnly {
+            Button("Copy Image", systemImage: "photo") { actions.copyImage(item) }
+            Button("Save Image…", systemImage: "square.and.arrow.down") { actions.saveImage(item) }
+        }
         Divider()
         Button("Edit Tags…", systemImage: "tag") { actions.tagTargets = [item] }
         if item.isPrivate {

@@ -40,7 +40,8 @@
 			<string>SUBQUERY(extensionItems, $item,
   SUBQUERY($item.attachments, $attachment,
     ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
-    ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image"
+    ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image" OR
+    ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-text"
   ).@count &gt; 0
 ).@count == 0 AND SUBQUERY(extensionItems, $item,
   SUBQUERY($item.attachments, $attachment,
