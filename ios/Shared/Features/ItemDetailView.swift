@@ -392,7 +392,7 @@ private struct RecognizedText: View {
             HStack {
                 Text("Text in Image").font(.headline)
                 Spacer()
-                Button("Copy", systemImage: "doc.on.doc") { UIPasteboard.general.string = text }
+                Button("Copy", systemImage: "doc.on.doc") { Clipboard.copy(text) }
                     .labelStyle(.iconOnly)
             }
             Text(text)

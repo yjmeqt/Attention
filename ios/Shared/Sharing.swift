@@ -6,19 +6,30 @@ import LinkPresentation
 enum Clipboard {
     private static let ignoredKey = "ignoredPasteboardChangeCount"
 
+    enum Offer: Equatable { case link, text, image }
+
     /// Marks the current clipboard contents as already handled so they aren't offered again.
     static func ignoreCurrent() {
         AppGroup.defaults.set(UIPasteboard.general.changeCount, forKey: ignoredKey)
     }
 
-    /// Checks for a link without triggering the paste-permission prompt.
-    static func hasNewLink() async -> Bool {
-        let pasteboard = UIPasteboard.general
-        guard pasteboard.changeCount != AppGroup.defaults.integer(forKey: ignoredKey) else { return false }
+    /// Checks for a new link, image or text without reading the clipboard contents.
+    static func newOffer() async -> Offer? {
+        await offer(on: .general, since: AppGroup.defaults.integer(forKey: ignoredKey))
+    }
+
+    static func offer(on pasteboard: UIPasteboard, since ignoredChangeCount: Int) async -> Offer? {
+        guard pasteboard.changeCount != ignoredChangeCount else { return nil }
         return await withCheckedContinuation { continuation in
             pasteboard.detectPatterns(for: [\.probableWebURL]) { @Sendable result in
                 let found = (try? result.get()) ?? []
-                continuation.resume(returning: found.contains(\UIPasteboard.DetectedValues.probableWebURL))
+                if found.contains(\UIPasteboard.DetectedValues.probableWebURL) {
+                    continuation.resume(returning: .link)
+                } else if pasteboard.hasImages {
+                    continuation.resume(returning: .image)
+                } else {
+                    continuation.resume(returning: pasteboard.hasStrings ? .text : nil)
+                }
             }
         }
     }
