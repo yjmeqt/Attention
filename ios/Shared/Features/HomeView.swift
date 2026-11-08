@@ -454,7 +454,7 @@ struct HomeView: View {
         clipboardHasLink = false
         Task {
             guard let capture = await Intake.capture(from: providers) else {
-                notice = String(localized: "No link found on the clipboard.")
+                notice = String(localized: "No link, image or text found on the clipboard.")
                 return
             }
             open(capture)

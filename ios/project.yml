@@ -71,8 +71,10 @@ targets:
         NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         NSUserActivityTypes: [INSendMessageIntent]
-        # Outgoing representations retain standard URL/PNG conformance for other receivers.
+        # Outgoing representations retain standard URL/PNG/plain-text conformance for other receivers.
         UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.yjmeqt.attn.shared-text
+            UTTypeConformsTo: [public.utf8-plain-text]
           - UTTypeIdentifier: com.yjmeqt.attn.shared-url
             UTTypeConformsTo: [public.url]
           - UTTypeIdentifier: com.yjmeqt.attn.shared-image
@@ -192,7 +194,8 @@ targets:
               SUBQUERY(extensionItems, $item,
                 SUBQUERY($item.attachments, $attachment,
                   ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
-                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image"
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image" OR
+                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-text"
                 ).@count > 0
               ).@count == 0 AND
               SUBQUERY(extensionItems, $item,

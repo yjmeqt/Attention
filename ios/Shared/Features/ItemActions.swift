@@ -18,7 +18,7 @@ final class ItemActions {
 
     init(library: Library) { self.library = library }
 
-    enum Notice { case linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
+    enum Notice { case textCopied, linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
 
     func shareLink(_ item: LibraryItem) {
         guard library.contains(item) else { return }
@@ -31,6 +31,17 @@ final class ItemActions {
         guard let url = shareURL(item) else { return }
         Clipboard.copy(url)
         notice = .linkCopied
+    }
+
+    func copyText(_ item: LibraryItem) {
+        guard library.contains(item), let text = item.text else { return }
+        Clipboard.copy(text)
+        notice = .textCopied
+    }
+
+    func shareText(_ item: LibraryItem) {
+        guard library.contains(item), let text = item.text else { return }
+        presenter.present([ShareItem(text: text, title: item.displayTitle)])
     }
 
     func copyImage(_ item: LibraryItem) {
@@ -76,10 +87,14 @@ final class ItemActions {
         ShareSuggestion.share.donate()
     }
 
-    /// What a plain Share does: the link or the image as Settings says; image items have only their image.
+    /// Shares the link, full text or rendered image according to the saved preference.
     func share(_ item: LibraryItem, _ preference: ShareDefault) {
         guard library.contains(item) else { return }
-        if item.url == nil || preference == .image { shareImage(item) } else { shareLink(item) }
+        switch preference.format(for: item) {
+        case .text: shareText(item)
+        case .link: shareLink(item)
+        case .image: shareImage(item)
+        }
     }
 
     private func shareURL(_ item: LibraryItem) -> URL? {
@@ -139,6 +154,12 @@ struct ItemMenu: View {
     var body: some View {
         Section {
             Button("Share", systemImage: "square.and.arrow.up") { actions.share(item, shareDefault) }
+            if item.hasText {
+                Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                if !item.isTextOnly {
+                    Button("Share Text", systemImage: "text.alignleft") { actions.shareText(item) }
+                }
+            }
             if item.url != nil {
                 Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
             }
@@ -164,6 +185,14 @@ enum ShareDefault: String, CaseIterable {
     case link, image
 
     static let key = "shareDefault"
+
+    enum Format { case text, link, image }
+
+    func format(for item: LibraryItem) -> Format {
+        if self == .image { return .image }
+        if item.isTextOnly { return .text }
+        return item.url == nil ? .image : .link
+    }
 }
 
 /// Share Link, Copy Link and Share as Image; a single Share button for image items, which have no link.
@@ -176,7 +205,7 @@ struct ShareMenu<MenuLabel: View>: View {
     @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
 
     var body: some View {
-        if item.url == nil {
+        if item.url == nil && !item.hasText {
             Button { actions.shareImage(item) } label: { label() }
         } else if sharesOnTap {
             Menu {
@@ -197,8 +226,14 @@ struct ShareMenu<MenuLabel: View>: View {
 
     @ViewBuilder
     private var options: some View {
-        Button("Share Link", systemImage: "link") { actions.shareLink(item) }
-        Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
+        if item.hasText {
+            Button("Share Text", systemImage: "text.alignleft") { actions.shareText(item) }
+            Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+        }
+        if item.url != nil {
+            Button("Share Link", systemImage: "link") { actions.shareLink(item) }
+            Button("Copy Link", systemImage: "doc.on.doc") { actions.copyLink(item) }
+        }
         Button("Share as Image", systemImage: "photo") { actions.shareImage(item) }
     }
 }

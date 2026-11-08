@@ -175,7 +175,7 @@ private struct Eyebrow: View {
                     .frame(width: 14, height: 14)
                     .clipShape(.rect(cornerRadius: 3))
             } else {
-                Image(systemName: item.isImage ? "photo" : "globe")
+                Image(systemName: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe")
             }
             Text(item.platformName)
                 .textCase(.uppercase)

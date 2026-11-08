@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A saved item: its card (or image), style, tags and actions. Used by the app and the share extension.
 struct ItemDetailView: View {
+    @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
     let item: LibraryItem
     /// Set in the share extension: shows a Done button that closes it.
     var onDone: (() -> Void)?
@@ -65,7 +66,7 @@ struct ItemDetailView: View {
         .toolbar { toolbar }
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
-        .task(id: "\(library.revision)-\(item.templateRaw)") {
+        .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
             guard !Task.isCancelled, library.contains(item) else { return }
             image = library.fullImage(item)
             covers = item.isImage ? nil
@@ -143,6 +144,17 @@ struct ItemDetailView: View {
     private var details: some View {
         VStack(alignment: .leading, spacing: 20) {
             imageButtons
+            if let text = item.text {
+                HStack {
+                    Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
+                    Button("Share Text", systemImage: "square.and.arrow.up") { actions.shareText(item) }
+                }
+                .buttonStyle(.bordered)
+                Text(verbatim: text)
+                    .font(.body)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             VStack(alignment: .leading, spacing: 6) {
                 if !item.title.isEmpty {
                     Text(item.title).font(.headline).textSelection(.enabled)
@@ -236,6 +248,9 @@ struct ItemDetailView: View {
                 } else {
                     Button("Move to Private", systemImage: "lock") { Task { await actions.setPrivate(true, [item]) } }
                 }
+                Button(item.isArchived ? "Unarchive" : "Archive", systemImage: "archivebox") {
+                    actions.setArchived(!item.isArchived, [item])
+                }
                 Button("Delete", systemImage: "trash", role: .destructive) { actions.delete([item]) }
             }
         }
@@ -291,6 +306,8 @@ struct ItemDetailView: View {
     @ViewBuilder
     private var statusLabel: some View {
         switch actions.notice {
+        case .textCopied:
+            Label("Text copied", systemImage: "doc.on.clipboard")
         case .linkCopied:
             Label("Link copied", systemImage: "doc.on.clipboard")
         case .linkCopiedForImage:
@@ -346,7 +363,7 @@ private struct TagRow: View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 TagChip(text: item.domainLabel,
-                        systemImage: item.isImage ? "photo" : "globe",
+                        systemImage: item.isTextOnly ? "text.alignleft" : item.isImage ? "photo" : "globe",
                         icon: item.isImage ? nil : actions.library.favicon(item),
                         isSelected: false)
                 if item.isPrivate {

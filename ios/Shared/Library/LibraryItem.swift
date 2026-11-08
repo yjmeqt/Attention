@@ -6,7 +6,7 @@ import SwiftData
 @Model
 final class LibraryItem {
     var id = UUID()
-    /// Cleaned URL for links, `image:<sha256>` for images.
+    /// Cleaned URL for bare links, image hash for bare images, or a versioned composite body hash.
     var key = ""
     var urlString: String?
     var createdAt = Date.now
@@ -15,6 +15,8 @@ final class LibraryItem {
     var title = ""
     var authorName: String?
     var authorHandle: String?
+    /// Original plain-text body, independent of preview metadata and OCR.
+    var text: String?
     var ocrText: String?
     var templateRaw = CardTemplate.auto.rawValue
     var tags: [String] = []
@@ -51,21 +53,26 @@ final class LibraryItem {
 @MainActor
 extension LibraryItem {
     var url: URL? { urlString.flatMap(URL.init(string:)) }
-    var isImage: Bool { url == nil }
+    var hasText: Bool { text.map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } ?? false }
+    var isTextOnly: Bool { hasText && url == nil && sourceData == nil }
+    var isImage: Bool { url == nil && !isTextOnly }
 
     var style: CardStyle {
         get { CardStyle(template: CardTemplate(rawValue: templateRaw) ?? .auto) }
         set { templateRaw = newValue.template.rawValue }
     }
 
-    /// The automatic tag: the normalized domain, or "Images" for image items.
-    var domain: String { url.map(DomainTag.domain(of:)) ?? DomainTag.images }
+    /// The automatic tag: normalized domain, "Images", or "Text".
+    var domain: String { url.map(DomainTag.domain(of:)) ?? (isTextOnly ? DomainTag.text : DomainTag.images) }
     var domainLabel: String { DomainTag.label(domain) }
     /// The site's own name when known, else its domain.
     var platformName: String { site.isEmpty ? domainLabel : site }
 
     var displayTitle: String {
         if !title.isEmpty { return title }
+        if let text, hasText {
+            return String(text.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ").prefix(160))
+        }
         if let url { return LinkMeta(url: url, site: site, title: "").displayURL }
         return createdAt.formatted(date: .abbreviated, time: .shortened)
     }
@@ -73,12 +80,13 @@ extension LibraryItem {
     func matches(search: String) -> Bool {
         let query = search.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else { return true }
-        return [title, urlString ?? "", ocrText ?? "", site].contains { $0.localizedStandardContains(query) }
+        return [title, text ?? "", urlString ?? "", ocrText ?? "", site].contains { $0.localizedStandardContains(query) }
     }
 }
 
 nonisolated enum DomainTag {
     static let images = "Images"
+    static let text = "Text"
 
     private static let aliases = [
         "youtu.be": "youtube.com",
@@ -97,7 +105,7 @@ nonisolated enum DomainTag {
 
     @MainActor
     static func label(_ domain: String) -> String {
-        domain == images ? String(localized: "Images") : domain
+        domain == images ? String(localized: "Images") : domain == text ? String(localized: "Text") : domain
     }
 
     @MainActor

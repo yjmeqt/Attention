@@ -31,13 +31,18 @@ enum Clipboard {
         if !offerToPaste { ignoreCurrent() }
     }
 
+    static func copy(_ text: String) {
+        UIPasteboard.general.string = text
+        ignoreCurrent()
+    }
+
     static func copy(_ image: UIImage) {
         UIPasteboard.general.image = image
         ignoreCurrent()
     }
 }
 
-/// A shared image or link plus the title and icon the share sheet's header shows for it,
+/// A shared image, link or text body plus the title and icon the share sheet's header shows for it,
 /// so the header reads like the card instead of "PNG Image".
 final class ShareItem {
     let provider: NSItemProvider
@@ -56,6 +61,15 @@ final class ShareItem {
         }
         metadata = Self.metadata(title: title, url: url, icon: icon)
         metadata.imageProvider = NSItemProvider(object: image)
+    }
+
+    init(text: String, title: String) {
+        provider = NSItemProvider(object: text as NSString)
+        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-text", visibility: .all) { completion in
+            completion(Data(text.utf8), nil)
+            return nil
+        }
+        metadata = Self.metadata(title: title, url: nil, icon: nil)
     }
 
     init(url: URL, title: String, icon: UIImage?) {

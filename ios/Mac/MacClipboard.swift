@@ -13,6 +13,11 @@ enum MacClipboard {
         return pasteboard.string(forType: .string).flatMap(URL.extract(from:))
     }
 
+    static func copy(_ text: String) {
+        pasteboard.clearContents()
+        pasteboard.setString(text, forType: .string)
+    }
+
     static func copy(_ url: URL) {
         pasteboard.clearContents()
         pasteboard.writeObjects([url as NSURL])

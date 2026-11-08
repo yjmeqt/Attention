@@ -1,6 +1,7 @@
 import Testing
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 import CoreImage.CIFilterBuiltins
 @testable import Attention
 
@@ -10,6 +11,247 @@ struct LibraryTests {
     let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
 
     func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
+
+    @Test func defaultShareFormatRespectsPreferenceAndAvailableContent() throws {
+        let library = makeLibrary()
+        let text = library.save(Capture(text: "Full text **including literal markup**"))
+        let link = library.save(Capture(url: URL(string: "https://example.com/article")!))
+        let image = library.save(Capture(image: try jpeg(200, 200, .blue)))
+        #expect(ShareDefault.link.format(for: text) == .text)
+        #expect(ShareDefault.image.format(for: text) == .image)
+        #expect(ShareDefault.link.format(for: link) == .link)
+        #expect(ShareDefault.image.format(for: link) == .image)
+        #expect(ShareDefault.link.format(for: image) == .image)
+        #expect(ShareDefault.image.format(for: image) == .image)
+        #expect(ShareDefault(rawValue: "link") == .link)
+        #expect(ShareDefault(rawValue: "image") == .image)
+    }
+
+    @Test func textCardIncludesAppStoreQRCode() throws {
+        let image = try #require(TextCardRenderer.render("A small thought."))
+        let cgImage = try #require(image.cgImage)
+        let detector = try #require(CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
+                                             options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]))
+        let urls = detector.features(in: CIImage(cgImage: cgImage))
+            .compactMap { ($0 as? CIQRCodeFeature)?.messageString }
+        #expect(urls == [Brand.appStoreURL.absoluteString])
+    }
+
+    @Test func textCardCanOmitAppStoreQRCode() throws {
+        let image = try #require(TextCardRenderer.render("A small thought.", showsAppStoreQR: false))
+        let cgImage = try #require(image.cgImage)
+        let detector = try #require(CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
+                                             options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]))
+        #expect(detector.features(in: CIImage(cgImage: cgImage)).isEmpty)
+    }
+
+    @Test func textCardPromotionPreferenceDefaultsOnAndRespectsOptOut() throws {
+        let suite = "TextCardPromotionTests-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        #expect(TextCardPromotion.isEnabled(in: defaults))
+        defaults.set(false, forKey: TextCardPromotion.key)
+        #expect(!TextCardPromotion.isEnabled(in: defaults))
+        defaults.set(true, forKey: TextCardPromotion.key)
+        #expect(TextCardPromotion.isEnabled(in: defaults))
+    }
+
+    @Test func shortTextRendersAnAdaptiveCard() throws {
+        let library = makeLibrary()
+        let item = library.save(Capture(text: "A small thought."))
+        let image = try #require(library.fullImage(item))
+        #expect(image.cgImage?.width == 1080)
+        #expect(image.size.height < 200)
+        let paragraphs = library.save(Capture(text: "First paragraph.\n\n第二段 👩🏽‍💻\n\n**Literal markdown**"))
+        let taller = try #require(library.fullImage(paragraphs))
+        #expect(taller.size.height > image.size.height)
+    }
+
+    @Test func longTextCardIsBoundedAndPreservesTheBody() throws {
+        let library = makeLibrary()
+        let body = String(repeating: "**Literal markdown** 中文 👩🏽‍💻\n\nA paragraph worth keeping.\n", count: 200)
+        let item = library.save(Capture(text: body))
+        let image = try #require(library.fullImage(item))
+        #expect(image.cgImage?.width == 1080)
+        #expect(image.size.height <= 720)
+        #expect(item.text == body)
+        #expect(item.url == nil)
+        #expect(library.data(.source, of: item) == nil)
+        let longer = library.save(Capture(text: body + body))
+        let longerImage = try #require(library.fullImage(longer))
+        #expect(longerImage.size == image.size)
+        let actions = ItemActions(library: library)
+        actions.copyText(item)
+        #expect(UIPasteboard.general.string == body)
+    }
+
+    @Test func capturesPlainTextWithoutURL() async {
+        let capture = await Intake.capture(from: [NSItemProvider(object: "A note without links" as NSString)])
+        #expect(capture != nil)
+    }
+
+    @Test func proseWithURLIsNotLinkOnly() async {
+        let url = URL(string: "https://example.com/article")!
+        let capture = await Intake.capture(from: [NSItemProvider(object: "Read this https://example.com/article tomorrow" as NSString)])
+        #expect(capture != nil)
+        #expect(capture != .link(url, image: nil))
+    }
+
+
+    @Test func preservesBodiesAndSeparatesStandaloneURLs() async throws {
+        let body = " \tFirst paragraph\n\nhttps://example.com/a and https://example.org/b\n "
+        let capture = try #require(await Intake.capture(from: [NSItemProvider(object: body as NSString)]))
+        #expect(capture.text == body)
+        #expect(capture.url == nil)
+        let standalone = try #require(await Intake.capture(from: [NSItemProvider(object: " \nhttps://example.com/a\t" as NSString)]))
+        #expect(standalone.text == nil)
+        #expect(standalone.url?.absoluteString == "https://example.com/a")
+        #expect(await Intake.capture(from: [NSItemProvider(object: " \n\t" as NSString)]) == nil)
+    }
+
+    @Test func explicitURLAndDistinctBodiesCoexist() async throws {
+        let url = URL(string: "https://example.org/explicit")!
+        let capture = try #require(await Intake.capture(from: [
+            NSItemProvider(object: url as NSURL),
+            NSItemProvider(object: url.absoluteString as NSString),
+            NSItemProvider(object: "First body https://example.com/embedded" as NSString),
+            NSItemProvider(object: "Second body" as NSString),
+        ]))
+        #expect(capture.url == url)
+        #expect(capture.text == "First body https://example.com/embedded\n\nSecond body")
+    }
+
+    @Test func standaloneSchemelessWebURLRemainsLink() async throws {
+        let capture = try #require(await Intake.capture(from: [NSItemProvider(object: " www.example.com/path " as NSString)]))
+        #expect(capture.url?.host() == "www.example.com")
+        #expect(capture.text == nil)
+    }
+
+    @Test func oneProviderCanContainExplicitURLAndBody() async throws {
+        let provider = NSItemProvider(object: URL(string: "https://example.com/explicit")! as NSURL)
+        provider.registerObject("Actual body" as NSString, visibility: .all)
+        let capture = try #require(await Intake.capture(from: [provider]))
+        #expect(capture.url?.path == "/explicit")
+        #expect(capture.text == "Actual body")
+    }
+
+    @Test func repeatedPayloadsKeepTheirOrder() async throws {
+        let providers = ["A", "B", "A"].map { NSItemProvider(object: $0 as NSString) }
+        let capture = try #require(await Intake.capture(from: providers))
+        #expect(capture.text == "A\n\nB\n\nA")
+        let items = providers.map { provider in
+            let item = NSExtensionItem()
+            item.attachments = [provider]
+            return item
+        }
+        #expect(await Intake.capture(from: items)?.text == "A\n\nB\n\nA")
+    }
+
+    @Test func multipleURLPayloadsDoNotLoseTheSecondURL() async throws {
+        let capture = try #require(await Intake.capture(from: [
+            NSItemProvider(object: "https://example.com/a" as NSString),
+            NSItemProvider(object: "https://example.org/b" as NSString),
+        ]))
+        #expect(capture.url == nil)
+        #expect(capture.text == "https://example.com/a\n\nhttps://example.org/b")
+    }
+
+    @Test func attributedContentFallbackNeverUsesTitleAsBody() async throws {
+        let item = NSExtensionItem()
+        item.attributedContentText = NSAttributedString(string: "  fallback\nbody  ")
+        item.attributedTitle = NSAttributedString(string: "Not the body")
+        let capture = try #require(await Intake.capture(from: [item]))
+        #expect(capture.text == "  fallback\nbody  ")
+        item.attributedContentText = nil
+        item.attributedTitle = NSAttributedString(string: "A title mentioning https://example.com")
+        #expect(await Intake.capture(from: [item]) == nil)
+    }
+
+    @Test func textSurvivesStorageSearchAndEnrichment() async throws {
+        let body = " \tUnique needle\n\nSecond paragraph  "
+        let library = Library(directory: directory)
+        let item = library.save(Capture(text: body))
+        #expect(item.hasText && item.isTextOnly && !item.isImage)
+        #expect(item.matches(search: "needle"))
+        #expect(item.displayTitle == "Unique needle Second paragraph")
+        await library.enrich(item, fetchPreview: { url in
+            Issue.record("Text-only capture must not fetch")
+            return Unfurler.Result(meta: LinkMeta(url: url, site: "", title: ""), isFallback: true)
+        }, readText: { _ in
+            Issue.record("Text-only capture must not run OCR")
+            return nil
+        })
+        #expect(item.text == body)
+        #expect(item.ocrText == nil)
+        let reopened = Library(directory: directory)
+        #expect(reopened.items.first?.text == body)
+    }
+
+    @Test func bodyIdentityIncludesExactTextURLAndImage() throws {
+        let library = makeLibrary()
+        let url = URL(string: "https://example.com/a")!
+        let image = try jpeg(200, 200, .blue)
+        let a = library.save(Capture(url: url, text: "Message"))
+        #expect(library.save(Capture(url: url, text: "Message")).id == a.id)
+        #expect(library.save(Capture(url: url, text: "Message ")).id != a.id)
+        #expect(library.save(Capture(text: "Message")).id != a.id)
+        #expect(library.save(Capture(url: url, image: image, text: "Message")).id != a.id)
+        let imageBody = library.save(Capture(image: image, text: "Caption"))
+        #expect(imageBody.isImage && imageBody.hasText && !imageBody.isTextOnly)
+        #expect(library.data(.source, of: imageBody) == image)
+    }
+
+    @Test func retryPreservesCompositeIdentityAndEnrichmentBody() async {
+        let library = makeLibrary()
+        let url = URL(string: "http://example.com/a")!
+        let a = library.save(Capture(url: url, text: "One"))
+        let b = library.save(Capture(url: url, text: "Two"))
+        let keys = Set([a.key, b.key])
+        a.urlString = url.absoluteString
+        b.urlString = url.absoluteString
+        await library.retryMissingPreviews { url in
+            Unfurler.Result(meta: LinkMeta(url: url, site: "Example", title: "Fetched"), isFallback: false)
+        }
+        library.mergeDuplicates()
+        #expect(library.items.count == 2)
+        #expect(Set(library.items.map(\.key)) == keys)
+        #expect(Set(library.items.compactMap(\.text)) == ["One", "Two"])
+        #expect(library.items.allSatisfy { $0.url?.scheme == "https" })
+    }
+
+    @Test func rawRichFormatsDoNotBecomeBody() async {
+        for type in [UTType.rtf, .html] {
+            let provider = NSItemProvider()
+            provider.registerDataRepresentation(forTypeIdentifier: type.identifier, visibility: .all) { done in
+                done(Data("<b>https://example.com/not-standalone</b>".utf8), nil)
+                return nil
+            }
+            let capture = await Intake.capture(from: [provider])
+            #expect(capture?.text == nil)
+            #expect(capture?.url == nil)
+        }
+    }
+
+    @Test func duplicateMergeRetainsMissingBody() {
+        let library = makeLibrary()
+        let a = library.save(Capture(text: "Body"))
+        let b = library.save(.link(URL(string: "https://example.com")!, image: nil))
+        a.id = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+        b.id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        b.key = a.key
+        library.save()
+        library.mergeDuplicates()
+        #expect(library.items.count == 1)
+        #expect(library.items.first?.text == "Body")
+    }
+
+    @Test func QRAndImageCaptureKeepTheirBody() async throws {
+        let qr = try #require(Self.qrImage("https://example.com/qr"))
+        let capture = try #require(await Intake.capture(image: qr, link: nil, text: "Caption"))
+        #expect(capture.url?.path == "/qr")
+        #expect(capture.image != nil)
+        #expect(capture.text == "Caption")
+    }
 
     @Test func previewCompletionIgnoresDeletedItemAndReplacement() async throws {
         let library = makeLibrary()
@@ -320,12 +562,8 @@ struct LibraryTests {
     @Test func readsLinkFromQRCodeImage() async throws {
         let data = try #require(Self.qrImage("https://www.xiaohongshu.com/discovery/item/abc"))
         let capture = await Intake.capture(image: data, link: nil)
-        guard case let .link(url, image) = capture else {
-            Issue.record("expected a link, got \(String(describing: capture))")
-            return
-        }
-        #expect(url.host() == "www.xiaohongshu.com")
-        #expect(image != nil)
+        #expect(capture?.url?.host() == "www.xiaohongshu.com")
+        #expect(capture?.image != nil)
     }
 
     @Test func imageWithoutQRCodeBecomesImageItem() async throws {
@@ -334,10 +572,9 @@ struct LibraryTests {
             UIColor.systemTeal.setFill()
             context.fill(CGRect(x: 0, y: 0, width: 200, height: 300))
         }
-        guard case .image = await Intake.capture(image: data, link: nil) else {
-            Issue.record("expected an image capture")
-            return
-        }
+        let capture = await Intake.capture(image: data, link: nil)
+        #expect(capture?.url == nil)
+        #expect(capture?.image != nil)
     }
 
     @Test func unwrapsProxiedImageURLs() {

@@ -79,6 +79,7 @@ final class Library {
                 keeper.tags += other.tags.filter { !keeper.tags.contains($0) }
                 keeper.isPrivate = keeper.isPrivate || other.isPrivate
                 if keeper.title.isEmpty { keeper.title = other.title }
+                if keeper.text == nil { keeper.text = other.text }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
                 if keeper.coverData == nil { keeper.coverData = other.coverData }
                 if keeper.avatarData == nil { keeper.avatarData = other.avatarData }
@@ -366,8 +367,9 @@ final class Library {
         return image
     }
 
-    /// The full-size card for links, the shared image for images.
+    /// A card for links or plain text, or the original shared image.
     func fullImage(_ item: LibraryItem) -> PlatformImage? {
+        if item.isTextOnly, let text = item.text { return TextCardRenderer.render(text, showsAppStoreQR: TextCardPromotion.isEnabled()) }
         if let meta = meta(for: item) { return CardRenderer.render(meta, style: item.style) }
         return data(.source, of: item).flatMap(PlatformImage.init(data:))
     }
