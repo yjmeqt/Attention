@@ -137,28 +137,7 @@ struct TileTemplate: View {
     }
 
     private func footer(_ tint: CardTint) -> some View {
-        HStack(alignment: .bottom, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(verbatim: meta.displayURL)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(tint.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                HStack(spacing: 6) {
-                    AttentionGlyph(size: 18)
-                    Text("Made with \(Brand.name)")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(tint.secondary)
-                }
-            }
-            Spacer(minLength: 0)
-            Image(platformImage: QRCode.image(meta.shareURL.absoluteString))
-                .interpolation(.none)
-                .resizable()
-                .frame(width: 60, height: 60)
-                .padding(5)
-                .background(.white, in: .rect(cornerRadius: 9, style: .continuous))
-        }
+        BrandedCardFooter(tint: tint, displayURL: meta.displayURL, qrURL: meta.shareURL)
     }
 }
 

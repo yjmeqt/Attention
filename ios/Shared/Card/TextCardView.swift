@@ -16,23 +16,7 @@ struct TextCardView: View {
                 .truncationMode(.tail)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            HStack {
-                HStack(spacing: 6) {
-                    AttentionGlyph(size: 18)
-                    Text("Made with \(Brand.name)")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(tint.secondary)
-                }
-                Spacer()
-                if showsAppStoreQR {
-                    Image(platformImage: QRCode.image(Brand.appStoreURL.absoluteString))
-                        .interpolation(.none)
-                        .resizable()
-                        .frame(width: 57, height: 57)
-                        .padding(7)
-                        .background(.white)
-                }
-            }
+            BrandedCardFooter(tint: tint, qrURL: showsAppStoreQR ? Brand.appStoreURL : nil)
         }
         .padding(24)
         .frame(width: CardView.width)

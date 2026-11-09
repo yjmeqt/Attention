@@ -125,6 +125,42 @@ struct CardFooter: View {
     }
 }
 
+/// Shared branding and QR layout for image tiles and saved-text cards.
+struct BrandedCardFooter: View {
+    let tint: CardTint
+    var displayURL: String?
+    var qrURL: URL?
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                if let displayURL {
+                    Text(verbatim: displayURL)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(tint.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                HStack(spacing: 6) {
+                    AttentionGlyph(size: 18)
+                    Text("Made with \(Brand.name)")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(tint.secondary)
+                }
+            }
+            Spacer(minLength: 0)
+            if let qrURL {
+                Image(platformImage: QRCode.image(qrURL.absoluteString))
+                    .interpolation(.none)
+                    .resizable()
+                    .frame(width: 60, height: 60)
+                    .padding(5)
+                    .background(.white, in: .rect(cornerRadius: 9, style: .continuous))
+            }
+        }
+    }
+}
+
 /// Site icon for in-app lists, with a link glyph when there's no favicon.
 struct FaviconView: View {
     let meta: LinkMeta

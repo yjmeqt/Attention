@@ -8,6 +8,7 @@ final class ItemActions {
     @ObservationIgnored let presenter = SharePresenter()
     var browser: BrowserLink?
     var tagTargets: [LibraryItem]?
+    var textTarget: LibraryItem?
     var pendingDelete: [LibraryItem]?
     var notice: Notice?
     /// While Private is unlocked, removing items from it doesn't ask for Face ID again.
@@ -115,6 +116,11 @@ final class ItemActions {
 
     func editTags(_ items: [LibraryItem]) { tagTargets = items }
 
+    func editText(_ item: LibraryItem) {
+        guard library.contains(item), item.hasText else { return }
+        textTarget = item
+    }
+
     func setPrivate(_ isPrivate: Bool, _ items: [LibraryItem]) async {
         if !isPrivate, !privateUnlocked {
             switch await DeviceOwner.authenticate(reason: String(localized: "Remove items from Private")) {
@@ -155,6 +161,7 @@ struct ItemMenu: View {
         Section {
             Button("Share", systemImage: "square.and.arrow.up") { actions.share(item, shareDefault) }
             if item.hasText {
+                Button("Edit Text", systemImage: "pencil") { actions.editText(item) }
                 Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
                 if !item.isTextOnly {
                     Button("Share Text", systemImage: "text.alignleft") { actions.shareText(item) }
@@ -254,6 +261,9 @@ private struct ItemActionPresentations: ViewModifier {
             .background(ShareAnchor(presenter: actions.presenter))
             .sheet(item: $actions.browser) { link in
                 SafariView(url: link.url).ignoresSafeArea()
+            }
+            .sheet(item: $actions.textTarget) { item in
+                SavedTextEditor(library: actions.library, item: item)
             }
             .sheet(isPresented: Binding(get: { actions.tagTargets != nil }, set: { if !$0 { actions.tagTargets = nil } })) {
                 if let targets = actions.tagTargets {

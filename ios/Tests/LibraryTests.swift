@@ -12,6 +12,121 @@ struct LibraryTests {
 
     func makeLibrary() -> Library { Library(directory: directory, inMemory: true) }
 
+    @Test func importingOriginalCapturePreservesEditedBody() throws {
+        let library = makeLibrary()
+        let capture = Capture(text: "Original note")
+        let item = library.save(capture)
+        try library.updateText("Corrected note", for: item)
+
+        let imported = library.save(capture)
+        #expect(imported.id == item.id)
+        #expect(imported.text == "Corrected note")
+        #expect(library.items.count == 1)
+    }
+
+    @Test func editedTextPersistsAndRefreshesSearchAndCard() throws {
+        let library = Library(directory: directory)
+        let item = library.save(Capture(text: "Original note"))
+        let id = item.id
+        let key = item.key
+        let createdAt = item.createdAt
+        item.tags = ["ideas"]
+        item.isPrivate = true
+        item.isArchived = true
+        item.keywords = ["obsoletekeyword"]
+        item.analysisVersion = 2
+        item.analysisFingerprint = library.analysisFingerprint(item)
+        let oldImage = try #require(library.fullImage(item))
+        let body = " \tCorrected thought 👩🏽‍💻\n\n第二段\n\n**Literal markup**  "
+
+        try library.updateText(body, for: item)
+
+        #expect(item.id == id && item.key == key && item.createdAt == createdAt)
+        #expect(item.tags == ["ideas"] && item.isPrivate && item.isArchived)
+        #expect(item.text == body && item.textEditedAt != nil)
+        #expect(item.matches(search: "Corrected"))
+        #expect(!item.matches(search: "obsoletekeyword"))
+        #expect(item.analysisVersion == 0 && item.analysisFingerprint.isEmpty)
+        let newImage = try #require(library.fullImage(item))
+        #expect(newImage.size.height > oldImage.size.height)
+        ItemActions(library: library).copyText(item)
+        #expect(UIPasteboard.general.string == body)
+        let reopened = Library(directory: directory)
+        #expect(reopened.items.first?.text == body)
+        #expect(reopened.items.first?.textEditedAt == item.textEditedAt)
+    }
+
+    @Test func editingAttachedTextPreservesLinkImageAndMetadata() throws {
+        let library = makeLibrary()
+        let url = URL(string: "https://example.com/article")!
+        let image = try jpeg(200, 200, .blue)
+        for capture in [Capture(url: url, text: "Link caption"),
+                        Capture(image: image, text: "Image caption"),
+                        Capture(url: url, image: image, text: "Both caption")] {
+            let item = library.save(capture)
+            item.title = "Preview title"
+            item.ocrText = "Text recognized in image"
+            let key = item.key
+            try library.updateText("Updated caption", for: item)
+            #expect(item.text == "Updated caption")
+            #expect(item.key == key && item.url == capture.url)
+            #expect(item.sourceData == capture.image)
+            #expect(item.title == "Preview title" && item.ocrText == "Text recognized in image")
+            #expect(library.save(capture).text == "Updated caption")
+        }
+        #expect(library.items.count == 3)
+    }
+
+    @Test func textEditingRejectsBlankMissingAndDeletedItems() throws {
+        let library = makeLibrary()
+        let item = library.save(Capture(text: "Keep this"))
+        let updatedAt = item.updatedAt
+        #expect(throws: Library.TextEditError.self) { try library.updateText(" \n\t", for: item) }
+        #expect(item.text == "Keep this" && item.updatedAt == updatedAt)
+        try library.updateText("Keep this", for: item)
+        #expect(item.textEditedAt == nil && item.updatedAt == updatedAt)
+        let link = library.save(.link(URL(string: "https://example.com")!, image: nil))
+        #expect(throws: Library.TextEditError.self) { try library.updateText("New text", for: link) }
+        library.delete([item])
+        #expect(throws: Library.TextEditError.self) { try library.updateText("Changed", for: item) }
+    }
+
+    @Test func duplicateMergePreservesMostRecentTextEdit() throws {
+        let library = makeLibrary()
+        let original = library.save(Capture(text: "Original"))
+        let edited = library.save(Capture(text: "Other"))
+        original.id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        edited.id = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+        edited.key = original.key
+        try library.updateText("Correction from another device", for: edited)
+        // A recent preview fetch on the unedited copy must not replace the user's edit.
+        original.updatedAt = .now.addingTimeInterval(60)
+        original.keywords = ["stale"]
+        library.save()
+        library.mergeDuplicates()
+        #expect(library.items.count == 1)
+        #expect(original.text == "Correction from another device")
+        #expect(original.textEditedAt != nil)
+        #expect(original.keywords.isEmpty)
+    }
+
+    @Test func duplicateMergeDoesNotRestoreKeywordsFromBeforeAnEdit() throws {
+        let library = makeLibrary()
+        let edited = library.save(Capture(text: "Original"))
+        let duplicate = library.save(Capture(text: "Other"))
+        edited.id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        duplicate.id = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+        duplicate.key = edited.key
+        duplicate.text = "Older correction"
+        duplicate.textEditedAt = .distantPast
+        duplicate.analysisVersion = 2
+        duplicate.keywords = ["stale"]
+        try library.updateText("Newest correction", for: edited)
+        library.mergeDuplicates()
+        #expect(edited.text == "Newest correction")
+        #expect(edited.keywords.isEmpty)
+    }
+
     @Test func defaultShareFormatRespectsPreferenceAndAvailableContent() throws {
         let library = makeLibrary()
         let text = library.save(Capture(text: "Full text **including literal markup**"))
