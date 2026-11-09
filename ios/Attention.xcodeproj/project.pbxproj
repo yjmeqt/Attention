@@ -98,6 +98,7 @@
 		3BBFD7A5A668CEB3E2D1AAF9 /* FeedCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2D35747DB2725DE907A498 /* FeedCollection.swift */; };
 		3BC41CAA1E59690B033F0C8A /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A56D7636DDC8C25EAB1544 /* ItemDetailView.swift */; };
 		3CA9876069220C82CBEE2D50 /* AttentionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA59CEFFC873EF28B586BB15 /* AttentionApp.swift */; };
+		3D2E271575691E9C0D8E470D /* AttentionDev.icon in Resources */ = {isa = PBXBuildFile; fileRef = 58643BE21B3CFFCCB378A57F /* AttentionDev.icon */; };
 		3DC42137232B0797BA438D2E /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995BDC3986BCF6B25F34BEF3 /* Platform.swift */; };
 		3E46D2219126B00A7ED6C6A4 /* GuideTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */; };
 		3E8F34DDB46148322CD5D873 /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
@@ -243,6 +244,7 @@
 		C2D8109AF7AE3B35EB388363 /* SavedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897D2CE57F169B765172CF03 /* SavedTextEditor.swift */; };
 		C39087D78043072CEBACD4B2 /* ClipSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C114954FAE70B8E09C825B8 /* ClipSearch.swift */; };
 		C40CFDD1928CD57B886A894A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCFF55CD82E091EAF41124A4 /* InfoPlist.strings */; };
+		C5D4C8965EF0337CB6D64DC1 /* AttentionDev.icon in Resources */ = {isa = PBXBuildFile; fileRef = 58643BE21B3CFFCCB378A57F /* AttentionDev.icon */; };
 		C6B33B7AE77CEF6D97BDEB0A /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175444254D79ADED042D61A /* Sidebar.swift */; };
 		C71284B25F78CBBE6973D362 /* SearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276089EBC2FCA937CB5766C4 /* SearchRequest.swift */; };
 		C8A234C885F1C8416FA10089 /* ImageAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DFFE82D650B8C3D49D4285 /* ImageAnalysis.swift */; };
@@ -391,6 +393,7 @@
 		5423A5E5C180676E34D4930B /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		546BEC571E4A414BD9F54A28 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		557D97726DE27F59DEEC1306 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		58643BE21B3CFFCCB378A57F /* AttentionDev.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AttentionDev.icon; sourceTree = "<group>"; };
 		5A42364C5A1C3DA679EC841C /* Assistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assistant.swift; sourceTree = "<group>"; };
 		5C7302D564B8215A789F0A2E /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		61EABF9910C697C13BAF4A83 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -698,6 +701,7 @@
 				F5C219B7609CD5CA61BFFBDB /* Attention.entitlements */,
 				846AA8FA9D947B6EAF662FFC /* Attention.icon */,
 				CA59CEFFC873EF28B586BB15 /* AttentionApp.swift */,
+				58643BE21B3CFFCCB378A57F /* AttentionDev.icon */,
 				9839E88FB73799F9385F41D8 /* Info.plist */,
 				AA2328CF3B5D9937C118BF35 /* InfoPlist.strings */,
 				3CE1DECE6EE590D686514363 /* InfoPlist.strings */,
@@ -953,6 +957,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B3CC4C10011F3F2DED716E /* Attention.icon in Resources */,
+				3D2E271575691E9C0D8E470D /* AttentionDev.icon in Resources */,
 				5D869F3289FDB9BD8C3AA5A5 /* Localizable.xcstrings in Resources */,
 				3A631649B560FE49DC65DADC /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -981,6 +986,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2E551A4F9934AB44740CA9F /* Attention.icon in Resources */,
+				C5D4C8965EF0337CB6D64DC1 /* AttentionDev.icon in Resources */,
 				0762ECD9D388BE60DD364FE5 /* InfoPlist.strings in Resources */,
 				30B27752CBBB7386D30C5FD4 /* InfoPlist.strings in Resources */,
 				DA1230E1AAFAE2E539A7D6A0 /* InfoPlist.strings in Resources */,
@@ -1335,7 +1341,7 @@
 		2CA7BDDE5F15BBBF69EAF624 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = Attention;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AttentionDev;
 				CODE_SIGN_ENTITLEMENTS = App/Attention.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = App/Info.plist;
@@ -1492,7 +1498,7 @@
 		5F3A93CC72A132A0850ED4EB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = Attention;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AttentionDev;
 				CODE_SIGN_ENTITLEMENTS = Mac/AttentionMac.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
