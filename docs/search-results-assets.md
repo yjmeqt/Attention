@@ -24,11 +24,15 @@ Outputs are `ios/fastlane/search-results/search-en-US.png` and `search-zh-Hans.p
 | Treatment | `e905c1e8-9fd0-40ab-983b-15a99761a421` |
 | English treatment localization | `46a483bd-7186-4505-a68b-0df26917290d` |
 | Simplified Chinese treatment localization | `85776018-f18f-4acc-b4a7-8281f4f83fd7` |
-| English image | `69800019-6ee2-84b4-802f-ac461796325a` |
+| English image | `97c00019-6ee2-84b4-800e-9c6b5c7b5fce` |
 | Simplified Chinese image | `96800019-6ee2-84b4-8034-0571de1b85c2` |
 | Review submission | `c72b38aa-819f-44c9-8b36-4ae1c0a7366c` |
 
 Images are assigned to `APP_STORE_SEARCH_RESULTS_ASSET` on treatment localizations, not the default version. Submit the experiment with its assets; do not also add the same images as standalone review items, which locks them out of experiment review. Approval and experiment start are separate from upload. Read current state from ASC before making further changes.
+
+Submitted at 17:43 Singapore time on 9 November 2026; Apple returned `WAITING_FOR_REVIEW`. The experiment is not running yet. After approval, start the experiment in ASC or with `asc product-pages experiments update --experiment-id f6976f09-e5c1-4eb2-be98-182ac72d7edc --v2 --started true`, then verify its state.
+
+The first English upload (`69800019-6ee2-84b4-802f-ac461796325a`) timed out in Apple's processing queue. A second upload processed successfully and replaced its pending placement. The original library image remains unassigned; no duplicate experiment or review submission was created.
 
 Compare download conversion against the original in PPO; no improvement is assumed. Search creative assets appear on iOS/iPadOS 27 and later; retain screenshots for other clients. See [Apple's asset guidance](https://developer.apple.com/app-store/asset-best-practices/).
 
