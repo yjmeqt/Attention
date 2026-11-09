@@ -17,12 +17,16 @@ final class Library {
 
     @ObservationIgnored private let context: ModelContext
     @ObservationIgnored let directory: URL
+    let isTransient: Bool
     @ObservationIgnored private let thumbnails = NSCache<NSString, PlatformImage>()
     @ObservationIgnored private let tints = NSCache<NSString, Tint>()
     /// Items whose tile was regenerated this session, so ones without a photo aren't retried every render.
     @ObservationIgnored private var checked: Set<UUID> = []
     @ObservationIgnored var retriedPreviews: Set<UUID> = []
     @ObservationIgnored var analyzing = false
+    @ObservationIgnored var analysisFailures: [UUID: (fingerprint: String, count: Int)] = [:]
+    @ObservationIgnored var pendingAnalysis: Task<Void, Never>?
+    @ObservationIgnored var analysisRequested = false
     @ObservationIgnored private var remoteChanges: (any NSObjectProtocol)?
     @ObservationIgnored private var pendingReload: Task<Void, Never>?
 
@@ -31,6 +35,7 @@ final class Library {
     init(directory: URL = AppGroup.container.appending(path: "Library", directoryHint: .isDirectory),
          inMemory: Bool = false, syncs: Bool = false) {
         self.directory = directory
+        self.isTransient = inMemory
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let cloud: ModelConfiguration.CloudKitDatabase = syncs ? CloudSync.containerID.map { .private($0) } ?? .none : .none
         let configuration = inMemory
@@ -61,6 +66,9 @@ final class Library {
                     self.reload()
                     self.mergeDuplicates()
                     self.revision += 1
+                    #if !SHARE_EXTENSION
+                    self.scheduleAnalysis()
+                    #endif
                 }
             }
         }
@@ -106,6 +114,7 @@ final class Library {
     func reload() {
         let descriptor = FetchDescriptor<LibraryItem>(sortBy: [SortDescriptor(\.updatedAt, order: .reverse)])
         items = (try? context.fetch(descriptor)) ?? []
+        revision += 1
     }
 
     func item(forKey key: String) -> LibraryItem? {
@@ -221,6 +230,7 @@ final class Library {
     }
 
     func write(_ data: Data?, _ file: File, of item: LibraryItem) {
+        if file == .embedding { revision += 1 }
         switch file {
         case .cover: item.coverData = data
         case .avatar: item.avatarData = data
@@ -292,8 +302,7 @@ final class Library {
         guard self.cover(of: item) != cover else { return }
         item.usesCustomImage = cover == .custom
         item.usesSharedImage = cover == .shared
-        item.analysisVersion = 0
-        write(nil, .embedding, of: item)
+        invalidateAnalysis(item)
         refreshThumbnail(item)
         save()
     }
@@ -306,8 +315,7 @@ final class Library {
         write(jpeg, .custom, of: item)
         item.usesCustomImage = true
         item.usesSharedImage = false
-        item.analysisVersion = 0
-        write(nil, .embedding, of: item)
+        invalidateAnalysis(item)
         refreshThumbnail(item)
         save()
         return true
@@ -317,8 +325,7 @@ final class Library {
         guard contains(item) else { return }
         write(nil, .custom, of: item)
         item.usesCustomImage = false
-        item.analysisVersion = 0
-        write(nil, .embedding, of: item)
+        invalidateAnalysis(item)
         refreshThumbnail(item)
         save()
     }

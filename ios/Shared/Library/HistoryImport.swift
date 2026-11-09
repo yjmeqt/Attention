@@ -9,6 +9,7 @@ enum HistoryImport {
     }
 
     static func run(into library: Library, from directory: URL = AppGroup.container.appending(path: "History")) {
+        guard !library.isTransient else { return }
         let index = directory.appending(path: "index.json")
         guard let data = try? Data(contentsOf: index) else { return }
         let entries = (try? JSONDecoder().decode([Entry].self, from: data)) ?? []

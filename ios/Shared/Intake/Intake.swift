@@ -142,12 +142,8 @@ extension Library {
         defer {
             enriching.remove(id)
             if !Task.isCancelled, contains(item) {
-                item.analysisVersion = 0
-                write(nil, .embedding, of: item)
+                invalidateAnalysis(item)
                 save()
-                #if !SHARE_EXTENSION
-                Task { await analyzePending() }
-                #endif
             }
         }
         let source = data(.source, of: item)

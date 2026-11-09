@@ -15,7 +15,7 @@ enum KeywordWriter {
         Use only what the title, text and image labels support. Never invent names or facts.
         """
 
-    /// Nil when the on-device model isn't available; empty when it couldn't write any.
+    /// Nil on unavailability or failure; an empty array is a successful empty result.
     static func keywords(site: String, title: String, text: String?, labels: [String]) async -> [String]? {
         guard isAvailable else { return nil }
         var prompt = ""
@@ -24,9 +24,15 @@ enum KeywordWriter {
         if !labels.isEmpty { prompt += "Image labels: \(labels.joined(separator: ", "))\n" }
         if let text, !text.isEmpty { prompt += "Text in the image:\n\(text.prefix(1000))\n" }
         guard !prompt.isEmpty else { return [] }
-        let session = LanguageModelSession(instructions: instructions)
-        let response = try? await session.respond(to: prompt, generating: ItemKeywords.self)
-        let words = response?.content.keywords.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) } ?? []
+        return await generateKeywords(prompt: prompt) { prompt in
+            let session = LanguageModelSession(instructions: instructions)
+            return try await session.respond(to: prompt, generating: ItemKeywords.self).content.keywords
+        }
+    }
+
+    static func generateKeywords(prompt: String, using generate: (String) async throws -> [String]) async -> [String]? {
+        guard let result = try? await generate(prompt), !Task.isCancelled else { return nil }
+        let words = result.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         var seen = Set<String>()
         return words.filter { !$0.isEmpty && seen.insert($0.lowercased()).inserted }
     }

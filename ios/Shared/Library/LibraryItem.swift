@@ -24,6 +24,7 @@ final class LibraryItem {
     var keywords: [String] = []
     /// Which `Library.Analysis` pass the labels and keywords come from; 0 until analyzed.
     var analysisVersion = 0
+    var analysisFingerprint = ""
     var templateRaw = CardTemplate.auto.rawValue
     var tags: [String] = []
     var isPrivate = false
