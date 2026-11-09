@@ -68,8 +68,7 @@ struct ItemDetailView: View {
         .safeAreaBar(edge: .bottom) { bottomBar }
         .itemActionPresentations(actions)
         .fullScreenCover(item: $presentedCover) { cover in
-            FullScreenCoverImage(image: cover.image)
-                .navigationTransition(.zoom(sourceID: cover.source, in: cover.namespace))
+            CoverGallery(presentation: cover, selectedCover: coverBinding)
         }
         .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
             guard !Task.isCancelled, library.contains(item) else { return }
@@ -224,14 +223,17 @@ struct ItemDetailView: View {
 
     private func showCover(_ cover: Library.Cover, namespace: Namespace.ID) {
         guard library.contains(item) else { return }
-        let data: Data?
-        switch cover {
-        case .preview: data = library.previewData(item)
-        case .shared: data = library.data(.source, of: item)
-        case .custom: data = library.data(.custom, of: item)
+        let candidates: [(Library.Cover, String, Data?)] = [
+            (.preview, String(localized: "Link Preview"), library.previewData(item)),
+            (.shared, String(localized: "Shared Image"), library.data(.source, of: item)),
+            (.custom, String(localized: "Your Image"), library.data(.custom, of: item))
+        ]
+        let pages = candidates.compactMap { source, title, data -> CoverPage? in
+            guard let data else { return nil }
+            return CoverPage(id: source, title: title, data: data)
         }
-        guard let data, let image = ImageData.downsample(data, maxPixel: 4096) else { return }
-        presentedCover = PresentedCover(image: UIImage(cgImage: image), source: cover, namespace: namespace)
+        guard pages.contains(where: { $0.id == cover }) else { return }
+        presentedCover = PresentedCover(pages: pages, source: cover, namespace: namespace)
     }
 
     private var styleBinding: Binding<CardStyle> {
@@ -358,37 +360,107 @@ struct ItemDetailView: View {
     }
 }
 
+private struct CoverPage: Identifiable {
+    let id: Library.Cover
+    let title: String
+    let data: Data
+}
+
 private struct PresentedCover: Identifiable {
     let id = UUID()
-    let image: UIImage
+    let pages: [CoverPage]
     let source: Library.Cover
     let namespace: Namespace.ID
 }
 
-private struct FullScreenCoverImage: View {
-    let image: UIImage
+private struct CoverGallery: View {
+    let presentation: PresentedCover
+    @Binding var selectedCover: Library.Cover
+    @State private var current: Library.Cover
     @Environment(\.dismiss) private var dismiss
 
+    init(presentation: PresentedCover, selectedCover: Binding<Library.Cover>) {
+        self.presentation = presentation
+        _selectedCover = selectedCover
+        _current = State(initialValue: presentation.source)
+    }
+
+    private var index: Int { presentation.pages.firstIndex(where: { $0.id == current }) ?? 0 }
+    private var isSelected: Bool { selectedCover == current }
+
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            Color.secondaryBackground.ignoresSafeArea()
-            ZoomableImageView(image: image)
-                .ignoresSafeArea()
-            Button("Close", systemImage: "xmark") { dismiss() }
-                .labelStyle(.iconOnly)
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .controlSize(.large)
-                .tint(.primary)
-                .padding()
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(presentation.pages[index].title).font(.headline)
+                    Text("\(index + 1) / \(presentation.pages.count)")
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Close", systemImage: "xmark") { dismiss() }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .controlSize(.large)
+                    .tint(.primary)
+            }
+            .padding()
+
+            TabView(selection: $current) {
+                ForEach(presentation.pages) { page in
+                    CoverGalleryPage(page: page, onDismiss: { dismiss() })
+                        .tag(page.id)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+
+
+            Button {
+                selectedCover = current
+                dismiss()
+            } label: {
+                Label(isSelected ? "Currently Used" : "Use as Cover",
+                      systemImage: isSelected ? "checkmark.circle.fill" : "photo")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .controlSize(.large)
+            .disabled(isSelected)
+            .frame(maxWidth: 420)
+            .padding()
+        }
+        .background(Color.secondaryBackground.ignoresSafeArea())
+        .interactiveDismissDisabled()
+        .navigationTransition(.zoom(sourceID: current, in: presentation.namespace))
+    }
+}
+
+private struct CoverGalleryPage: View {
+    let page: CoverPage
+    let onDismiss: () -> Void
+    @State private var image: UIImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                ZoomableImageView(image: image, onDismiss: onDismiss)
+            } else {
+                ProgressView()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .task(id: page.id) {
+            image = ImageData.downsample(page.data, maxPixel: 4096).map(UIImage.init(cgImage:))
         }
     }
 }
 
 private struct ZoomableImageView: UIViewRepresentable {
     let image: UIImage
+    let onDismiss: () -> Void
 
-    func makeCoordinator() -> Coordinator { Coordinator() }
+    func makeCoordinator() -> Coordinator { Coordinator(onDismiss: onDismiss) }
 
     func makeUIView(context: Context) -> ZoomScrollView {
         let scrollView = ZoomScrollView(frame: .zero)
@@ -405,6 +477,10 @@ private struct ZoomableImageView: UIViewRepresentable {
         let doubleTap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.toggleZoom(_:)))
         doubleTap.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTap)
+        let dismissPan = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.dragToDismiss(_:)))
+        dismissPan.maximumNumberOfTouches = 1
+        dismissPan.delegate = context.coordinator
+        scrollView.addGestureRecognizer(dismissPan)
         return scrollView
     }
 
@@ -412,13 +488,32 @@ private struct ZoomableImageView: UIViewRepresentable {
         scrollView.imageView.image = image
     }
 
-    final class Coordinator: NSObject, UIScrollViewDelegate {
+    final class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
+        let onDismiss: () -> Void
+
+        init(onDismiss: @escaping () -> Void) { self.onDismiss = onDismiss }
+
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
             (scrollView as? ZoomScrollView)?.imageView
         }
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
             (scrollView as? ZoomScrollView)?.centerImage()
+        }
+
+        func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
+            guard let pan = gesture as? UIPanGestureRecognizer,
+                  let scrollView = pan.view as? UIScrollView, scrollView.zoomScale <= 1.01 else { return false }
+            let velocity = pan.velocity(in: scrollView)
+            return velocity.y > abs(velocity.x) * 1.5
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool { true }
+
+        @objc func dragToDismiss(_ gesture: UIPanGestureRecognizer) {
+            guard gesture.state == .ended, gesture.translation(in: gesture.view).y > 100 else { return }
+            onDismiss()
         }
 
         @objc func toggleZoom(_ gesture: UITapGestureRecognizer) {

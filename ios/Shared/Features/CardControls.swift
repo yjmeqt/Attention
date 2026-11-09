@@ -155,48 +155,40 @@ struct CoverPicker: View {
 
     private func option(_ title: String, image: PlatformImage?, for option: Library.Cover) -> some View {
         let selected = cover == option
-        return ZStack(alignment: .topTrailing) {
-            Button { cover = option } label: {
-                VStack(spacing: 6) {
-                    Color.clear
-                        .frame(width: 96, height: 72)
-                        .overlay {
-                            if let image {
-                                Image(platformImage: image).resizable().scaledToFill()
-                            } else {
-                                Image(systemName: "photo").font(.title2).foregroundStyle(.tertiary)
-                            }
-                        }
-                        .background(.fill.tertiary)
-                        .clipShape(.rect(cornerRadius: 6))
-                        .matchedTransitionSource(id: option, in: previewTransition)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
-                        }
-                    Text(title)
-                        .font(.caption)
-                        .foregroundStyle(selected ? .primary : .secondary)
-                }
+        return Button {
+            if let onPreview, image != nil {
+                onPreview(option, previewTransition)
+            } else {
+                cover = option
             }
-            .buttonStyle(.plain)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(title)
-            .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-
-            if image != nil, let onPreview {
-                Button { onPreview(option, previewTransition) } label: {
-                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .font(.caption.weight(.semibold))
-                        .padding(6)
-                        .background(.regularMaterial, in: .circle)
-                        .frame(width: 44, height: 44)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("View \(title) full screen"))
+        } label: {
+            VStack(spacing: 6) {
+                Color.clear
+                    .frame(width: 96, height: 72)
+                    .overlay {
+                        if let image {
+                            Image(platformImage: image).resizable().scaledToFill()
+                        } else {
+                            Image(systemName: "photo").font(.title2).foregroundStyle(.tertiary)
+                        }
+                    }
+                    .background(.fill.tertiary)
+                    .clipShape(.rect(cornerRadius: 6))
+                    .matchedTransitionSource(id: option, in: previewTransition)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
+                    }
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(selected ? .primary : .secondary)
             }
         }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityHint(onPreview != nil && image != nil ? Text("Preview and choose a cover") : Text(""))
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 }
 
