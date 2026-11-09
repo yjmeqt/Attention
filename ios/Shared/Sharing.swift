@@ -56,39 +56,23 @@ enum Clipboard {
 /// A shared image, link or text body plus the title and icon the share sheet's header shows for it,
 /// so the header reads like the card instead of "PNG Image".
 final class ShareItem {
+    // Keep outgoing representations standard: custom marker types can hide receiving apps.
     let provider: NSItemProvider
     private let metadata: LPLinkMetadata
 
     init(image: UIImage, title: String, url: URL?, icon: UIImage?) {
         provider = NSItemProvider(object: image)
-        // A subtype carries real PNG bytes, so receivers can still use standard image types.
-        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-image", visibility: .all) { completion in
-            if let data = image.pngData() {
-                completion(data, nil)
-            } else {
-                completion(nil, CocoaError(.fileReadCorruptFile))
-            }
-            return nil
-        }
         metadata = Self.metadata(title: title, url: url, icon: icon)
         metadata.imageProvider = NSItemProvider(object: image)
     }
 
     init(text: String, title: String) {
         provider = NSItemProvider(object: text as NSString)
-        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-text", visibility: .all) { completion in
-            completion(Data(text.utf8), nil)
-            return nil
-        }
         metadata = Self.metadata(title: title, url: nil, icon: nil)
     }
 
     init(url: URL, title: String, icon: UIImage?) {
         provider = NSItemProvider(object: url as NSURL)
-        provider.registerDataRepresentation(forTypeIdentifier: "com.yjmeqt.attn.shared-url", visibility: .all) { completion in
-            completion(Data(url.absoluteString.utf8), nil)
-            return nil
-        }
         metadata = Self.metadata(title: title, url: url, icon: icon)
     }
 

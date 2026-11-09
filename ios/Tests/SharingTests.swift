@@ -101,10 +101,8 @@ struct SharingTests {
                 continuation.resume(returning: url)
             }
         }
-        let marked = try await load(item.provider, type: UTType("com.yjmeqt.attn.shared-url")!)
         #expect(standard == url)
-        #expect(String(data: marked, encoding: .utf8) == url.absoluteString)
-        #expect(UTType("com.yjmeqt.attn.shared-url")?.conforms(to: .url) == true)
+        #expect(!item.provider.registeredTypeIdentifiers.contains { $0.hasPrefix("com.yjmeqt.attn.shared-") })
         let metadata = try #require(config.perItemMetadataProvider?(0, .linkPresentationMetadata) as? LPLinkMetadata)
         #expect(metadata.title == "Example title")
         #expect(metadata.url == url)
@@ -121,13 +119,13 @@ struct SharingTests {
         let config = ShareItem.configuration(for: [item])
         #expect(config.itemProvidersForActivityItemsConfiguration.count == 1)
         #expect(item.provider.canLoadObject(ofClass: UIImage.self))
-        for type in [UTType.png, UTType("com.yjmeqt.attn.shared-image")!] {
+        for type in [UTType.png] {
             let data = try await load(item.provider, type: type)
             let decoded = try #require(UIImage(data: data))
             #expect(decoded.cgImage?.width == image.cgImage?.width)
             #expect(decoded.cgImage?.height == image.cgImage?.height)
         }
-        #expect(UTType("com.yjmeqt.attn.shared-image")?.conforms(to: .png) == true)
+        #expect(!item.provider.registeredTypeIdentifiers.contains { $0.hasPrefix("com.yjmeqt.attn.shared-") })
         let metadata = try #require(config.perItemMetadataProvider?(0, .linkPresentationMetadata) as? LPLinkMetadata)
         #expect(metadata.title == "Image title")
         #expect(metadata.imageProvider != nil)
@@ -145,10 +143,10 @@ struct SharingTests {
             }
         }
         #expect(standard == body)
-        for type in [UTType.utf8PlainText, try #require(UTType("com.yjmeqt.attn.shared-text"))] {
+        for type in [UTType.utf8PlainText] {
             #expect(String(data: try await load(item.provider, type: type), encoding: .utf8) == body)
         }
-        #expect(UTType("com.yjmeqt.attn.shared-text")?.conforms(to: .utf8PlainText) == true)
+        #expect(!item.provider.registeredTypeIdentifiers.contains { $0.hasPrefix("com.yjmeqt.attn.shared-") })
         let metadata = try #require(config.perItemMetadataProvider?(0, .linkPresentationMetadata) as? LPLinkMetadata)
         #expect(metadata.title == "Text preview")
         #expect(metadata.url == nil)
