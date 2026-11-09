@@ -205,11 +205,12 @@ struct LibraryTests {
         #expect(capture != nil)
     }
 
-    @Test func proseWithURLIsNotLinkOnly() async {
+    @Test func proseWithURLIsLinkAndPreservesBody() async {
         let url = URL(string: "https://example.com/article")!
         let capture = await Intake.capture(from: [NSItemProvider(object: "Read this https://example.com/article tomorrow" as NSString)])
         #expect(capture != nil)
-        #expect(capture != .link(url, image: nil))
+        #expect(capture?.url == url)
+        #expect(capture?.text == "Read this https://example.com/article tomorrow")
     }
 
 
@@ -217,11 +218,23 @@ struct LibraryTests {
         let body = " \tFirst paragraph\n\nhttps://example.com/a and https://example.org/b\n "
         let capture = try #require(await Intake.capture(from: [NSItemProvider(object: body as NSString)]))
         #expect(capture.text == body)
-        #expect(capture.url == nil)
+        #expect(capture.url?.absoluteString == "https://example.com/a")
         let standalone = try #require(await Intake.capture(from: [NSItemProvider(object: " \nhttps://example.com/a\t" as NSString)]))
         #expect(standalone.text == nil)
         #expect(standalone.url?.absoluteString == "https://example.com/a")
         #expect(await Intake.capture(from: [NSItemProvider(object: " \n\t" as NSString)]) == nil)
+    }
+
+    @Test func attributedBodyFindsWebLinkAfterEmail() async throws {
+        let item = NSExtensionItem()
+        let body = "联系 test@example.com，阅读 https://example.com/article 了解详情"
+        item.attributedContentText = NSAttributedString(string: body)
+        let capture = try #require(await Intake.capture(from: [item]))
+        #expect(capture.url?.absoluteString == "https://example.com/article")
+        #expect(capture.text == body)
+        let saved = makeLibrary().save(capture)
+        #expect(!saved.isTextOnly)
+        #expect(saved.domain == "example.com")
     }
 
     @Test func explicitURLAndDistinctBodiesCoexist() async throws {

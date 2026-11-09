@@ -153,8 +153,9 @@ enum ItemProviders {
     }
 
     static func webLink(in text: String) -> URL? {
-        guard let url = URL.extract(from: text), url.scheme?.hasPrefix("http") == true else { return nil }
-        return url
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: text, range: NSRange(text.startIndex..., in: text)) ?? []
+        return matches.compactMap(\.url).first { isWebURL($0) && $0.host() != nil }
     }
 
     private nonisolated static func text(from item: NSSecureCoding?) -> String? {

@@ -68,9 +68,9 @@ enum Intake {
         let explicit = await ItemProviders.explicitLink(in: providers)
         let standaloneURLs = texts.compactMap { ItemProviders.standaloneWebURL(in: $0) }
         let multipleURLBodies = standaloneURLs.count == texts.count && Set(standaloneURLs).count > 1
-        let standalone = texts.count == 1 ? standaloneURLs.first : nil
+        let embedded = texts.lazy.compactMap { ItemProviders.webLink(in: $0) }.first
         let link = if multipleURLBodies { nil as URL? }
-            else if let known = explicit ?? standalone { known }
+            else if let known = explicit ?? embedded { known }
             else if texts.isEmpty { await ItemProviders.standaloneLink(in: providers) }
             else { nil as URL? }
         let bodies = texts.filter { text in
