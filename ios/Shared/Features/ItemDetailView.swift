@@ -371,16 +371,17 @@ private struct FullScreenCoverImage: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
+            Color.secondaryBackground.ignoresSafeArea()
             ZoomableImageView(image: image)
                 .ignoresSafeArea()
             Button("Close", systemImage: "xmark") { dismiss() }
                 .labelStyle(.iconOnly)
                 .buttonStyle(.glass)
-                .tint(.white)
+                .buttonBorderShape(.circle)
+                .controlSize(.large)
+                .tint(.primary)
                 .padding()
         }
-        .background(.black)
-        .preferredColorScheme(.dark)
     }
 }
 
@@ -391,7 +392,7 @@ private struct ZoomableImageView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> ZoomScrollView {
         let scrollView = ZoomScrollView(frame: .zero)
-        scrollView.backgroundColor = .black
+        scrollView.backgroundColor = .clear
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = 5
         scrollView.delegate = context.coordinator
