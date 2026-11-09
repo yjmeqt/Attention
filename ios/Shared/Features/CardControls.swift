@@ -85,7 +85,8 @@ struct CoverPicker: View {
     @Binding var cover: Library.Cover
     let pick: (Data) -> Void
     let removeCustom: () -> Void
-    var onPreview: ((Library.Cover) -> Void)? = nil
+    var onPreview: ((Library.Cover, Namespace.ID) -> Void)? = nil
+    @Namespace private var previewTransition
 
     #if os(iOS)
     @State private var photo: PhotosPickerItem?
@@ -168,6 +169,7 @@ struct CoverPicker: View {
                         }
                         .background(.fill.tertiary)
                         .clipShape(.rect(cornerRadius: 6))
+                        .matchedTransitionSource(id: option, in: previewTransition)
                         .overlay {
                             RoundedRectangle(cornerRadius: 6)
                                 .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1)
@@ -183,7 +185,7 @@ struct CoverPicker: View {
             .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
 
             if image != nil, let onPreview {
-                Button { onPreview(option) } label: {
+                Button { onPreview(option, previewTransition) } label: {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .font(.caption.weight(.semibold))
                         .padding(6)

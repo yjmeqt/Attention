@@ -69,6 +69,7 @@ struct ItemDetailView: View {
         .itemActionPresentations(actions)
         .fullScreenCover(item: $presentedCover) { cover in
             FullScreenCoverImage(image: cover.image)
+                .navigationTransition(.zoom(sourceID: cover.source, in: cover.namespace))
         }
         .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.templateRaw)") {
             guard !Task.isCancelled, library.contains(item) else { return }
@@ -188,8 +189,8 @@ struct ItemDetailView: View {
                             library.setCustomImage($0, for: item)
                         } removeCustom: {
                             library.removeCustomImage(item)
-                        } onPreview: { cover in
-                            showCover(cover)
+                        } onPreview: { cover, namespace in
+                            showCover(cover, namespace: namespace)
                         }
                     }
                     Text("Template").font(.headline)
@@ -221,7 +222,7 @@ struct ItemDetailView: View {
         ImageData.downsample(data, maxPixel: 300).map(UIImage.init(cgImage:))
     }
 
-    private func showCover(_ cover: Library.Cover) {
+    private func showCover(_ cover: Library.Cover, namespace: Namespace.ID) {
         guard library.contains(item) else { return }
         let data: Data?
         switch cover {
@@ -230,7 +231,7 @@ struct ItemDetailView: View {
         case .custom: data = library.data(.custom, of: item)
         }
         guard let data, let image = ImageData.downsample(data, maxPixel: 4096) else { return }
-        presentedCover = PresentedCover(image: UIImage(cgImage: image))
+        presentedCover = PresentedCover(image: UIImage(cgImage: image), source: cover, namespace: namespace)
     }
 
     private var styleBinding: Binding<CardStyle> {
@@ -360,6 +361,8 @@ struct ItemDetailView: View {
 private struct PresentedCover: Identifiable {
     let id = UUID()
     let image: UIImage
+    let source: Library.Cover
+    let namespace: Namespace.ID
 }
 
 private struct FullScreenCoverImage: View {
@@ -394,6 +397,7 @@ private struct ZoomableImageView: UIViewRepresentable {
         scrollView.delegate = context.coordinator
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.contentInsetAdjustmentBehavior = .never
 
         scrollView.imageView.image = image
 
@@ -410,6 +414,10 @@ private struct ZoomableImageView: UIViewRepresentable {
     final class Coordinator: NSObject, UIScrollViewDelegate {
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
             (scrollView as? ZoomScrollView)?.imageView
+        }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            (scrollView as? ZoomScrollView)?.centerImage()
         }
 
         @objc func toggleZoom(_ gesture: UITapGestureRecognizer) {
@@ -441,11 +449,21 @@ private final class ZoomScrollView: UIScrollView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        guard bounds.size != laidOutSize else { return }
+        guard bounds.size != laidOutSize, bounds.width > 0, bounds.height > 0,
+              let image = imageView.image, image.size.width > 0, image.size.height > 0 else { return }
         laidOutSize = bounds.size
         setZoomScale(1, animated: false)
-        imageView.frame = CGRect(origin: .zero, size: bounds.size)
-        contentSize = bounds.size
+        let fit = min(bounds.width / image.size.width, bounds.height / image.size.height)
+        let size = CGSize(width: image.size.width * fit, height: image.size.height * fit)
+        imageView.frame = CGRect(origin: .zero, size: size)
+        contentSize = size
+        centerImage()
+    }
+
+    func centerImage() {
+        let horizontal = max(0, (bounds.width - imageView.frame.width) / 2)
+        let vertical = max(0, (bounds.height - imageView.frame.height) / 2)
+        contentInset = UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
     }
 }
 
