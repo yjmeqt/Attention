@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 /// A saved item: its card (or image), style, tags and actions. Used by the app and the share extension.
 struct ItemDetailView: View {
@@ -26,6 +27,8 @@ struct ItemDetailView: View {
         actions.privateUnlocked = privateUnlocked
         _actions = State(initialValue: actions)
     }
+
+    private let shareFormatTip = ShareFormatTip()
 
     private var library: Library { actions.library }
     private var isLoading: Bool { library.enriching.contains(item.id) }
@@ -317,6 +320,7 @@ struct ItemDetailView: View {
         ShareMenu(item: item, actions: actions, sharesOnTap: true) {
             Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
         }
+        .popoverTip(onDone == nil && !autoShare && (item.url != nil || item.hasText) ? shareFormatTip : nil, arrowEdge: .bottom)
         .disabled(item.isImage && image == nil)
     }
 
@@ -658,4 +662,14 @@ struct TagChip: View {
         .foregroundStyle(isSelected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
         .background(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.fill.tertiary), in: .capsule)
     }
+}
+
+/// Explain alternate formats at the point of sharing, once per TipKit datastore.
+private struct ShareFormatTip: Tip {
+    var title: Text { Text("More ways to share") }
+    var message: Text? {
+        Text("Touch and hold Share to choose another format. Change the default in Settings.")
+    }
+    var image: Image? { Image(systemName: "square.and.arrow.up") }
+    var options: [any TipOption] { MaxDisplayCount(1) }
 }
