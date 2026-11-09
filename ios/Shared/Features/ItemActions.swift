@@ -149,7 +149,7 @@ final class ItemActions {
 struct ItemMenu: View {
     let item: LibraryItem
     let actions: ItemActions
-    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
+    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.initial
 
     var body: some View {
         Section {
@@ -185,6 +185,7 @@ enum ShareDefault: String, CaseIterable {
     case link, image
 
     static let key = "shareDefault"
+    static let initial: Self = .image
 
     enum Format { case text, link, image }
 
@@ -202,7 +203,7 @@ struct ShareMenu<MenuLabel: View>: View {
     /// Tapping shares the way Settings says; the menu opens on a long press.
     var sharesOnTap = false
     @ViewBuilder var label: () -> MenuLabel
-    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
+    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.initial
 
     var body: some View {
         if item.url == nil && !item.hasText {

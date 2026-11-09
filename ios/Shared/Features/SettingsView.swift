@@ -3,7 +3,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage(TextCardPromotion.key, store: AppGroup.defaults) private var showsAppStoreQR = true
-    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.link
+    @AppStorage(ShareDefault.key, store: AppGroup.defaults) private var shareDefault = ShareDefault.initial
     @Environment(\.requestReview) private var requestReview
     @Environment(\.dismiss) private var dismiss
 

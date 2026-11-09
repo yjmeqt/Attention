@@ -1,6 +1,50 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "More ways to share": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More ways to share"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多分享方式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多分享方式"
+          }
+        }
+      }
+    },
+    "Touch and hold Share to choose another format. Change the default in Settings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch and hold Share to choose another format. Change the default in Settings."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "长按分享可选择其他格式，默认格式可在设置中修改。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "長按分享可選擇其他格式，預設格式可在設定中修改。"
+          }
+        }
+      }
+    },
     "Fit": {
       "localizations": {
         "en": {
