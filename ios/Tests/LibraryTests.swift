@@ -607,7 +607,7 @@ struct LibraryTests {
         [{"id":"\(id.uuidString)","date":0,"meta":{"url":"https://example.com/post","site":"example.com","title":"Hello"}}]
         """
         try Data(json.utf8).write(to: history.appending(path: "index.json"))
-        let library = makeLibrary()
+        let library = Library(directory: directory, inMemory: false)
         HistoryImport.run(into: library, from: history)
         #expect(library.items.count == 1)
         #expect(library.items.first?.title == "Hello")

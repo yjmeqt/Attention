@@ -44,6 +44,7 @@ struct HomeView: View {
     @State private var visualScores: [UUID: Float] = [:]
     #if os(iOS) && !SHARE_EXTENSION
     @State private var assistant = Assistant()
+    @State private var visualRequest = SearchRequest()
     #endif
     @FocusState private var searchFocused: Bool
     private let longPressTip = LongPressTip()
@@ -60,7 +61,7 @@ struct HomeView: View {
 
     private var visible: [LibraryItem] {
         #if os(iOS) && !SHARE_EXTENSION
-        filter.apply(library.items, visualScores: visualScores, visualThreshold: ClipModel.matchThreshold)
+        filter.apply(library.items, visualScores: visualRequest.isCurrent(in: library, filter: filter) ? visualScores : [:], visualThreshold: ClipModel.matchThreshold)
         #else
         filter.apply(library.items)
         #endif
@@ -137,7 +138,7 @@ struct HomeView: View {
         .task {
             if !seenShareGuide { showsGuide = true }
             #if DEBUG
-            if !DemoLibrary.searchCorpus { HistoryImport.run(into: library) }
+            if !DemoLibrary.searchCorpus && !DemoLibrary.realLinks { HistoryImport.run(into: library) }
             #else
             HistoryImport.run(into: library)
             #endif
@@ -175,18 +176,20 @@ struct HomeView: View {
         .onChange(of: library.items.count, initial: true) { _, count in LongPressTip.itemCount = count }
         #if os(iOS) && !SHARE_EXTENSION
         .onChange(of: filter.search) { _, _ in
-            assistant.reset()
             #if targetEnvironment(simulator)
             if !filter.search.isEmpty { Task { await assistant.verifyModelIfNeeded() } }
             #endif
-            Task { await refreshVisualScores() }
         }
+        .onChange(of: SearchContext(in: library, filter: filter)) { _, _ in assistant.reset() }
+        .onChange(of: searching) { _, open in if !open { assistant.reset() } }
+        .onDisappear { assistant.reset(); visualRequest.cancel() }
+        .task(id: SearchContext(in: library, filter: filter)) { await refreshVisualScores() }
         #if targetEnvironment(simulator)
         .onChange(of: searching) { _, open in
             if open { Task { await assistant.verifyModelIfNeeded() } }
         }
         #endif
-        .onChange(of: ClipModel.shared.status) { _, _ in
+        .onChange(of: ClipModel.shared.isReady) { _, _ in
             Task {
                 await library.embedPending()
                 await refreshVisualScores()
@@ -201,16 +204,17 @@ struct HomeView: View {
 
     #if os(iOS) && !SHARE_EXTENSION
     private func refreshVisualScores() async {
+        let token = visualRequest.begin(in: library, filter: filter)
+        visualScores = [:]
         let query = filter.search.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty, ClipModel.shared.isReady else {
             visualScores = [:]
             return
         }
         let prompt = await ClipPrompt.english(for: query)
-        guard let text = await ClipModel.shared.textEmbedding(prompt) else {
-            visualScores = [:]
-            return
-        }
+        guard visualRequest.accepts(token, in: library, filter: filter),
+              let text = await ClipModel.shared.textEmbedding(prompt),
+              visualRequest.accepts(token, in: library, filter: filter) else { return }
         var scores: [UUID: Float] = [:]
         for item in library.items {
             guard let image = library.embedding(of: item) else { continue }
@@ -231,7 +235,7 @@ struct HomeView: View {
                         if assistant.showsAskEntry {
                             Button {
                                 searchFocused = false
-                                Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                                assistant.start(filter.search, in: library, scope: filter)
                             } label: {
                                 Label("Ask", systemImage: "sparkles")
                                     .frame(maxWidth: .infinity)
@@ -339,7 +343,7 @@ struct HomeView: View {
             #if os(iOS) && !SHARE_EXTENSION
             if showingAsk {
                 AskCard(assistant: assistant) {
-                    Task { await assistant.ask(filter.search, in: library, scope: filter) }
+                    assistant.start(filter.search, in: library, scope: filter)
                 }
                 .padding(.horizontal)
             }
@@ -404,7 +408,7 @@ struct HomeView: View {
 
     private var showingAsk: Bool {
         #if os(iOS) && !SHARE_EXTENSION
-        searching && assistant.phase != .idle && assistant.phase != .unavailable && !assistant.modelFailed
+        searching && assistant.isCurrent(in: library, scope: filter) && assistant.phase != .idle && assistant.phase != .unavailable && !assistant.modelFailed
         #else
         false
         #endif
@@ -412,8 +416,8 @@ struct HomeView: View {
 
     private var askItems: [LibraryItem] {
         #if os(iOS) && !SHARE_EXTENSION
-        if assistant.phase == .matching || assistant.phase == .answering || assistant.phase == .done {
-            return assistant.matches
+        if showingAsk && (assistant.phase == .matching || assistant.phase == .answering || assistant.phase == .done) {
+            return assistant.matches.filter { library.contains($0) && filter.contains($0) }
         }
         #endif
         return visible
@@ -633,6 +637,11 @@ struct HomeView: View {
     }
 
     private func lockPrivate() {
+        #if os(iOS) && !SHARE_EXTENSION
+        assistant.reset()
+        visualRequest.cancel()
+        visualScores = [:]
+        #endif
         let wasShowingPrivate = filter.showsPrivate
         filter.privateUnlocked = false
         actions.privateUnlocked = false

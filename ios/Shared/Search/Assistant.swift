@@ -11,6 +11,9 @@ final class Assistant {
         case idle, planning, matching, answering, done, unavailable, failed(String)
     }
 
+    private let request = SearchRequest()
+    private var task: Task<Void, Never>?
+
     private(set) var phase: Phase = .idle
     private(set) var plan: QueryPlan?
     private(set) var matches: [LibraryItem] = []
@@ -65,6 +68,9 @@ final class Assistant {
     var isBusy: Bool { phase == .planning || phase == .matching || phase == .answering }
 
     func reset() {
+        task?.cancel()
+        task = nil
+        request.cancel()
         phase = .idle
         plan = nil
         matches = []
@@ -89,15 +95,28 @@ final class Assistant {
     }
     #endif
 
-    func ask(_ question: String, in library: Library, scope: FeedFilter) async {
+    func isCurrent(in library: Library, scope: FeedFilter) -> Bool {
+        request.isCurrent(in: library, filter: scope)
+    }
+
+    /// Start synchronously so rapid taps cannot queue competing requests before reset runs.
+    func start(_ question: String, in library: Library, scope: FeedFilter) {
+        reset()
         guard canAsk else {
             phase = .unavailable
             return
         }
-        reset()
+        let token = request.begin(in: library, filter: scope)
         phase = .planning
-        let sites = Set(library.items.map(\.domain).filter { !$0.isEmpty }).sorted().prefix(40)
-        let tags = library.allTags.prefix(40)
+        task = Task { await run(question, in: library, scope: scope, token: token) }
+    }
+
+    private func run(_ question: String, in library: Library, scope: FeedFilter, token: UUID) async {
+        guard request.accepts(token, in: library, filter: scope) else { return }
+        phase = .planning
+        let scopedItems = library.items.filter(scope.contains)
+        let sites = Set(scopedItems.map(\.domain).filter { !$0.isEmpty }).sorted().prefix(40)
+        let tags = FeedFilter.ranked(scopedItems.flatMap(\.tags)).prefix(40)
         let instructions = """
             You turn a question about a personal link-and-image library into a QueryPlan. \
             Use only these domains when setting site: \(sites.joined(separator: ", ")). \
@@ -110,8 +129,10 @@ final class Assistant {
             // Stream the plan so chips appear as fields fill in.
             let stream = session.streamResponse(to: question, generating: QueryPlan.self)
             for try await snapshot in stream {
+                guard request.accepts(token, in: library, filter: scope) else { return }
                 plan = Self.materialize(snapshot.content)
             }
+            guard request.accepts(token, in: library, filter: scope) else { return }
             guard let final = plan else {
                 phase = .failed(String(localized: "Couldn't understand that."))
                 return
@@ -122,6 +143,7 @@ final class Assistant {
             let concept = final.visualConcept.trimmingCharacters(in: .whitespaces)
             if !concept.isEmpty, ClipModel.shared.isReady {
                 if let text = await ClipModel.shared.textEmbedding(concept) {
+                    guard request.accepts(token, in: library, filter: scope) else { return }
                     for item in library.items {
                         guard let image = library.embedding(of: item) else { continue }
                         visualScores[item.id] = ClipModel.cosine(text, image)
@@ -129,6 +151,7 @@ final class Assistant {
                 }
             }
 
+            guard request.accepts(token, in: library, filter: scope) else { return }
             // Scope only (all / site / tag / private) — the typed question is not a text filter.
             let scoped = library.items.filter(scope.contains)
             let found = final.apply(to: scoped, visualScores: visualScores, visualThreshold: ClipModel.matchThreshold)
@@ -146,10 +169,13 @@ final class Assistant {
                 """
             let reply = session.streamResponse(to: fact)
             for try await partial in reply {
+                guard request.accepts(token, in: library, filter: scope) else { return }
                 answer = partial.content
             }
+            guard request.accepts(token, in: library, filter: scope) else { return }
             phase = .done
         } catch {
+            guard request.accepts(token, in: library, filter: scope) else { return }
             recordFailure(error)
         }
     }

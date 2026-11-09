@@ -41,6 +41,7 @@ final class ClipModel {
     private var downloadTask: URLSessionDownloadTask?
     private var progressObservation: NSKeyValueObservation?
     private var downloadIndex = 0
+    private var downloadGeneration = UUID()
     private let session = URLSession(configuration: .default)
 
     init(directory: URL = AppGroup.container.appending(path: "MobileCLIP", directoryHint: .isDirectory)) {
@@ -72,39 +73,47 @@ final class ClipModel {
         }
         downloadIndex = index
         let url = Self.archiveURLs[index]
+        let generation = UUID()
+        downloadGeneration = generation
         let task = session.downloadTask(with: url) { [weak self] temp, response, error in
+            // URLSession owns temp only until this callback returns. Take ownership here,
+            // before hopping to MainActor (which may be busy for an arbitrary duration).
+            let retained = Result<URL, Error> {
+                if let error { throw error }
+                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                    throw NSError(domain: "ClipDownload", code: http.statusCode,
+                                  userInfo: [NSLocalizedDescriptionKey: "Download failed (HTTP \(http.statusCode))."])
+                }
+                guard let temp else { throw URLError(.cannotCreateFile) }
+                return try Self.retainDownload(temp)
+            }
             Task { @MainActor in
-                guard let self else { return }
+                defer {
+                    if case let .success(file) = retained { try? FileManager.default.removeItem(at: file) }
+                }
+                guard let self, self.downloadGeneration == generation else { return }
                 self.progressObservation = nil
                 self.downloadTask = nil
-                if let error {
-                    if (error as? URLError)?.code == .cancelled {
-                        if case .missing = self.status { return }
-                        return
+                switch retained {
+                case let .failure(error):
+                    if (error as? URLError)?.code != .cancelled { self.retryOrFail(Self.message(for: error)) }
+                case let .success(file):
+                    do {
+                        try self.install(from: file)
+                        await self.load()
+                    } catch {
+                        self.status = .failed(error.localizedDescription)
+                        try? FileManager.default.removeItem(at: self.directory)
                     }
-                    self.retryOrFail(Self.message(for: error))
-                    return
-                }
-                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-                    self.retryOrFail(String(localized: "Download failed (HTTP \(http.statusCode))."))
-                    return
-                }
-                guard let temp else {
-                    self.retryOrFail(String(localized: "Download failed."))
-                    return
-                }
-                do {
-                    try self.install(from: temp)
-                    await self.load()
-                } catch {
-                    // Checksum / extract failures are about the file itself — don't burn mirrors on a bad build.
-                    self.status = .failed(error.localizedDescription)
-                    try? FileManager.default.removeItem(at: self.directory)
                 }
             }
         }
         progressObservation = task.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
-            Task { @MainActor in self?.status = .downloading(progress.fractionCompleted) }
+            let fraction = progress.fractionCompleted
+            Task { @MainActor in
+                guard let self, self.downloadGeneration == generation, self.downloadTask != nil else { return }
+                self.status = .downloading(fraction)
+            }
         }
         downloadTask = task
         task.resume()
@@ -137,6 +146,7 @@ final class ClipModel {
     }
 
     func delete() {
+        downloadGeneration = UUID()
         downloadTask?.cancel()
         progressObservation = nil
         downloadTask = nil
@@ -173,17 +183,29 @@ final class ClipModel {
     // MARK: - Private
 
     private func load() async {
+        let generation = downloadGeneration
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             let config = MLModelConfiguration()
             config.computeUnits = .cpuAndNeuralEngine
-            imageModel = try await MLModel.load(contentsOf: directory.appending(path: "mobileclip_s0_image.mlmodelc"), configuration: config)
-            textModel = try await MLModel.load(contentsOf: directory.appending(path: "mobileclip_s0_text.mlmodelc"), configuration: config)
-            tokenizer = try CLIPTokenizer(directory: directory)
+            let image = try await MLModel.load(contentsOf: directory.appending(path: "mobileclip_s0_image.mlmodelc"), configuration: config)
+            let text = try await MLModel.load(contentsOf: directory.appending(path: "mobileclip_s0_text.mlmodelc"), configuration: config)
+            guard downloadGeneration == generation else { return }
+            let tokenizer = try CLIPTokenizer(directory: directory)
+            imageModel = image
+            textModel = text
+            self.tokenizer = tokenizer
             status = .ready
         } catch {
+            guard downloadGeneration == generation else { return }
             status = .failed(error.localizedDescription)
         }
+    }
+
+    nonisolated static func retainDownload(_ temporary: URL) throws -> URL {
+        let owned = FileManager.default.temporaryDirectory.appending(path: "mobileclip-\(UUID().uuidString).aar")
+        try FileManager.default.moveItem(at: temporary, to: owned)
+        return owned
     }
 
     private func install(from archive: URL) throws {
