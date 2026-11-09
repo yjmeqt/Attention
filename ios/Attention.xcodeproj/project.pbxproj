@@ -248,6 +248,7 @@
 		FD4F7E7924E9D0031409B8F3 /* AttentionCardAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0BF281F4BE559A2247003492 /* AttentionCardAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FE91EE4E9D4EC545548A499C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F25185D8C537E29BF073422D /* InfoPlist.strings */; };
 		FF0767D8C6F44B49C885FF87 /* Vision.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB62E4296F1EED134B56DB97 /* Vision.swift */; };
+		FFDC6C6309155B70F6260946 /* CoverGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B513C1A71127FA07A8088EB /* CoverGallery.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -317,6 +318,7 @@
 		4175444254D79ADED042D61A /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		425A626D3D87F1F26F642921 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		46736B2D6210E236010432C4 /* ItemProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemProviders.swift; sourceTree = "<group>"; };
+		4B513C1A71127FA07A8088EB /* CoverGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverGallery.swift; sourceTree = "<group>"; };
 		4C2727A28BE0D218D5ED70BD /* UnfurlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfurlTests.swift; sourceTree = "<group>"; };
 		4E1E2ECE666F90B1FAB14DCA /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		52C124B6E5A25B69451C95D9 /* ImageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageData.swift; sourceTree = "<group>"; };
@@ -571,6 +573,7 @@
 				09CF7990FF7733CC81F4C854 /* AttentionMac.entitlements */,
 				99590A28A46FC25273771198 /* AttentionMacApp.swift */,
 				F00C570F6D1A403871DCEC39 /* CardMaker.swift */,
+				4B513C1A71127FA07A8088EB /* CoverGallery.swift */,
 				6F5C57EF084CB93F37668CCA /* Hotkey.swift */,
 				F779F8FEDE5F763E3855138A /* Info.plist */,
 				873D6516EF481D43954CD703 /* ItemInspector.swift */,
@@ -926,6 +929,7 @@
 				74E831D7D27E0EF216A3B78D /* CardMaker.swift in Sources */,
 				246C230A176AFE00BF769D88 /* CardPalette.swift in Sources */,
 				05A2DD05CE972D0778065414 /* CardView.swift in Sources */,
+				FFDC6C6309155B70F6260946 /* CoverGallery.swift in Sources */,
 				1ECA21C7A407AB306016FC99 /* Feed.swift in Sources */,
 				2E84E6A1C4C9BBF0C6B4D6F0 /* FeedFilter.swift in Sources */,
 				C2C54E9C7F70FE3FC2C57EF7 /* Hotkey.swift in Sources */,
