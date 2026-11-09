@@ -10,6 +10,7 @@ struct LibraryView: View {
     @State private var showsInspector = false
     @State private var columns = 3
     @State private var tagTargets: [LibraryItem]?
+    @State private var textTarget: LibraryItem?
     @State private var pendingDelete: [LibraryItem]?
     @State private var notice: String?
     @State private var showsPasscodeRequired = false
@@ -19,7 +20,7 @@ struct LibraryView: View {
     private var visible: [LibraryItem] { filter.apply(library.items) }
     private var selectedItem: LibraryItem? { selection.flatMap { id in library.items.first { $0.id == id } } }
     private var actions: LibraryActions {
-        LibraryActions(library: library, tagTargets: $tagTargets, pendingDelete: $pendingDelete, notice: $notice,
+        LibraryActions(library: library, tagTargets: $tagTargets, textTarget: $textTarget, pendingDelete: $pendingDelete, notice: $notice,
                        showsPasscodeRequired: $showsPasscodeRequired, privateUnlocked: filter.privateUnlocked)
     }
 
@@ -57,6 +58,9 @@ struct LibraryView: View {
             if let tagTargets {
                 TagEditor(library: library, items: tagTargets).frame(minWidth: 320, minHeight: 360)
             }
+        }
+        .sheet(item: $textTarget) { item in
+            SavedTextEditor(library: library, item: item)
         }
         .confirmationDialog(deleteTitle, isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } })) {
             Button("Delete", role: .destructive) {
@@ -163,6 +167,7 @@ struct LibraryView: View {
 
     private func lockPrivate() {
         filter.privateUnlocked = false
+        if textTarget?.isPrivate == true { textTarget = nil }
         if section == .locked { section = .all }
         if selectedItem?.isPrivate == true { selection = nil }
     }
@@ -286,10 +291,16 @@ struct LibraryView: View {
 struct LibraryActions {
     let library: Library
     @Binding var tagTargets: [LibraryItem]?
+    @Binding var textTarget: LibraryItem?
     @Binding var pendingDelete: [LibraryItem]?
     @Binding var notice: String?
     @Binding var showsPasscodeRequired: Bool
     let privateUnlocked: Bool
+
+    func editText(_ item: LibraryItem) {
+        guard library.contains(item), item.hasText else { return }
+        textTarget = item
+    }
 
     func shareURL(_ item: LibraryItem) -> URL? { library.meta(for: item)?.shareURL ?? item.url }
 
@@ -356,6 +367,7 @@ struct ItemContextMenu: View {
             Button("Copy Link", systemImage: "link") { actions.copyLink(item) }
         }
         if let text = item.text {
+            Button("Edit Text", systemImage: "pencil") { actions.editText(item) }
             Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
             ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
         }

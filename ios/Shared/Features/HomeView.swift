@@ -647,6 +647,7 @@ struct HomeView: View {
         actions.privateUnlocked = false
         if wasShowingPrivate { filter.reset() }
         let privateIDs = Set(library.items.filter(\.isPrivate).map(\.id))
+        if let target = actions.textTarget, privateIDs.contains(target.id) { actions.textTarget = nil }
         if let detailID, privateIDs.contains(detailID) { self.detailID = nil }
         selection.subtract(privateIDs)
     }

@@ -6,7 +6,7 @@ import SwiftData
 @Model
 final class LibraryItem {
     var id = UUID()
-    /// Cleaned URL for bare links, image hash for bare images, or a versioned composite body hash.
+    /// Identity of the original capture; editing its text preserves this key.
     var key = ""
     var urlString: String?
     var createdAt = Date.now
@@ -15,8 +15,10 @@ final class LibraryItem {
     var title = ""
     var authorName: String?
     var authorHandle: String?
-    /// Original plain-text body, independent of preview metadata and OCR.
+    /// Saved plain-text body, independent of preview metadata and OCR.
     var text: String?
+    /// Separates user edits from imports and preview updates when merging synced duplicates.
+    var textEditedAt: Date?
     var ocrText: String?
     /// What Vision sees in the item's image, as Vision's own English identifiers.
     var visualLabels: [String] = []

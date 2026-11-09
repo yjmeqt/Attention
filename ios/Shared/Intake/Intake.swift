@@ -98,7 +98,7 @@ extension Library {
     func save(_ capture: Capture) -> LibraryItem {
         let url = capture.url?.upgradedToHTTPS
         let item = upsert(key: capture.key, url: url, site: url.map(Unfurler.siteName) ?? "", style: CardStyle.load())
-        if let text = capture.text { item.text = text }
+        if item.text == nil, let text = capture.text { item.text = text }
         if let image = capture.image { write(image, .source, of: item) }
         if data(.thumbnail, of: item) == nil { refreshThumbnail(item) }
         save()
@@ -116,7 +116,9 @@ extension Library {
             guard !Task.isCancelled else { return }
             guard contains(item) else { continue }
             if let url = item.url, url.upgradedToHTTPS != url {
-                let key = Capture(url: url.upgradedToHTTPS, image: data(.source, of: item), text: item.text).key
+                let key = item.textEditedAt == nil
+                    ? Capture(url: url.upgradedToHTTPS, image: data(.source, of: item), text: item.text).key
+                    : item.key
                 if self.item(forKey: key).map({ $0.id == item.id }) ?? true {
                     item.urlString = url.upgradedToHTTPS.absoluteString
                     item.key = key

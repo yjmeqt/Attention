@@ -82,13 +82,17 @@ final class Library {
         for group in groups {
             let sorted = group.sorted { $0.id.uuidString < $1.id.uuidString }
             let keeper = sorted[0]
+            let previousText = keeper.text
             for other in sorted.dropFirst() {
                 keeper.createdAt = min(keeper.createdAt, other.createdAt)
                 keeper.updatedAt = max(keeper.updatedAt, other.updatedAt)
                 keeper.tags += other.tags.filter { !keeper.tags.contains($0) }
                 keeper.isPrivate = keeper.isPrivate || other.isPrivate
                 if keeper.title.isEmpty { keeper.title = other.title }
-                if keeper.text == nil { keeper.text = other.text }
+                if keeper.text == nil || (other.textEditedAt ?? .distantPast) > (keeper.textEditedAt ?? .distantPast) {
+                    keeper.text = other.text
+                    keeper.textEditedAt = other.textEditedAt
+                }
                 if keeper.ocrText == nil { keeper.ocrText = other.ocrText }
                 if keeper.analysisVersion < other.analysisVersion {
                     keeper.visualLabels = other.visualLabels
@@ -106,6 +110,7 @@ final class Library {
                 try? FileManager.default.removeItem(at: folder(other))
                 context.delete(other)
             }
+            if keeper.textEditedAt != nil || keeper.text != previousText { invalidateAnalysis(keeper) }
             refreshThumbnail(keeper)
         }
         save()
@@ -145,6 +150,37 @@ final class Library {
 
     func save() {
         try? context.save()
+        reload()
+    }
+
+    enum TextEditError: Error { case unavailable, emptyText }
+
+    /// Keeps the original capture identity so importing it again finds the user's edited copy.
+    func updateText(_ text: String, for item: LibraryItem) throws {
+        guard contains(item), item.hasText else { throw TextEditError.unavailable }
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw TextEditError.emptyText }
+        guard text != item.text else { return }
+        let previous = (text: item.text, editedAt: item.textEditedAt, updatedAt: item.updatedAt,
+                        version: item.analysisVersion, fingerprint: item.analysisFingerprint,
+                        labels: item.visualLabels, keywords: item.keywords)
+        item.text = text
+        let editedAt = Date.now
+        item.textEditedAt = editedAt
+        item.updatedAt = editedAt
+        invalidateAnalysis(item)
+        do {
+            try context.save()
+        } catch {
+            item.text = previous.text
+            item.textEditedAt = previous.editedAt
+            item.updatedAt = previous.updatedAt
+            item.analysisVersion = previous.version
+            item.analysisFingerprint = previous.fingerprint
+            item.visualLabels = previous.labels
+            item.keywords = previous.keywords
+            throw error
+        }
+        // The revision also refreshes rendered text cards in the detail views.
         reload()
     }
 

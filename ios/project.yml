@@ -139,6 +139,7 @@ targets:
       - Shared/Features/FeedFilter.swift
       - Shared/Features/CardControls.swift
       - Shared/Features/TagEditor.swift
+      - Shared/Features/SavedTextEditor.swift
       - Shared/Features/Opening.swift
       - Shared/Localizable.xcstrings
       - App/PrivacyInfo.xcprivacy

@@ -24,6 +24,11 @@ struct ItemInspector: View {
                 }
                 if let text = item.text {
                     HStack {
+                        Text("Text").font(.headline)
+                        Spacer()
+                        Button("Edit Text", systemImage: "pencil") { actions.editText(item) }
+                    }
+                    HStack {
                         Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
                         ShareLink(item: text) { Label("Share Text", systemImage: "square.and.arrow.up") }
                     }

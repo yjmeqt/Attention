@@ -153,6 +153,11 @@ struct ItemDetailView: View {
             imageButtons
             if let text = item.text {
                 HStack {
+                    Text("Text").font(.headline)
+                    Spacer()
+                    Button("Edit Text", systemImage: "pencil") { actions.editText(item) }
+                }
+                HStack {
                     Button("Copy Text", systemImage: "doc.on.doc") { actions.copyText(item) }
                     Button("Share Text", systemImage: "square.and.arrow.up") { actions.shareText(item) }
                 }
@@ -267,6 +272,9 @@ struct ItemDetailView: View {
                         .disabled(isLoading)
                 }
                 Button("Edit Tags…", systemImage: "tag") { actions.editTags([item]) }
+                if item.hasText {
+                    Button("Edit Text", systemImage: "pencil") { actions.editText(item) }
+                }
                 if item.isPrivate {
                     Button("Remove from Private", systemImage: "lock.open") { Task { await actions.setPrivate(false, [item]) } }
                 } else {
