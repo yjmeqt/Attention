@@ -42,7 +42,8 @@ final class ItemActions {
 
     func shareText(_ item: LibraryItem) {
         guard library.contains(item), let text = item.text else { return }
-        presenter.present([ShareItem(text: text, title: item.displayTitle)])
+        // Plain text is a single native share item, without link-preview metadata.
+        presenter.present([text])
     }
 
     func copyImage(_ item: LibraryItem) {

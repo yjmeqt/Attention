@@ -60,32 +60,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.utf8-plain-text</string>
-			</array>
-			<key>UTTypeIdentifier</key>
-			<string>com.yjmeqt.attn.shared-text</string>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.url</string>
-			</array>
-			<key>UTTypeIdentifier</key>
-			<string>com.yjmeqt.attn.shared-url</string>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.png</string>
-			</array>
-			<key>UTTypeIdentifier</key>
-			<string>com.yjmeqt.attn.shared-image</string>
-		</dict>
-	</array>
 </dict>
 </plist>

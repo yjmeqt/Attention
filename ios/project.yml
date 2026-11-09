@@ -74,14 +74,6 @@ targets:
         NSFaceIDUsageDescription: Unlock your private items.
         ITSAppUsesNonExemptEncryption: false
         NSUserActivityTypes: [INSendMessageIntent]
-        # Outgoing representations retain standard URL/PNG/plain-text conformance for other receivers.
-        UTExportedTypeDeclarations:
-          - UTTypeIdentifier: com.yjmeqt.attn.shared-text
-            UTTypeConformsTo: [public.utf8-plain-text]
-          - UTTypeIdentifier: com.yjmeqt.attn.shared-url
-            UTTypeConformsTo: [public.url]
-          - UTTypeIdentifier: com.yjmeqt.attn.shared-image
-            UTTypeConformsTo: [public.png]
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
@@ -198,16 +190,9 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
           NSExtensionAttributes:
             IntentsSupported: [INSendMessageIntent]
-            # Reject our outgoing subtypes while accepting external links, text and images.
+            # Accept supported links, text and images regardless of their source.
             # Use nested SUBQUERYs: the extension matcher rejects @unionOfArrays.
             NSExtensionActivationRule: &captureActivationRule >-
-              SUBQUERY(extensionItems, $item,
-                SUBQUERY($item.attachments, $attachment,
-                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-url" OR
-                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-image" OR
-                  ANY $attachment.registeredTypeIdentifiers == "com.yjmeqt.attn.shared-text"
-                ).@count > 0
-              ).@count == 0 AND
               SUBQUERY(extensionItems, $item,
                 SUBQUERY($item.attachments, $attachment,
                   ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url" OR
