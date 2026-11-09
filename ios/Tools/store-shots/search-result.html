@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Attention Search Result</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}body{font-family:"Helvetica Neue","PingFang SC",sans-serif;color:#171713}
+#art{width:1200px;height:800px;background:#ece2cd;position:relative;overflow:hidden}
+.wedge{position:absolute;inset:0;background:#d4261b;clip-path:polygon(83% 0,100% 0,100% 100%,43% 100%)}
+.brand{position:absolute;left:76px;top:66px;font-size:25px;font-weight:700;letter-spacing:1px}
+.rule{position:absolute;left:76px;top:120px;width:55px;height:7px;background:#d4261b}
+.copy{position:absolute;left:76px;top:211px;width:590px}h1{font-size:76px;line-height:1.04;letter-spacing:-3px;margin:0;font-weight:900}h1 span{display:block;color:#d4261b}p{font-size:27px;line-height:1.45;margin:32px 0 0;max-width:470px}
+.phone{position:absolute;right:86px;top:57px;width:320px;border:8px solid #171713;border-radius:46px;overflow:hidden;background:white;box-shadow:16px 22px 0 #17171325;transform:rotate(5deg)}.phone img{width:100%;display:block}
+.foot{position:absolute;left:76px;bottom:66px;font-size:17px;letter-spacing:2px;font-weight:700}
+:lang(zh-Hans) h1{font-size:78px;line-height:1.19;letter-spacing:0}:lang(zh-Hans) p{font-size:26px}
+</style></head><body><main id="art"><div class="wedge"></div><div class="brand">Attention</div><div class="rule"></div><div class="copy"><h1></h1><p></p></div><div class="phone"><img alt="Attention app interface"></div><div class="foot"></div></main>
+<script>
+const locale=new URLSearchParams(location.search).get('locale')||'en-US';
+if(!['en-US','zh-Hans'].includes(locale))throw new Error('Unsupported locale');
+document.documentElement.lang=locale;
+const zh=locale==='zh-Hans';
+document.querySelector('h1').innerHTML=zh?'收藏链接。<span>分享成卡片。</span>':'Save links.<span>Find them<br>again.</span>';
+document.querySelector('p').textContent=zh?'标题、封面、二维码。\n让分享的链接一眼看懂。':'Your links, together.\nReady when you need them.';
+document.querySelector('p').style.whiteSpace='pre-line';
+document.querySelector('.foot').textContent=zh?'收藏 · 整理 · 分享':'SAVE · ORGANIZE · REDISCOVER';
+document.querySelector('img').src=`../../fastlane/raw/${locale}/iphone-${zh?'3-detail':'1-feed'}.png`;
+</script></body></html>
