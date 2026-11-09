@@ -40,8 +40,11 @@ targets:
     platform: iOS
     sources:
       - path: App
-        excludes: [Attention.icon, SearchDemoCorpus.json]
+        excludes: [Attention.icon, AttentionDev.icon, SearchDemoCorpus.json]
       - path: App/Attention.icon
+        type: file
+        buildPhase: resources
+      - path: App/AttentionDev.icon
         type: file
         buildPhase: resources
       - path: App/SearchDemoCorpus.json
@@ -91,6 +94,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
         ASSETCATALOG_COMPILER_APPICON_NAME: Attention
       configs:
+        Debug:
+          ASSETCATALOG_COMPILER_APPICON_NAME: AttentionDev
         Release:
           EXCLUDED_SOURCE_FILE_NAMES: SearchDemoCorpus.json
     scheme:
@@ -116,6 +121,9 @@ targets:
     sources:
       - Mac
       - path: App/Attention.icon
+        type: file
+        buildPhase: resources
+      - path: App/AttentionDev.icon
         type: file
         buildPhase: resources
       - Shared/Model.swift
@@ -163,6 +171,9 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: Attention
         ENABLE_HARDENED_RUNTIME: YES
         COMBINE_HIDPI_IMAGES: YES
+      configs:
+        Debug:
+          ASSETCATALOG_COMPILER_APPICON_NAME: AttentionDev
     scheme: {}
 
   AttentionExtension:
