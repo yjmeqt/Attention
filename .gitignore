@@ -15,6 +15,7 @@ ios/fastlane/raw/
 ios/fastlane/screenshots/
 ios/fastlane/mac-screenshots/
 ios/fastlane/headers/
+ios/fastlane/search-results/
 ios/Tools/store-shots/node_modules/
 # asc upload reports.
 .asc/

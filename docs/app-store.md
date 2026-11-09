@@ -127,6 +127,12 @@ node Tools/store-shots/export.js screenshots duo ar-SA   # one device and locale
 - Neither the raw nor the framed images are in git: run the pipeline to regenerate them before uploading. Look through every image first: a link that failed to unfurl shows as a bare tile, and Safari sometimes shows the wrong page under the share sheet. Rerun just that scene with `SCENES`, `ONLY` and `DEVICES`.
 - Upload with `Tools/release.sh metadata --apply` (see Releasing), or by hand in App Store Connect: drag each device's files into its slot, and both Duo displays into the one iPhone Duo slot.
 
+### Search-result creative assets
+
+Run `node ios/Tools/store-shots/search-export.js` from the repository root to generate English and Simplified Chinese search-result images in `ios/fastlane/search-results/`. Requires the store-shots npm dependencies, Google Chrome (`CHROME` overrides its path), and local raw captures `en-US/iphone-1-feed.png` and `zh-Hans/iphone-3-detail.png` under `ios/fastlane/raw/`.
+
+The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to the ASC Asset Library and assigning `APP_STORE_SEARCH_RESULTS_ASSET`. Upload, review approval, and PPO experiment start are separate steps. Keep one-off resource IDs and submission status in the corresponding PR, not this guide.
+
 ## Design decisions
 
 - **App icon**: keep the current one.
