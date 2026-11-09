@@ -6,6 +6,7 @@ struct ItemInspector: View {
     let item: LibraryItem
     let actions: LibraryActions
 
+    @State private var presentedCover: MacCoverPresentation?
     @State private var image: NSImage?
     @State private var covers: (preview: NSImage?, shared: NSImage?, custom: NSImage?)?
 
@@ -41,6 +42,8 @@ struct ItemInspector: View {
                                 library.setCustomImage($0, for: item)
                             } removeCustom: {
                                 library.removeCustomImage(item)
+                            } onPreview: { cover, _ in
+                                showCover(cover)
                             }
                         }
                         Text("Template").font(.headline)
@@ -51,6 +54,13 @@ struct ItemInspector: View {
                 if let text = item.ocrText, !text.isEmpty { recognizedText(text) }
             }
             .padding()
+        }
+        .sheet(item: $presentedCover) { presentation in
+            MacCoverGallery(presentation: presentation, selectedCover: coverBinding)
+        }
+        .onChange(of: item.id) { _, _ in presentedCover = nil }
+        .onChange(of: library.contains(item)) { _, available in
+            if !available { presentedCover = nil }
         }
         .task(id: "\(showsAppStoreQR)-\(library.revision)-\(item.id)-\(item.templateRaw)-\(item.usesSharedImage)-\(item.usesCustomImage)") {
             image = library.fullImage(item)
@@ -166,7 +176,10 @@ struct ItemInspector: View {
     }
 
     private var coverBinding: Binding<Library.Cover> {
-        Binding { library.cover(of: item) } set: { library.setCover($0, for: item) }
+        Binding { library.contains(item) ? library.cover(of: item) : .preview } set: {
+            guard library.contains(item) else { return }
+            library.setCover($0, for: item)
+        }
     }
 
     private var styleBinding: Binding<CardStyle> {
@@ -176,6 +189,21 @@ struct ItemInspector: View {
             library.setStyle(style, for: item)
             style.save()
         }
+    }
+
+    private func showCover(_ cover: Library.Cover) {
+        guard library.contains(item) else { return }
+        let candidates: [(Library.Cover, String, Data?)] = [
+            (.preview, String(localized: "Link Preview"), library.previewData(item)),
+            (.shared, String(localized: "Shared Image"), library.data(.source, of: item)),
+            (.custom, String(localized: "Your Image"), library.data(.custom, of: item))
+        ]
+        let pages = candidates.compactMap { source, title, data -> MacCoverPresentation.Page? in
+            guard let data else { return nil }
+            return MacCoverPresentation.Page(id: source, title: title, data: data)
+        }
+        guard pages.contains(where: { $0.id == cover }) else { return }
+        presentedCover = MacCoverPresentation(pages: pages, initial: cover)
     }
 
     private static func coverThumbnail(_ data: Data) -> NSImage? {
