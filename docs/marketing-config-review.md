@@ -80,6 +80,8 @@
 
 ## 5. 隐私政策与代码的差距
 
+> 已于 2026-11-10 改完：政策补了 iCloud 同步、模型下载与镜像、Apple Intelligence 三节，生效日期更新，三种语言同步；审核备注首句改成卡片故事，测试步骤加了"发到聊天 App 看效果"，并说明了可选的模型下载。下面保留当时的发现。
+
 政策（生效日 2026-10-26）列出的第三方：YouTube oEmbed、FxTwitter、Bilibili API、Google favicon。代码里实际还会联系：
 
 - **iCloud 同步**：README 和 Mac 审核备注都说收藏库通过用户自己的 iCloud 私有数据库在 iPhone、iPad、Mac 之间同步。政策的 "On-device storage" 一节只说"保存在你的设备上"，一字未提 iCloud。虽然私有数据库不经过开发者，App Privacy 仍可答 "Data Not Collected"，但政策必须写明。
