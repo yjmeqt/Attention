@@ -1,4 +1,9 @@
 title: Attention
+# Only the privacy policy and the support page are public; everything else in docs/ is internal.
 exclude:
   - app-store.md
+  - mac-app-store.md
+  - positioning-review.md
+  - marketing-config-review.md
+  - search-followups.md
   - superpowers
