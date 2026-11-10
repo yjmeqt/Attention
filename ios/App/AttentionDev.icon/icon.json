@@ -1,12 +1,12 @@
 {
   "fill": {
-    "solid": "srgb:0.949,0.929,0.894,1.00000"
+    "solid": "srgb:0.910,0.251,0.165,1.00000"
   },
   "fill-specializations": [
     {
       "appearance": "dark",
       "value": {
-        "solid": "srgb:0.110,0.110,0.118,1.00000"
+        "solid": "srgb:0.620,0.150,0.100,1.00000"
       }
     }
   ],
@@ -31,14 +31,26 @@
     {
       "layers": [
         {
-          "glass": true,
-          "image-name": "link.svg",
-          "name": "link"
-        },
-        {
           "glass": false,
-          "image-name": "details.svg",
-          "name": "details"
+          "image-name": "cover.svg",
+          "name": "cover"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.3
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    },
+    {
+      "layers": [
+        {
+          "glass": true,
+          "image-name": "bubble.svg",
+          "name": "bubble"
         }
       ],
       "shadow": {
@@ -46,30 +58,8 @@
         "opacity": 0.5
       },
       "translucency": {
-        "enabled": true,
-        "value": 0.4
-      }
-    },
-    {
-      "layers": [
-        {
-          "glass": false,
-          "image-name": "hero.svg",
-          "name": "hero"
-        },
-        {
-          "glass": false,
-          "image-name": "card.svg",
-          "name": "card"
-        }
-      ],
-      "shadow": {
-        "kind": "layer-color",
-        "opacity": 0.5
-      },
-      "translucency": {
-        "enabled": true,
-        "value": 0.3
+        "enabled": false,
+        "value": 0
       }
     }
   ],

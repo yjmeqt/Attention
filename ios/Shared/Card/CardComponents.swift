@@ -190,34 +190,53 @@ struct PlayGlyph: View {
     }
 }
 
-/// A SwiftUI rendition of the app icon for use inside mock system UI.
+/// The app icon in miniature: a two-tone chat bubble on the brand red, the same artwork as App/Attention.icon.
 struct AttentionGlyph: View {
     let size: CGFloat
 
     var body: some View {
         RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
-            .fill(Color(red: 0.949, green: 0.929, blue: 0.894))
+            .fill(Color(red: 0.910, green: 0.251, blue: 0.165))
             .overlay {
-                RoundedRectangle(cornerRadius: size * 0.07, style: .continuous)
-                    .fill(Color(red: 0.659, green: 0.749, blue: 0.651))
-                    .frame(width: size * 0.5, height: size * 0.62)
-                    .overlay(alignment: .top) {
-                        RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
-                            .fill(Color(red: 0.91, green: 0.333, blue: 0.239))
-                            .frame(width: size * 0.42, height: size * 0.27)
-                            .overlay {
-                                Image(systemName: "link")
-                                    .font(.system(size: size * 0.17, weight: .bold))
-                                    .foregroundStyle(.black.opacity(0.85))
-                            }
-                            .padding(.top, size * 0.04)
-                    }
-                    .rotationEffect(.degrees(-8))
+                IconBubble(part: .bubble).fill(Color(red: 0.965, green: 0.953, blue: 0.929))
+                IconBubble(part: .cover).fill(Color(red: 0.082, green: 0.082, blue: 0.102))
             }
             .frame(width: size, height: size)
             .overlay {
                 RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
                     .strokeBorder(.black.opacity(0.08), lineWidth: 0.5)
             }
+    }
+}
+
+/// The icon's bubble and its dark cover block, in the icon's 1024-unit space.
+nonisolated struct IconBubble: Shape {
+    enum Part { case bubble, cover }
+    let part: Part
+
+    func path(in rect: CGRect) -> Path {
+        let s = min(rect.width, rect.height) / 1024
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * s, y: rect.minY + y * s) }
+        var path = Path()
+        path.move(to: p(312, 176))
+        path.addLine(to: p(712, 176))
+        path.addCurve(to: p(876, 340), control1: p(804, 176), control2: p(876, 248))
+        switch part {
+        case .cover:
+            path.addLine(to: p(876, 520))
+            path.addLine(to: p(148, 520))
+        case .bubble:
+            path.addLine(to: p(876, 684))
+            path.addCurve(to: p(712, 848), control1: p(876, 776), control2: p(804, 848))
+            path.addLine(to: p(452, 848))
+            path.addLine(to: p(316, 956))
+            path.addCurve(to: p(268, 932), control1: p(296, 972), control2: p(268, 958))
+            path.addLine(to: p(268, 836))
+            path.addCurve(to: p(148, 684), control1: p(206, 810), control2: p(148, 746))
+        }
+        path.addLine(to: p(148, 340))
+        path.addCurve(to: p(312, 176), control1: p(148, 248), control2: p(220, 176))
+        path.closeSubpath()
+        return path
     }
 }
