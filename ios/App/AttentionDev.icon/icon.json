@@ -2,6 +2,14 @@
   "fill": {
     "solid": "srgb:0.965,0.953,0.929,1.00000"
   },
+  "fill-specializations": [
+    {
+      "appearance": "dark",
+      "value": {
+        "solid": "srgb:0.082,0.082,0.102,1.00000"
+      }
+    }
+  ],
   "groups": [
     {
       "layers": [
@@ -23,6 +31,14 @@
     {
       "layers": [
         {
+          "fill-specializations": [
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.965,0.953,0.929,1.00000"
+              }
+            }
+          ],
           "glass": false,
           "image-name": "line.svg",
           "name": "line"
