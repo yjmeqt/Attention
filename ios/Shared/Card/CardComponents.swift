@@ -190,30 +190,27 @@ struct PlayGlyph: View {
     }
 }
 
-/// A SwiftUI rendition of the app icon for use inside mock system UI.
+/// The app icon in miniature, the same artwork as App/Attention.icon: a light square whose bottom-right
+/// quarter is the brand red, with a short dark line in the bottom-left quarter.
 struct AttentionGlyph: View {
     let size: CGFloat
 
     var body: some View {
+        let unit = size / 1024
         RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
-            .fill(Color(red: 0.949, green: 0.929, blue: 0.894))
-            .overlay {
-                RoundedRectangle(cornerRadius: size * 0.07, style: .continuous)
-                    .fill(Color(red: 0.659, green: 0.749, blue: 0.651))
-                    .frame(width: size * 0.5, height: size * 0.62)
-                    .overlay(alignment: .top) {
-                        RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
-                            .fill(Color(red: 0.91, green: 0.333, blue: 0.239))
-                            .frame(width: size * 0.42, height: size * 0.27)
-                            .overlay {
-                                Image(systemName: "link")
-                                    .font(.system(size: size * 0.17, weight: .bold))
-                                    .foregroundStyle(.black.opacity(0.85))
-                            }
-                            .padding(.top, size * 0.04)
-                    }
-                    .rotationEffect(.degrees(-8))
+            .fill(Color(red: 0.965, green: 0.953, blue: 0.929))
+            .overlay(alignment: .bottomTrailing) {
+                Rectangle()
+                    .fill(Color(red: 0.910, green: 0.251, blue: 0.165))
+                    .frame(width: size / 2, height: size / 2)
             }
+            .overlay(alignment: .topLeading) {
+                Rectangle()
+                    .fill(Color(red: 0.082, green: 0.082, blue: 0.102))
+                    .frame(width: 226 * unit, height: max(1, 32 * unit))
+                    .offset(x: 143 * unit, y: 752 * unit)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.225, style: .continuous))
             .frame(width: size, height: size)
             .overlay {
                 RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
