@@ -190,53 +190,31 @@ struct PlayGlyph: View {
     }
 }
 
-/// The app icon in miniature: a two-tone chat bubble on the brand red, the same artwork as App/Attention.icon.
+/// The app icon in miniature, the same artwork as App/Attention.icon: a light square whose bottom-right
+/// quarter is the brand red, with a short dark line in the bottom-left quarter.
 struct AttentionGlyph: View {
     let size: CGFloat
 
     var body: some View {
+        let unit = size / 1024
         RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
-            .fill(Color(red: 0.910, green: 0.251, blue: 0.165))
-            .overlay {
-                IconBubble(part: .bubble).fill(Color(red: 0.965, green: 0.953, blue: 0.929))
-                IconBubble(part: .cover).fill(Color(red: 0.082, green: 0.082, blue: 0.102))
+            .fill(Color(red: 0.965, green: 0.953, blue: 0.929))
+            .overlay(alignment: .bottomTrailing) {
+                Rectangle()
+                    .fill(Color(red: 0.910, green: 0.251, blue: 0.165))
+                    .frame(width: size / 2, height: size / 2)
             }
+            .overlay(alignment: .topLeading) {
+                Rectangle()
+                    .fill(Color(red: 0.082, green: 0.082, blue: 0.102))
+                    .frame(width: 226 * unit, height: max(1, 32 * unit))
+                    .offset(x: 143 * unit, y: 752 * unit)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.225, style: .continuous))
             .frame(width: size, height: size)
             .overlay {
                 RoundedRectangle(cornerRadius: size * 0.225, style: .continuous)
                     .strokeBorder(.black.opacity(0.08), lineWidth: 0.5)
             }
-    }
-}
-
-/// The icon's bubble and its dark cover block, in the icon's 1024-unit space.
-nonisolated struct IconBubble: Shape {
-    enum Part { case bubble, cover }
-    let part: Part
-
-    func path(in rect: CGRect) -> Path {
-        let s = min(rect.width, rect.height) / 1024
-        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * s, y: rect.minY + y * s) }
-        var path = Path()
-        path.move(to: p(312, 176))
-        path.addLine(to: p(712, 176))
-        path.addCurve(to: p(876, 340), control1: p(804, 176), control2: p(876, 248))
-        switch part {
-        case .cover:
-            path.addLine(to: p(876, 520))
-            path.addLine(to: p(148, 520))
-        case .bubble:
-            path.addLine(to: p(876, 684))
-            path.addCurve(to: p(712, 848), control1: p(876, 776), control2: p(804, 848))
-            path.addLine(to: p(452, 848))
-            path.addLine(to: p(316, 956))
-            path.addCurve(to: p(268, 932), control1: p(296, 972), control2: p(268, 958))
-            path.addLine(to: p(268, 836))
-            path.addCurve(to: p(148, 684), control1: p(206, 810), control2: p(148, 746))
-        }
-        path.addLine(to: p(148, 340))
-        path.addCurve(to: p(312, 176), control1: p(148, 248), control2: p(220, 176))
-        path.closeSubpath()
-        return path
     }
 }
