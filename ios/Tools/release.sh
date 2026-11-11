@@ -97,8 +97,13 @@ beta() {
   step "Upload to TestFlight (waits for processing)"
   local args=(--app $APP_ID --$kind $artifact --version $version --build-number $build --wait --output table)
   if [[ -n $group ]]; then args+=(--group $group --notify); else args+=(--upload-only); fi
-  [[ -n $notes ]] && args+=(--test-notes $notes --locale en-US)
+  # asc rejects --test-notes with --upload-only, so without a group the notes are set once the build is processed.
+  [[ -n $notes && -n $group ]] && args+=(--test-notes $notes --locale en-US)
   asc publish testflight $args
+  if [[ -n $notes && -z $group ]]; then
+    asc builds test-notes create --app $APP_ID --build-number $build --platform $PLATFORM --version $version \
+      --locale en-US --whats-new $notes --output table
+  fi
 
   step "Done. Commit the build number bump:"
   print "  git commit -am \"Build $version ($build)\""
