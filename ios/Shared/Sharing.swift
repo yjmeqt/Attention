@@ -90,6 +90,8 @@ final class ShareItem: NSObject, UIActivityItemSource {
 /// so it works as a popover on iPad and inside the share extension.
 final class SharePresenter {
     weak var anchor: UIView?
+    /// Called when the person finishes an action in the share sheet, not when they cancel it.
+    var onCompleted: () -> Void = {}
 
     /// Actions that make no sense for a link or a link card.
     private static let excluded: [UIActivity.ActivityType] = [.assignToContact, .print, .openInIBooks, .markupAsPDF]
@@ -99,6 +101,9 @@ final class SharePresenter {
         while let presented = host.presentedViewController { host = presented }
         let sheet = UIActivityViewController(activityItems: items, applicationActivities: nil)
         sheet.excludedActivityTypes = Self.excluded
+        sheet.completionWithItemsHandler = { [weak self] _, completed, _, _ in
+            if completed { self?.onCompleted() }
+        }
         sheet.popoverPresentationController?.sourceView = anchor
         sheet.popoverPresentationController?.sourceRect = anchor.bounds
         host.present(sheet, animated: true)

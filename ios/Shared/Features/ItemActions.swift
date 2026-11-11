@@ -17,7 +17,15 @@ final class ItemActions {
     @ObservationIgnored var onDeleted: ([LibraryItem]) -> Void = { _ in }
     @ObservationIgnored var onArchived: ([LibraryItem]) -> Void = { _ in }
 
-    init(library: Library) { self.library = library }
+    init(library: Library) {
+        self.library = library
+        presenter.onCompleted = { [weak self] in self?.succeeded() }
+    }
+
+    /// A share or save went through: a good moment to ask for a rating, now and then.
+    private func succeeded() {
+        ReviewPrompt.success(in: presenter.anchor?.window?.windowScene)
+    }
 
     enum Notice { case textCopied, linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
 
@@ -65,6 +73,7 @@ final class ItemActions {
         do {
             try await Self.addToPhotos(image)
             notice = .savedToPhotos
+            succeeded()
         } catch {
             notice = .photosSaveFailed
         }
