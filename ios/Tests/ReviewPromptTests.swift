@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import UIKit
 @testable import Attention
 
 @MainActor
@@ -8,8 +9,8 @@ struct ReviewPromptTests {
     private let day: TimeInterval = 24 * 60 * 60
     private let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
 
-    private func prompt(at date: Date, version: String = "1.0", defaults: UserDefaults) -> ReviewPrompt {
-        ReviewPrompt(defaults: defaults, version: version, now: { date })
+    private func prompt(at date: Date, version: String = "1.0", source: String = "app", defaults: UserDefaults) -> ReviewPrompt {
+        ReviewPrompt(defaults: defaults, version: version, source: source, now: { date })
     }
 
     private func freshDefaults() -> UserDefaults {
@@ -58,5 +59,44 @@ struct ReviewPromptTests {
         // A new version soon after still waits out the gap.
         #expect(!prompt(at: start + 30 * day, version: "1.1", defaults: defaults).isDue)
         #expect(prompt(at: start + 130 * day, version: "1.1", defaults: defaults).isDue)
+    }
+
+    @Test func countsSuccessesFromTheAppAndItsExtensions() {
+        let defaults = freshDefaults()
+        prompt(at: start, source: "app", defaults: defaults).recordSuccess()
+        prompt(at: start, source: "app.share", defaults: defaults).recordSuccess()
+        prompt(at: start, source: "app.card-action", defaults: defaults).recordSuccess()
+        #expect(prompt(at: start, defaults: defaults).successes == 3)
+        #expect(prompt(at: start + 3 * day, defaults: defaults).isDue)
+    }
+
+    @Test func futureDatesFromAWrongClockAreResetToNow() {
+        let defaults = freshDefaults()
+        let ahead = prompt(at: start + 365 * day, defaults: defaults)
+        ahead.recordFirstUse()
+        ahead.markRequested()
+        for _ in 0..<ReviewPrompt.requiredSuccesses { ahead.recordSuccess() }
+
+        // The clock is corrected: the dates count from now instead of a year from now.
+        #expect(!prompt(at: start, version: "1.1", defaults: defaults).isDue)
+        #expect(prompt(at: start + 120 * day, version: "1.1", defaults: defaults).isDue)
+    }
+
+    @Test func onlyCompletedSharesThatSendSomethingCount() {
+        let defaults = freshDefaults()
+        let library = Library(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString), inMemory: true)
+        let actions = ItemActions(library: library)
+        actions.reviewPrompt = prompt(at: start, defaults: defaults)
+
+        actions.presenter.finished(.message, completed: false)
+        actions.presenter.finished(nil, completed: false)
+        #expect(actions.reviewPrompt.successes == 0)
+
+        actions.presenter.finished(.copyToPasteboard, completed: true)
+        #expect(actions.reviewPrompt.successes == 0)
+
+        actions.presenter.finished(.message, completed: true)
+        actions.presenter.finished(UIActivity.ActivityType("com.tencent.xin.sharetimeline"), completed: true)
+        #expect(actions.reviewPrompt.successes == 2)
     }
 }

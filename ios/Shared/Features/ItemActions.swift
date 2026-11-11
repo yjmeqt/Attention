@@ -6,6 +6,7 @@ import SwiftUI
 final class ItemActions {
     let library: Library
     @ObservationIgnored let presenter = SharePresenter()
+    @ObservationIgnored var reviewPrompt = ReviewPrompt()
     var browser: BrowserLink?
     var tagTargets: [LibraryItem]?
     var textTarget: LibraryItem?
@@ -19,12 +20,14 @@ final class ItemActions {
 
     init(library: Library) {
         self.library = library
-        presenter.onCompleted = { [weak self] in self?.succeeded() }
+        presenter.onCompleted = { [weak self] activity in
+            if ReviewPrompt.counts(activity) { self?.succeeded() }
+        }
     }
 
     /// A share or save went through: a good moment to ask for a rating, now and then.
     private func succeeded() {
-        ReviewPrompt.success(in: presenter.anchor?.window?.windowScene)
+        reviewPrompt.success(in: presenter.anchor?.window?.windowScene)
     }
 
     enum Notice { case textCopied, linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
