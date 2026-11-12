@@ -19,7 +19,7 @@ xc-dev run-mac              # build and open the Mac menu bar app
 xc-dev stop                 # kill this worktree's xcodebuild, terminate the app on its sims
 xc-dev clean                # delete this worktree's sims and its DerivedData
 xc-dev prune                # dry run: sims and DerivedData left by removed worktrees
-xc-dev prune mode=delete    # delete them
+xc-dev prune delete         # delete them
 xc-dev run-device <id>      # physical iPhone; ids from `xc-dev devices-iphone`
 xc-dev :get sim_id          # any resolved variable: sim_name, bundle_id, git_worktree_slug, ...
 ```
