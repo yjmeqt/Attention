@@ -23,6 +23,7 @@ struct AttentionApp: App {
         _library = State(initialValue: Library(syncs: true))
         #endif
         try? Tips.configure()
+        ReviewPrompt().recordFirstUse()
     }
 
     var body: some Scene {

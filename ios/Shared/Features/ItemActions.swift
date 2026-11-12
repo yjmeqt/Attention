@@ -6,6 +6,7 @@ import SwiftUI
 final class ItemActions {
     let library: Library
     @ObservationIgnored let presenter = SharePresenter()
+    @ObservationIgnored var reviewPrompt = ReviewPrompt()
     var browser: BrowserLink?
     var tagTargets: [LibraryItem]?
     var textTarget: LibraryItem?
@@ -17,7 +18,17 @@ final class ItemActions {
     @ObservationIgnored var onDeleted: ([LibraryItem]) -> Void = { _ in }
     @ObservationIgnored var onArchived: ([LibraryItem]) -> Void = { _ in }
 
-    init(library: Library) { self.library = library }
+    init(library: Library) {
+        self.library = library
+        presenter.onCompleted = { [weak self] activity in
+            if ReviewPrompt.counts(activity) { self?.succeeded() }
+        }
+    }
+
+    /// A share or save went through: a good moment to ask for a rating, now and then.
+    private func succeeded() {
+        reviewPrompt.success(in: presenter.anchor?.window?.windowScene)
+    }
 
     enum Notice { case textCopied, linkCopied, linkCopiedForImage, imageCopied, savedToPhotos, photosDenied, photosSaveFailed }
 
@@ -65,6 +76,7 @@ final class ItemActions {
         do {
             try await Self.addToPhotos(image)
             notice = .savedToPhotos
+            succeeded()
         } catch {
             notice = .photosSaveFailed
         }
