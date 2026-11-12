@@ -1,1 +1,1 @@
-bookmark,read later,reading list,organizer,library,stash,url,inbox,collect,web clip,collection
+image,qr code,share,poster,thumbnail,screenshot,group,messenger,video,tweet,reel,url,save,cover

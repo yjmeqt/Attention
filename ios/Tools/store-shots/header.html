@@ -39,7 +39,7 @@ h1 span { display: block; } h1 span + span { color: var(--red); }
 .qr b { background: var(--ink); } .qr b.o { background: transparent; }
 .cards { position: relative; height: 100%; }
 
-/* Chinese: a bare link, struck out, becomes a card. */
+/* Card locales: a bare link, struck out, becomes a card. */
 .bare { position: absolute; left: -4%; top: 16%; display: flex; align-items: center; gap: 12px; background: var(--white); border-radius: 20px; padding: 20px 26px; box-shadow: 0 20px 40px -24px #0008; }
 .bare svg { flex: none; }
 .bare .dots { display: flex; gap: 6px; } .bare .dots i { width: 22px; height: 10px; border-radius: 5px; background: #8b97b8; }
@@ -87,7 +87,8 @@ const zh = `<div class="stage">${title}<div class="cards">
   <span class="arrow"></span>
   ${card("dark", "net", "left: 34%; top: 42%; width: 290px; transform: rotate(-5deg)", true)}
 </div></div>`;
-document.getElementById("hd").innerHTML = bg + (lang === "zh" ? zh : en);
+// Locales whose first screenshot is the bare-link comparison get the same picture: link, arrow, card.
+document.getElementById("hd").innerHTML = bg + (COPY[l][0][2] === "compare" ? zh : en);
 // Shrink the headline until its longer line fits its column.
 document.fonts.ready.then(() => {
   const h = document.querySelector("h1"), col = h.parentElement.firstElementChild.getBoundingClientRect().width;

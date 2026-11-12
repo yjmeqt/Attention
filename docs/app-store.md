@@ -30,7 +30,7 @@ Traditional Chinese uses the shared `zh-Hant` locale for Taiwan and Hong Kong. O
 | `release_notes.txt` | What's New |
 | `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
 
-The listing pitches one library per market. Every locale but Simplified Chinese leads with all your links from every app and site in one place, with no feed, no algorithm and no tracking; cards and QR codes come last. Simplified Chinese leads with sending YouTube and X links to WeChat, which shows them as a bare URL, as image cards with title, cover and QR code. The app's empty screen follows the same split. Keywords leave out third-party names (YouTube, X, WeChat), per guideline 2.3.7. Plain "Attention" belongs to another developer, so every name adds a localized tail: "Attention – All Your Links" in English and its equivalents, "Attention – 链接转图片卡片" in Simplified Chinese (1.0 shipped as "Attention – Save & Share Links" everywhere). Subtitles avoid repeating the name's words, since both are indexed.
+English, Simplified Chinese and Traditional Chinese lead with sending YouTube and X links to WeChat, which shows them as a bare URL, as image cards with title, cover and QR code; the library, tags and search come after. Traditional Chinese frames it as sending to WeChat groups and friends in mainland China, since LINE and WhatsApp already preview links. The other nine locales still lead with all your links from every app and site in one place, with no feed, no algorithm and no tracking. The app's empty screen still uses the library pitch outside Simplified Chinese. Keywords leave out third-party names (YouTube, X, WeChat), per guideline 2.3.7. Plain "Attention" belongs to another developer, so every name adds a localized tail: "Attention – Link Preview Cards" in English, "Attention – 链接转图片卡片" and "Attention – 連結轉圖片卡片" in Chinese, "Attention – All Your Links" and its equivalents elsewhere (1.0 shipped as "Attention – Save & Share Links" everywhere). Subtitles avoid repeating the name's words, since both are indexed.
 
 Shared files: `copyright.txt`, `primary_category.txt` (Utilities), `secondary_category.txt` (Productivity), and `review_information/notes.txt` (instructions for App Review).
 
@@ -90,18 +90,18 @@ What to Test (per build):
 
 ## Screenshots
 
-Five per device, in the order the App Store shows them; people mostly see the first three. Every language but Simplified Chinese pitches one library for links from every site, with no feed and no tracking:
+Five per device, in the order the App Store shows them; people mostly see the first three. English, Simplified Chinese and Traditional Chinese pitch sending YouTube and X links to WeChat, which shows them bare:
+
+1. `compare`: a bare link in a chat bubble, then the same link as a card (no app screen; the card is cut out of that locale's iPhone `detail` screen)
+2. `detail`, 3. `share`, 4. `template` (the Text template), 5. `search`
+
+The other languages pitch one library for links from every site, with no feed and no tracking:
 
 1. `feed`: the home feed, all your links in one place
 2. `share`: Safari's own share sheet with Attention in its app row, saving from any app
 3. `private`: Private unlocked with Face ID; no algorithm, no tracking
 4. `search`: search results, find it by site
 5. `detail`: the item detail with its card, share it as a card, text or QR code
-
-Simplified Chinese pitches sending YouTube and X links to WeChat, which shows them bare:
-
-1. `compare`: a bare link in a chat bubble, then the same link as a card (no app screen)
-2. `detail`, 3. `share`, 4. `template` (the Text template), 5. `search`
 
 | Device | Size | App Store Connect slot |
 |---|---|---|
@@ -120,10 +120,10 @@ node Tools/store-shots/export.js screenshots duo ar-SA   # one device and locale
 ```
 
 - Build with `xc-dev build-store-shots`, then run the capture script with `NO_BUILD=1`. The capture script uses the Debug app named Attention from `build/store-shots`, drives the `Attention-Shots-*` simulators, and reinstalls the app for every scene, filling the library with the Debug-only launch arguments in `Shared/Library/DemoLibrary.swift`: `-demoLinks` (needs network access), `-demoSearch Apple`, `-demoOpen 0`, `-demoPrivate` with `-demoUnlockPrivate YES` (the script enrolls Face ID and sends a matching face). `-seenShareGuide YES` skips the first-launch guide. It boots each simulator in the locale's language, since the share sheet is drawn by the system, and empties the clipboard so the "You copied a link" banner stays away.
-- Content: outside Simplified Chinese the library is Apple and Wikipedia pages only (the locale's Bauhaus article, Apple's iPhone, Music, Maps, Keynote, Swift, Podcasts and HIG pages), so no third-party content or people appear. Russian uses the US storefront, whose Apple pages preview. Traditional Chinese shares Apple's Swift page, since Chinese Wikipedia shows a sitenotice. Simplified Chinese shows a 3Blue1Brown YouTube video, its pitch, and Apple's Chinese pages; on iPad and the Duo's inner display it shares Apple's Swift page, since desktop YouTube shows faces in its sidebar.
+- Content: the card locales (English and both Chinese) show a 3Blue1Brown YouTube video, their pitch, and the locale's Apple pages; on iPad and the Duo's inner display they share Apple's Swift page, since desktop YouTube shows faces in its sidebar. Elsewhere the library is Apple and Wikipedia pages only (the locale's Bauhaus article, Apple's iPhone, Music, Maps, Keynote, Swift, Podcasts and HIG pages), so no third-party content or people appear. Russian uses the US storefront, whose Apple pages preview.
 - The iPad is rotated to landscape and the Duo unfolded or folded with the argent CLI, which also takes the Duo's screenshots (`simctl` doesn't capture a folded device's panel) and does the taps.
 - Design: Constructivism. Paper (`#ece2cd`), ink and red (`#d4261b`), a red wedge and a black diagonal bar, a heavy headline tilted −8° with its second half in red, and a monospaced subline (each script's own Noto face where the mono font doesn't cover it). The device shows the real, unedited app screen. Arabic is mirrored. Headlines and sublines live in `Tools/store-shots/copy.js` (12 locales; `es-MX` reuses `es-ES`); the layout, with each language's line-breaking rules, is `frame.html`. The exporter renders each frame at an exact App Store size and writes PNGs with no alpha channel.
-- Product page header (21:9, 3840 × 1646): `header.html`, in the same style, with the first screenshot's headline and generic link cards (no real site, logo or URL). Everything that matters sits in the middle 60%, since devices crop the edges. App Store Connect takes headers in its Asset Library, which needs an approved version; `release.sh` doesn't upload them.
+- Product page header (21:9, 3840 × 1646): `header.html`, in the same style, with the first screenshot's headline and generic shapes (no real site, logo or URL): for the card locales a bare link, an arrow and a card, elsewhere four scattered cards. Everything that matters sits in the middle 60%, since devices crop the edges. App Store Connect takes headers in its Asset Library, which needs an approved version; `release.sh` doesn't upload them.
 - Neither the raw nor the framed images are in git: run the pipeline to regenerate them before uploading. Look through every image first: a link that failed to unfurl shows as a bare tile, and Safari sometimes shows the wrong page under the share sheet. Rerun just that scene with `SCENES`, `ONLY` and `DEVICES`.
 - Upload with `Tools/release.sh metadata --apply` (see Releasing), or by hand in App Store Connect: drag each device's files into its slot, and both Duo displays into the one iPhone Duo slot.
 
@@ -135,7 +135,7 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 
 ## Design decisions
 
-- **App icon**: keep the current one.
+- **App icon**: an off-white square with a red bottom-right quarter and a short black line in the bottom-left quarter, built in Icon Composer; the Dark style inverts it.
 - **Paste button**: a plain toolbar button next to Scan, so the two look the same. The system paste control pastes without the "Allow Paste" prompt, but it forces a solid background that can't match the glass, so it was dropped; iOS asks before each paste unless the user allows pasting in Settings.
 - **Filters**: Archived and Private are in the More menu; while one is open, a prominent button for it sits beside More and closes it. Site and tag chips sit just above the search field, only while searching or while one of them is on.
 

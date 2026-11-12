@@ -100,5 +100,9 @@ enum DemoLibrary {
     static var tagFilter: String? { UserDefaults.standard.string(forKey: "demoTagFilter") }
     /// `-demoUnlockPrivate YES` opens Private, still locked, and asks for Face ID.
     static var unlocksPrivate: Bool { UserDefaults.standard.bool(forKey: "demoUnlockPrivate") }
+    /// `-demoLinks` runs, the App Store screenshots, leave out the Ask row and the clipboard banner. The simulator
+    /// can't run Apple Intelligence, so the row would only show its error, and the banner appears whenever the
+    /// simulator picks up the Mac's clipboard.
+    static var hidesPrompts: Bool { UserDefaults.standard.string(forKey: "demoLinks") != nil }
 }
 #endif
