@@ -8,7 +8,7 @@
 # byte-for-byte, so regenerating when it's already current is harmless.
 [tasks.generate]
 args = ["mode=auto"]
-desc = "XcodeGen the project. mode=auto (default) only when project.yml is newer; mode=force always."
+desc = "XcodeGen the project: only when project.yml is newer (the default), or always with `xc-dev generate force`."
 cmd  = """
 cd {{project_root}}/ios
 STAMP=Attention.xcodeproj/project.pbxproj
@@ -243,7 +243,7 @@ grep -qxF "{{sim_name}}" "$REG" 2>/dev/null || echo "{{sim_name}}" >> "$REG"
 
 [tasks.prune]
 args = ["mode=dry-run"]
-desc = "List (mode=dry-run, default) or delete (mode=delete) sims and DerivedData left by removed worktrees."
+desc = "List (the default) or delete (`xc-dev prune delete`) sims and DerivedData left by removed worktrees."
 cmd  = """
 MAIN="{{git_main_root}}"
 REG="$(cd {{project_root}} && cd "$(git rev-parse --git-common-dir)" && pwd)/xc-dev-sims"
@@ -284,7 +284,7 @@ for pl in "$HOME"/Library/Developer/Xcode/DerivedData/*/info.plist; do
         echo "Would delete DerivedData $(basename "$dir") ($ws)"
     fi
 done
-[ "{{mode}}" = "delete" ] || echo "(dry run — pass mode=delete to delete)"
+[ "{{mode}}" = "delete" ] || echo '(dry run — run `xc-dev prune delete` to delete)'
 """
 
 [tasks.build-store-shots]
