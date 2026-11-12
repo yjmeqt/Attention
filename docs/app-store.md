@@ -129,7 +129,7 @@ node Tools/store-shots/export.js screenshots duo ar-SA   # one device and locale
 
 ### Search-result creative assets
 
-Run `node ios/Tools/store-shots/search-export.js` from the repository root to generate English and Simplified Chinese search-result images in `ios/fastlane/search-results/`. Requires the store-shots npm dependencies, Google Chrome (`CHROME` overrides its path), and local raw captures `en-US/iphone-1-feed.png` and `zh-Hans/iphone-3-detail.png` under `ios/fastlane/raw/`.
+Run `node ios/Tools/store-shots/search-export.js` from the repository root (add locales to limit it, e.g. `zh-Hant`) to generate search-result images for the card locales (en-US, zh-Hans, zh-Hant) in `ios/fastlane/search-results/`. Each tells the first screenshot's story with its headline and subline from `copy.js`: a bare YouTube link in a chat bubble, struck out, and the locale's real card. Requires the store-shots npm dependencies, Google Chrome (`CHROME` overrides its path), and `ios/fastlane/raw/<locale>/card.png`, which `export.js` crops from the iPhone detail capture; the exporter fails if the text overflows or runs into the bubble or card.
 
 The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to the ASC Asset Library and assigning `APP_STORE_SEARCH_RESULTS_ASSET`. Upload, review approval, and PPO experiment start are separate steps. Keep one-off resource IDs and submission status in the corresponding PR, not this guide.
 
