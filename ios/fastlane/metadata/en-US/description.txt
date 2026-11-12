@@ -1,16 +1,22 @@
-Attention keeps all your links from every app and site in one place. No feed, no recommendations, no algorithm, just what you saved.
+Paste a YouTube or X link in WeChat and your friend sees a bare URL: no title, no cover, no idea what it is. Attention turns any link into an image card with the title, cover, source and a QR code, so it reads at a glance in any chat, and the QR code opens the original.
 
-SAVE AS YOU GO
-Save links and images from the share sheet in Safari or other apps, or paste a link. Previews bring together page titles, covers and site details when available. Sites that require a login or restrict access may have limited previews.
+CARDS FOR CHAT
+Some chat apps, WeChat among them, don't preview links from YouTube, X and many other sites. Send the card instead. Sharing as an image also copies the link, so you can paste it right after the card.
 
-ORGANIZE AND FIND
-Add tags and filter by site or tag. Search titles and text recognized in saved images. Archive items for later, or move them to Private, where viewing requires device authentication.
+ONE TAP FROM SHARE
+In YouTube, X, Safari or any other app, tap Share and choose Attention. Or copy a link and paste it in the app. Previews bring in the page title, cover and site when available; sites that require a login or restrict access may have limited previews.
 
-SHARE WITH CONTEXT
-Open the original link, share it or copy it. Turn links into image cards with a QR code, using Card, Text or QR templates that size themselves to the content. Sharing as an image also copies the link so you can paste it after sending the card.
+THE RIGHT TEMPLATE
+Card, Text or QR templates size themselves to the content, and the one that fits is picked for you. Open the original link, share it or copy it at any time.
 
-SCAN AND SAVE
+KEEP WHAT YOU SHARED
+Every link you turn into a card stays in your library. Add tags, move items to Private, where viewing requires device authentication, or archive them.
+
+FIND IT AGAIN
+Search titles and text recognized in saved images, or filter by site or tag.
+
+SCAN
 Scan QR codes with the camera or find links in a selected photo. Made for iPhone and iPad, with dark mode support.
 
-KEPT ON YOUR DEVICE
-No account required. Your library, image text recognition and card rendering stay on your device. Loading previews contacts websites and, for some previews, third-party public services. See the privacy policy for details.
+ON YOUR DEVICE
+No account required. Cards are rendered and image text is recognized on your device, and your library syncs through your own iCloud. Loading previews contacts websites and, for some previews, third-party public services. See the privacy policy for details.

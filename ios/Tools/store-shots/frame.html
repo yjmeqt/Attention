@@ -46,9 +46,13 @@ h3 span { color: var(--red); }
 :lang(ar) .ipad h3 { transform: rotate(5deg); } .ipad .f > p, .ipad > p { font-size: calc(var(--u) * 12px); }
 .ipad .b { top: 62%; }
 
-/* zh-Hans screen 1: a bare link in a chat bubble, then the same link as a card. Generic chat styling. */
+/* Card locales' screen 1: a bare link in a chat bubble, then the same link as a card. Generic chat styling. */
 .cmp { position: relative; z-index: 3; margin-top: auto; margin-bottom: 7%; align-self: center; width: 88%; display: flex; flex-direction: column; gap: calc(var(--u) * 6px); }
-.ipad .cmp { width: 52%; margin-bottom: 4%; }
+/* The iPad frame is too short to stack them: before on the left, now on the right. */
+.ipad .cmp { width: 80%; margin-bottom: 3.5%; display: grid; grid-template-columns: auto 40%; grid-template-rows: auto auto; grid-auto-flow: column;
+  column-gap: calc(var(--u) * 28px); row-gap: calc(var(--u) * 6px); align-items: start; justify-items: start; }
+.ipad .cmp .tag.now { margin-top: 0; }
+.ipad .cmp .bubble { margin-top: calc(var(--u) * 10px); }
 /* The card is taller than wide; on Duo the block is sized so the card fits under the headline. */
 .duo .cmp, .duo-cover .cmp { width: 52%; margin-bottom: 5%; }
 .duo-cover .cmp { width: 44%; margin-bottom: 4%; } .duo-cover .cmp .bubble { font-size: calc(var(--u) * 10px); }
@@ -77,10 +81,13 @@ const lang = { "zh-Hans": "zh-Hans", "zh-Hant": "zh-Hant", "ar-SA": "ar", "fr-FR
 document.documentElement.lang = lang;
 if (lang === "ar") document.documentElement.dir = "rtl";
 const [head, sub, scene] = COPY[l][k - 1];
-// capture.zsh's screens; card.png is the card export.js crops out of the zh-Hans iPhone detail screen.
+// capture.zsh's screens; card.png is the card export.js crops out of the locale's iPhone detail screen.
 const raw = s => `../../fastlane/raw/${l}/${d}-${s}.png`;
+// The comparison's two tags and the friend's reply under the bare link.
+const CMP = { "zh-Hans": ["以前", "现在", "好友：这是什么？"], "zh-Hant": ["以前", "現在", "朋友：這是什麼？"], "en-US": ["BEFORE", "NOW", "Friend: what is this?"] };
+const [before, now, reply] = CMP[l] || CMP["en-US"];
 const body = scene === "compare"
-  ? `<div class="cmp"><span class="tag">以前</span><div class="bubble">https://youtu.be/aircAruvnKk<small>好友：这是什么？</small><b>✕</b></div><span class="tag now">现在</span><img src="../../fastlane/raw/zh-Hans/card.png" alt=""></div>`
+  ? `<div class="cmp"><span class="tag">${before}</span><div class="bubble">https://youtu.be/aircAruvnKk<small>${reply}</small><b>✕</b></div><span class="tag now">${now}</span><img src="../../fastlane/raw/${l}/card.png" alt=""></div>`
   : `<div class="dev"><img src="${raw(scene)}" alt=""></div>`;
 const f = document.getElementById("f");
 f.className = `f ${d}`;

@@ -1,1 +1,1 @@
-A clearer welcome screen, and small fixes.
+A new app icon, a clearer welcome screen, and small fixes.

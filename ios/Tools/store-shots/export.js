@@ -19,22 +19,22 @@ const devices = process.argv[3] ? process.argv[3].split(",") : Object.keys(SIZES
 const locales = process.argv[4] ? process.argv[4].split(",") : Object.keys(COPY);
 const page = file => `file://${path.join(__dirname, file)}`;
 
-// The Chinese comparison screen shows the app's card on its own, cut out of the iPhone detail screen.
-function cropCard() {
-  const shot = path.join(RAW, "zh-Hans", "iphone-detail.png"), frame = path.join(RAW, "zh-Hans", "iphone-detail.json");
+// A comparison screen shows the app's card on its own, cut out of that locale's iPhone detail screen.
+function cropCard(l) {
+  const shot = path.join(RAW, l, "iphone-detail.png"), frame = path.join(RAW, l, "iphone-detail.json");
   if (!fs.existsSync(shot) || !fs.existsSync(frame)) return false;
   const f = JSON.parse(fs.readFileSync(frame, "utf8"));
   const [w, h] = execFileSync("sips", ["-g", "pixelWidth", "-g", "pixelHeight", shot], { encoding: "utf8" })
     .match(/\d+$/gm).map(Number);
   execFileSync("sips", ["-c", String(Math.round(f.height * h)), String(Math.round(f.width * w)),
-    "--cropOffset", String(Math.round(f.y * h)), String(Math.round(f.x * w)), shot, "--out", path.join(RAW, "zh-Hans", "card.png")], { stdio: "ignore" });
+    "--cropOffset", String(Math.round(f.y * h)), String(Math.round(f.x * w)), shot, "--out", path.join(RAW, l, "card.png")], { stdio: "ignore" });
   return true;
 }
 
 async function screenshots(browser) {
   const OUT = path.join(FASTLANE, "screenshots");
   const missing = [];
-  if (locales.includes("zh-Hans") && !cropCard()) missing.push("zh-Hans/iphone-detail (for the card)");
+  for (const l of locales) if (COPY[l].some(c => c[2] === "compare") && !cropCard(l)) missing.push(`${l}/iphone-detail (for the card)`);
   for (const d of devices) {
     const [w, h, scale] = SIZES[d];
     const tab = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: scale });

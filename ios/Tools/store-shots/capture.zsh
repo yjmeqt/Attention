@@ -5,9 +5,9 @@
 # Duo's screenshots need the argent CLI (npm i -g @swmansion/argent).
 #   zsh Tools/store-shots/capture.zsh
 #   DEVICES="ipad duo" ONLY="en-US ko" SCENES="share search" limit the run; NO_BUILD=1 reuses the last build.
-# Output: fastlane/raw/<locale>/<device>-<scene>.png, plus fastlane/raw/zh-Hans/iphone-detail.json, the frame of
-# the card that export.js lifts out of the detail screen for the Chinese comparison screenshot.
-# Every locale but zh-Hans: feed, share, private, search, detail. zh-Hans: detail, share, template, search.
+# Output: fastlane/raw/<locale>/<device>-<scene>.png, plus fastlane/raw/<locale>/iphone-detail.json for the card
+# locales, the frame of the card that export.js lifts out of the detail screen for their comparison screenshot.
+# Card locales (en-US, zh-Hans, zh-Hant): detail, share, template, search. The rest: feed, share, private, search, detail.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -50,6 +50,8 @@ DEVICES=${DEVICES:-}
 ONLY=${ONLY:-}
 SCENES=${SCENES:-}
 want() { [[ -z $SCENES || " $SCENES " == *" $1 "* ]] }
+# Locales whose screenshots tell the WeChat card story, with the YouTube video as the first library item.
+CARD_LOCALES=" en-US zh-Hans zh-Hant "
 log() { print "[$slug] $*" }
 
 # Boots the simulator in that language: the share sheet is drawn by the system, so the whole device has to switch,
@@ -141,15 +143,13 @@ launch() {
 # Safari on a page in that locale, with its share sheet open. Safari keeps the button in its page menu on iPhone and
 # in the toolbar on iPad.
 share_sheet() {
-  # Other locales share their Wikipedia page (banner=none keeps fundraising and app banners off it). Chinese
-  # Wikipedia shows a sitenotice about a mainland Telegram group, so Traditional Chinese shares Apple's Swift page
-  # (Apple Taiwan's store pages show prices and a country banner). Simplified Chinese shares the YouTube video, its
-  # pitch, except on large screens, whose desktop YouTube page has a sidebar full of faces.
+  # Other locales share their Wikipedia page (banner=none keeps fundraising and app banners off it). The card
+  # locales share the YouTube video, their pitch, except on large screens, whose desktop YouTube page has a sidebar
+  # full of faces; there they share Apple's Swift page.
   local page="https://$wl.wikipedia.org/$wp/$wt?banner=none" try
-  [[ $lang == zh-Hant ]] && page="https://developer.apple.com/swift/"
-  if [[ $lang == zh-Hans ]]; then
+  if (( card )); then
     page="https://m.youtube.com/watch?v=aircAruvnKk"
-    [[ $slug == ipad || $slug == duo ]] && page="https://developer.apple.com/cn/swift/"
+    [[ $slug == ipad || $slug == duo ]] && page="https://developer.apple.com/${dev}swift/"
   fi
   # Safari sometimes opens its page menu or start page instead; start over until Attention's cell is in the sheet.
   for try in 1 2 3; do
@@ -184,31 +184,53 @@ for device in $devices; do
     dev=""; [[ $ar == (cn|jp|kr)/ ]] && dev=$ar
     # Chinese Wikipedia picks its script from the path: zh-tw is Traditional.
     wp=wiki; [[ $lang == zh-Hant ]] && wp=zh-tw
+    card=0; [[ $CARD_LOCALES == *" $lang "* ]] && card=1
     log "locale $lang"
     prepare $language $region
     mkdir -p $OUT/$lang
     if [[ $lang == zh-Hans ]]; then
-      # The Chinese set shows the YouTube card (its pitch) and search results; the rest are Apple's Chinese pages.
+      # The card sets open on the YouTube card (their pitch); the rest of the library is Apple's pages for search.
       library="https://www.youtube.com/watch?v=aircAruvnKk https://www.apple.com/cn/newsroom/ https://developer.apple.com/cn/swift/ https://apps.apple.com/cn/app/keynote/id361285480 https://www.apple.com.cn/iphone/ https://developer.apple.com/cn/design/human-interface-guidelines/"
+    elif (( card )); then
+      library="https://www.youtube.com/watch?v=aircAruvnKk https://www.apple.com/${ar}newsroom/ https://developer.apple.com/${dev}swift/ https://apps.apple.com/$cc/app/keynote/id361285480 https://www.apple.com/${ar}iphone/ https://developer.apple.com/${dev}design/human-interface-guidelines/"
     else
       # Apple and Wikipedia pages only, so no third-party content shows outside the Chinese set.
       library="https://$wl.wikipedia.org/$wp/$wt https://www.apple.com/${ar}iphone/ https://music.apple.com/$cc/station/apple-music-1/ra.978194965 https://maps.apple.com/place?address=Apple%20Park&coordinate=37.334922,-122.009033&name=Apple%20Park https://apps.apple.com/$cc/app/keynote/id361285480 https://developer.apple.com/${dev}swift/ https://podcasts.apple.com/$cc/browse https://developer.apple.com/design/human-interface-guidelines/"
     fi
-    if [[ $lang != zh-Hans ]] && want feed; then
+    if (( ! card )) && want feed; then
       launch; shoot $OUT/$lang/$slug-feed.png; log "feed"
     fi
     want search && { launch -demoSearch Apple; shoot $OUT/$lang/$slug-search.png; log "search"; }
     if want detail || want template; then
       launch -demoOpen 0; shoot $OUT/$lang/$slug-detail.png; log "detail"
-      if [[ $lang == zh-Hans && $slug == iphone ]]; then
+      if (( card )) && [[ $slug == iphone ]]; then
         f=($(frame_of CardPreview))
         [[ -n $f ]] && printf '{"x": %.4f, "y": %.4f, "width": %.4f, "height": %.4f}\n' $f > $OUT/$lang/$slug-detail.json \
           || log "no CardPreview"
       fi
     fi
-    if [[ $lang == zh-Hans ]] && want template; then
-      tap "文字" && sleep 3 && shoot $OUT/$lang/$slug-template.png && log "template" || log "no Text template"
-    elif [[ $lang != zh-Hans ]] && want private; then
+    if (( card )) && want template; then
+      text_label="Text"; [[ $lang == zh-* ]] && text_label="文字"
+      # On phones the template picker sits below the cover row: scroll to it, pick Text, then scroll back to the
+      # top so the whole Text card shows.
+      if [[ -z $(frame_of $text_label) ]]; then
+        argent run gesture-swipe --udid $udid --fromX 0.5 --fromY 0.75 --toX 0.5 --toY 0.35 --momentum false --durationMs 600 >/dev/null
+        sleep 1.5
+        # The Duo ignores the momentum-free swipe; a plain one scrolls it.
+        if [[ -z $(frame_of $text_label) ]]; then
+          argent run gesture-swipe --udid $udid --fromX 0.5 --fromY 0.8 --toX 0.5 --toY 0.3 --durationMs 400 >/dev/null
+          sleep 1.5
+        fi
+      fi
+      if tap $text_label; then
+        sleep 3
+        argent run gesture-swipe --udid $udid --fromX 0.5 --fromY 0.3 --toX 0.5 --toY 0.85 --durationMs 400 >/dev/null
+        sleep 2
+        shoot $OUT/$lang/$slug-template.png && log "template"
+      else
+        log "no Text template"
+      fi
+    elif (( ! card )) && want private; then
       launch -demoPrivate "0 1 2 3 4 5 6 7" -demoUnlockPrivate YES
       for _ in {1..15}; do [[ -n $(frame_of "Face ID") ]] && break; sleep 1; done
       for _ in {1..6}; do xcrun simctl spawn $udid notifyutil -p com.apple.BiometricKit_Sim.pearl.match; sleep 1; done

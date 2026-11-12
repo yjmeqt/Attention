@@ -1,13 +1,14 @@
 // [headline, subline, raw scene] for each screenshot, in App Store order. The <span> part is set in red.
-// Every language but Chinese pitches one library for links from every site, shown with Apple and Wikipedia pages only;
-// Chinese pitches sending YouTube and X links to WeChat.
+// English and both Chinese sets pitch sending YouTube and X links to WeChat as image cards, starting with the
+// bare-link comparison; the other languages still pitch one library for links from every site, shown with Apple and
+// Wikipedia pages only.
 const COPY = {
   "en-US": [
-    ["All your links. <span>One place!</span>", "From any app and any site", "feed"],
-    ["Save from <span>any app!</span>", "Tap Share, then Attention", "share"],
-    ["No algorithm. <span>No tracking!</span>", "No feed, only what you saved. Private stays behind Face ID", "private"],
-    ["Find it <span>by site!</span>", "Search everything, or filter by site", "search"],
-    ["Share it <span>your way!</span>", "As a card, plain text or a QR code", "detail"],
+    ["Don't send a <span>bare URL!</span>", "In WeChat a YouTube or X link is just text. Send a card instead", "compare"],
+    ["Title, cover, <span>QR code!</span>", "Friends scan it to open the original", "detail"],
+    ["Tap Share. <span>Done!</span>", "In YouTube or X, tap Share, then Attention", "share"],
+    ["Card or text, <span>your pick!</span>", "The right template is picked for you", "template"],
+    ["Everything you sent, <span>kept!</span>", "Search, or filter by site", "search"],
   ],
   "zh-Hans": [
     ["别再发<br><span>一串网址！</span>", "YouTube、X 的链接发到微信只剩网址。发张卡片，一眼看懂", "compare"],
@@ -17,11 +18,11 @@ const COPY = {
     ["存过的，<br><span>随时找回！</span>", "搜索，或按网站筛选", "search"],
   ],
   "zh-Hant": [
-    ["所有連結，<br><span>集中一處！</span>", "來自任何 App、任何網站", "feed"],
-    ["任何 App<br>都能<span>儲存！</span>", "點一下分享，再選 Attention", "share"],
-    ["無演算法。<br><span>無追蹤！</span>", "只看你的收藏，私密項目以 Face ID 保護", "private"],
-    ["依網站<br><span>找回！</span>", "搜尋全部，或依網站篩選", "search"],
-    ["想怎麼分享，<br><span>都可以！</span>", "卡片、文字或 QR Code", "detail"],
+    ["別再傳<br><span>一串網址！</span>", "YouTube、X 的連結傳到微信只剩網址。傳張卡片，一眼看懂", "compare"],
+    ["標題、封面、<br><span>QR Code！</span>", "朋友掃碼，就能打開原始連結", "detail"],
+    ["點分享，<br><span>一鍵產生！</span>", "在 YouTube、X 裡點分享，選 Attention", "share"],
+    ["卡片、文字、<br><span>隨你選！</span>", "預設幫你選好合適的樣板", "template"],
+    ["存過的，<br><span>隨時找回！</span>", "搜尋，或依網站篩選", "search"],
   ],
   "ko": [
     ["모든 링크를 <span>한곳에!</span>", "어떤 앱, 어떤 사이트에서든", "feed"],
