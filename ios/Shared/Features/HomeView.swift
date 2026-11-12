@@ -20,6 +20,11 @@ private struct HeaderGlyph: View {
 }
 
 struct HomeView: View {
+    #if DEBUG
+    private static var hidesPrompts: Bool { DemoLibrary.hidesPrompts }
+    #else
+    private static let hidesPrompts = false
+    #endif
     let library: Library
 
     @State private var filter = FeedFilter()
@@ -230,7 +235,7 @@ struct HomeView: View {
             // Right above the search field, which lives in the bottom bar.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 #if os(iOS) && !SHARE_EXTENSION
-                if searching && !selecting && (assistant.showsAskEntry || assistant.availabilityMessage != nil) {
+                if searching && !selecting && !Self.hidesPrompts && (assistant.showsAskEntry || assistant.availabilityMessage != nil) {
                     VStack(alignment: .leading, spacing: 6) {
                         if assistant.showsAskEntry {
                             Button {
@@ -253,7 +258,7 @@ struct HomeView: View {
                     .padding(.bottom, 8)
                 }
                 #endif
-                if let clipboardOffer, !selecting {
+                if let clipboardOffer, !selecting, !Self.hidesPrompts {
                     ClipboardBanner(offer: clipboardOffer, paste: paste, dismiss: dismissClipboard)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .padding(.bottom, 4)
