@@ -1,1 +1,1 @@
-image,qr code,share,poster,thumbnail,screenshot,group,messenger,video,tweet,reel,url,save,cover
+image,code,share,poster,thumbnail,screenshot,group,messenger,video,tweet,reel,url,save,scan,maker
