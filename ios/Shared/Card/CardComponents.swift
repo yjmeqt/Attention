@@ -64,7 +64,7 @@ struct QRBadge: View {
     let url: URL
     let size: CGFloat
     let palette: CardPalette
-    var caption = String(localized: "Scan to open")
+    var caption: String?
     var logo: PlatformImage?
 
     var body: some View {
@@ -85,9 +85,11 @@ struct QRBadge: View {
                 }
                 .padding(6)
                 .background(.white, in: .rect(cornerRadius: 8))
-            Text(verbatim: caption)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(palette.secondary)
+            if let caption {
+                Text(verbatim: caption)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(palette.secondary)
+            }
         }
     }
 }
@@ -96,9 +98,7 @@ struct BrandMark: View {
     let palette: CardPalette
 
     var body: some View {
-        Text("Made with \(Brand.name)")
-            .font(.system(size: 11))
-            .foregroundStyle(palette.tertiary)
+        BrandLabel(glyphSize: 14, font: .system(size: 11, weight: .semibold), color: palette.tertiary)
     }
 }
 
@@ -109,12 +109,14 @@ struct CardFooter: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(verbatim: meta.displayURL)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(palette.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+            VStack(alignment: .leading, spacing: 6) {
+                if qrSize != nil {
+                    Text("Scan QR code")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(palette.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
                 BrandMark(palette: palette)
             }
             Spacer(minLength: 0)
@@ -125,28 +127,38 @@ struct CardFooter: View {
     }
 }
 
+/// The app icon beside "Made with Attention", centered on the text.
+struct BrandLabel: View {
+    let glyphSize: CGFloat
+    let font: Font
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: glyphSize / 3) {
+            AttentionGlyph(size: glyphSize)
+            Text("Made with \(Brand.name)")
+                .font(font)
+                .foregroundStyle(color)
+        }
+    }
+}
+
 /// Shared branding and QR layout for image tiles and saved-text cards.
 struct BrandedCardFooter: View {
     let tint: CardTint
-    var displayURL: String?
     var qrURL: URL?
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                if let displayURL {
-                    Text(verbatim: displayURL)
+                if qrURL != nil {
+                    Text("Scan QR code")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(tint.secondary)
                         .lineLimit(1)
-                        .truncationMode(.middle)
+                        .minimumScaleFactor(0.8)
                 }
-                HStack(spacing: 6) {
-                    AttentionGlyph(size: 18)
-                    Text("Made with \(Brand.name)")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(tint.secondary)
-                }
+                BrandLabel(glyphSize: 18, font: .system(size: 12, weight: .semibold), color: tint.secondary)
             }
             Spacer(minLength: 0)
             if let qrURL {
