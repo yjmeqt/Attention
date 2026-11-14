@@ -1,19 +1,24 @@
 import SwiftUI
 
-/// Animated walkthrough of pinning Attention in the system share sheet.
+/// Animated walkthrough: first saving a copied link from the clipboard banner, then pinning Attention in the
+/// system share sheet.
 struct ShareSheetGuide: View {
     var onWatched: (() -> Void)? = nil
-    @State private var phase: Phase = .home
+    @State private var phase: Phase = .copyHome
     @State private var target: GuideTarget?
     @State private var pressing = false
     @State private var run = 0
     @Namespace private var ns
 
     enum Phase: Int, CaseIterable {
-        case home, sheet, list, editing, added, finished
+        case copyHome, copySheet, banner, saved, home, sheet, list, editing, added, finished
 
         var target: GuideTarget? {
             switch self {
+            case .copyHome: .share
+            case .copySheet: .copy
+            case .banner: .paste
+            case .saved: nil
             case .home: .share
             case .sheet: .more
             case .list: .edit
@@ -25,6 +30,10 @@ struct ShareSheetGuide: View {
 
         var caption: String {
             switch self {
+            case .copyHome: String(localized: "Tap the Share button")
+            case .copySheet: String(localized: "Tap Copy")
+            case .banner: String(localized: "Open \(Brand.name) and tap Paste")
+            case .saved: String(localized: "Your link is saved as a card")
             case .home: String(localized: "Tap the Share button")
             case .sheet: String(localized: "Swipe the app row to the end and tap More")
             case .list: String(localized: "Tap Edit")
@@ -33,6 +42,15 @@ struct ShareSheetGuide: View {
             case .finished: String(localized: "\(Brand.name) now shows up front in the share sheet")
             }
         }
+
+        /// The first scenes copy a link in another app and save it from the banner; the rest pin the share sheet.
+        var title: String {
+            rawValue < Phase.home.rawValue ? String(localized: "Copy and Paste") : String(localized: "Pin to Share Sheet")
+        }
+
+        var showsLibrary: Bool { self == .banner || self == .saved }
+        var showsSheet: Bool { self == .copySheet || self == .sheet || self == .finished }
+        var showsAppList: Bool { self == .list || self == .editing || self == .added }
     }
 
     var body: some View {
@@ -44,7 +62,7 @@ struct ShareSheetGuide: View {
             .padding()
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(String(localized: "Pin to Share Sheet"))
+        .navigationTitle(phase.title)
         .navigationBarTitleDisplayMode(.inline)
         .task(id: run) { await play() }
     }
@@ -52,16 +70,24 @@ struct ShareSheetGuide: View {
     private var stage: some View {
         ZStack(alignment: .bottom) {
             GuideSourcePage()
-            if phase != .home {
-                Color.black.opacity(0.25).transition(.opacity)
+            // Switching apps: the library slides over the page the link was copied from.
+            if phase.showsLibrary {
+                GuideLibrary(saved: phase == .saved)
+                    .transition(.move(edge: .trailing))
+                    .zIndex(1)
             }
-            if phase == .sheet || phase == .finished {
+            if phase.showsSheet || phase.showsAppList {
+                Color.black.opacity(0.25).transition(.opacity).zIndex(2)
+            }
+            if phase.showsSheet {
                 GuideShareSheet(pinned: phase == .finished)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(3)
             }
-            if phase == .list || phase == .editing || phase == .added {
+            if phase.showsAppList {
                 GuideAppList(editing: phase != .list, added: phase == .added, ns: ns)
                     .transition(.move(edge: .bottom))
+                    .zIndex(3)
             }
         }
         .frame(width: 290, height: 560)
@@ -105,21 +131,24 @@ struct ShareSheetGuide: View {
 
     private func play() async {
         while !Task.isCancelled {
-            withAnimation(.smooth) { phase = .home; target = nil }
+            withAnimation(.smooth) { phase = .copyHome; target = nil }
             guard await pause(0.8) else { return }
             for p in Phase.allCases.dropLast() {
-                withAnimation(.smooth(duration: 0.6)) { target = p.target }
-                guard await pause(0.9) else { return }
-                withAnimation(.easeIn(duration: 0.12)) { pressing = true }
-                guard await pause(0.16) else { return }
-                withAnimation(.easeOut(duration: 0.2)) { pressing = false }
+                // A scene without a target has nothing to tap; it moves on by itself.
+                if let tap = p.target {
+                    withAnimation(.smooth(duration: 0.6)) { target = tap }
+                    guard await pause(0.9) else { return }
+                    withAnimation(.easeIn(duration: 0.12)) { pressing = true }
+                    guard await pause(0.16) else { return }
+                    withAnimation(.easeOut(duration: 0.2)) { pressing = false }
+                }
                 let next = Phase(rawValue: p.rawValue + 1) ?? .finished
                 withAnimation(.snappy(duration: 0.45)) {
                     phase = next
-                    if next == .finished { target = nil }
+                    if next.target == nil { target = nil }
                 }
                 if next == .finished { onWatched?() }
-                guard await pause(1.3) else { return }
+                guard await pause(next == .saved ? 2.2 : 1.3) else { return }
             }
             guard await pause(2.4) else { return }
         }
@@ -132,7 +161,7 @@ struct ShareSheetGuide: View {
 
 
 nonisolated enum GuideTarget: Hashable, Sendable {
-    case share, more, edit, add, done
+    case share, copy, paste, more, edit, add, done
 }
 
 nonisolated struct GuideTargetKey: PreferenceKey {
@@ -205,6 +234,78 @@ private struct GuideSourcePage: View {
     }
 }
 
+/// Attention's library with the banner that offers the copied link, then the card it was saved as.
+private struct GuideLibrary: View {
+    let saved: Bool
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                AttentionGlyph(size: 26)
+                Text(Brand.name).font(.title3.bold())
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 56)
+            .padding(.horizontal, 18)
+
+            HStack(alignment: .top, spacing: 10) {
+                ForEach([[120.0, 150, 90], [150.0, 100, 110]], id: \.self) { heights in
+                    VStack(spacing: 10) {
+                        ForEach(heights, id: \.self) { height in
+                            RoundedRectangle(cornerRadius: 12).fill(.fill.tertiary).frame(height: height)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .opacity(saved ? 0.35 : 1)
+            .overlay {
+                if saved {
+                    SampleCard(scale: 0.55)
+                        .transition(.scale(scale: 0.5).combined(with: .opacity))
+                }
+            }
+
+            if !saved {
+                banner.transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .padding(.bottom, 26)
+        .background(Color(.systemBackground))
+    }
+
+    private var banner: some View {
+        HStack(spacing: 8) {
+            Label("You copied a link", systemImage: "link")
+                .font(.footnote.weight(.medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            Label(String(localized: "Paste"), systemImage: "doc.on.clipboard")
+                .font(.footnote.weight(.semibold))
+                .lineLimit(1)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(.tint, in: .capsule)
+                .fixedSize()
+                .guideTarget(.paste)
+            Image(systemName: "xmark")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, 12)
+        .padding(.vertical, 7)
+        .background(.regularMaterial, in: .capsule)
+        .overlay(Capsule().strokeBorder(.secondary.opacity(0.2)))
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+        .padding(.horizontal, 12)
+    }
+}
+
 private struct GuideShareSheet: View {
     let pinned: Bool
 
@@ -244,7 +345,11 @@ private struct GuideShareSheet: View {
             }
             Divider()
             HStack(spacing: 12) {
-                ForEach(["doc.on.doc", "person.crop.circle.badge.plus", "eyeglasses", "chevron.down"], id: \.self) { symbol in
+                Image(systemName: "doc.on.doc")
+                    .frame(width: 50, height: 50)
+                    .background(.fill.tertiary, in: .circle)
+                    .guideTarget(.copy)
+                ForEach(["person.crop.circle.badge.plus", "eyeglasses", "chevron.down"], id: \.self) { symbol in
                     Image(systemName: symbol)
                         .frame(width: 50, height: 50)
                         .background(.fill.tertiary, in: .circle)
