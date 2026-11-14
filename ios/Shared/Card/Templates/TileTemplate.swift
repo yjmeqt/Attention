@@ -137,7 +137,7 @@ struct TileTemplate: View {
     }
 
     private func footer(_ tint: CardTint) -> some View {
-        BrandedCardFooter(tint: tint, displayURL: meta.displayURL, qrURL: meta.shareURL)
+        BrandedCardFooter(tint: tint, qrURL: meta.shareURL)
     }
 }
 

@@ -7093,7 +7093,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "长按识别二维码打开"
+            "value" : "扫描二维码打开"
           }
         },
         "zh-Hant" : {
@@ -7104,66 +7104,66 @@
         }
       }
     },
-    "Scan to open" : {
+    "Scan QR code" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "امسح للفتح"
+            "value" : "امسح رمز QR"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zum Öffnen scannen"
+            "value" : "QR-Code scannen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escanea para abrir"
+            "value" : "Escanea el código QR"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scanner pour ouvrir"
+            "value" : "Scannez le code QR"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スキャンして開く"
+            "value" : "QRコードをスキャン"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "스캔하여 열기"
+            "value" : "QR 코드 스캔"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сканируйте, чтобы открыть"
+            "value" : "Отсканируйте QR-код"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quét để mở"
+            "value" : "Quét mã QR"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "长按识别"
+            "value" : "扫描二维码"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "掃描開啟"
+            "value" : "掃描 QR Code"
           }
         }
       }
