@@ -112,7 +112,7 @@ struct HomeView: View {
         .sheet(isPresented: $showsSettings) { SettingsView() }
         .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
-                ShareSheetGuide(.copy, onWatched: { guideWatched = true })
+                CopyGuide(onWatched: { guideWatched = true })
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") { showsGuide = false }
@@ -525,16 +525,10 @@ struct HomeView: View {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     }
                     NavigationLink {
-                        ShareSheetGuide(.copy)
+                        CopyGuide()
                             .onAppear { guideTip.invalidate(reason: .actionPerformed) }
                     } label: {
                         Label("Copy and Paste", systemImage: "doc.on.clipboard")
-                    }
-                    NavigationLink {
-                        ShareSheetGuide(.pin)
-                            .onAppear { guideTip.invalidate(reason: .actionPerformed) }
-                    } label: {
-                        Label("Pin \(Brand.name) to the front of the share sheet", systemImage: "pin")
                     }
                 } label: {
                     Label("More", systemImage: "ellipsis")
@@ -555,7 +549,7 @@ struct HomeView: View {
         }
     }
 
-    private static let guideSource = "shareSheetGuide"
+    private static let guideSource = "copyGuide"
 
     /// Once the guide has shrunk into More, More bounces, then a tip says the guide lives there.
     private func guideDismissed() {

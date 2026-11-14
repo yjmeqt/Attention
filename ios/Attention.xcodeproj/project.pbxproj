@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		01F8CE2F229C561749BB8435 /* SearchRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E45A136035A28DAF300FB6C /* SearchRequestTests.swift */; };
-		027200EC7E80BC55E51E5F82 /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
 		0478AD3547EE74760F29D103 /* SavedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897D2CE57F169B765172CF03 /* SavedTextEditor.swift */; };
 		04C1D5C725C41C195B9C0514 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928DD4E2EC98DA34C218E7C4 /* Library.swift */; };
 		05A2DD05CE972D0778065414 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13DCB3DAE71878D65C76C77 /* CardView.swift */; };
@@ -26,7 +25,6 @@
 		0A17E0349C80D03303E834B2 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058199DB1D3A8B528047D93F /* LibraryView.swift */; };
 		0A25B275E380860CB9504973 /* AttentionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CEC5ACF91CD65913FA082F63 /* AttentionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0B04D26888FE8917FB09B581 /* MacClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AF2B9FFA867D69887A1FF3 /* MacClipboard.swift */; };
-		0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
 		0CCCC876C46563564DCC95F9 /* SearchDemoCorpusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CE9C9614339C0BD194741 /* SearchDemoCorpusTests.swift */; };
 		0D47F8F36791335C86609BC3 /* CardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430B9788D92BAB15EA6BD2A /* CardControls.swift */; };
 		0E5A766358D25359C5FB6B29 /* CardPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7465AC0D67046C8C505116 /* CardPalette.swift */; };
@@ -80,7 +78,6 @@
 		30B27752CBBB7386D30C5FD4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AA2328CF3B5D9937C118BF35 /* InfoPlist.strings */; };
 		31080F8C5A030E4AE3EAA09C /* ItemInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873D6516EF481D43954CD703 /* ItemInspector.swift */; };
 		3157155B76C7AFCEA08D71C8 /* ReviewPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8C8BC7C677D204C48B1C35 /* ReviewPrompt.swift */; };
-		3322AB4AC0482F090C66F76B /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
 		336241E0D9B48DCA0FB9D284 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 673FE037334CF4F013AADC70 /* InfoPlist.strings */; };
 		33F700B6D8B0A58DD62C6511 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */; };
 		34E1629EADB397CBDC465323 /* ClipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8811F6C3F4949FEC3B825642 /* ClipModel.swift */; };
@@ -102,7 +99,6 @@
 		3D2E271575691E9C0D8E470D /* AttentionDev.icon in Resources */ = {isa = PBXBuildFile; fileRef = 58643BE21B3CFFCCB378A57F /* AttentionDev.icon */; };
 		3DC42137232B0797BA438D2E /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995BDC3986BCF6B25F34BEF3 /* Platform.swift */; };
 		3E46D2219126B00A7ED6C6A4 /* GuideTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47FBF0A975C896C75D1AB8 /* GuideTip.swift */; };
-		3E8F34DDB46148322CD5D873 /* ShareSheetGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */; };
 		3EDA69B40FB6624C54B67E86 /* CLIPTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB48988FC880DF5292691D21 /* CLIPTokenizer.swift */; };
 		3F289AA59157E6ECB742EC29 /* LongPressTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */; };
 		410391E562DD9663730B1638 /* QRScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CB68E970E6B587DFFBF994 /* QRScanner.swift */; };
@@ -177,6 +173,7 @@
 		79AD9CCC1AD680C2C64124F7 /* Assistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A42364C5A1C3DA679EC841C /* Assistant.swift */; };
 		7B8E68E0108DE37F1717FD16 /* TileTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D003FB4E59849062A3EBCC /* TileTemplate.swift */; };
 		7BF406992AAA63FECA494906 /* ImageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C124B6E5A25B69451C95D9 /* ImageData.swift */; };
+		7C91744495E104780F8868C6 /* CopyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */; };
 		7DAB1A47A813D335C0C79AAB /* QueryPlanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F90FC6A6FFDC3679BCD8246 /* QueryPlanTests.swift */; };
 		7E224918BC34A89C33526CE8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E354346446847E36C65C2E14 /* InfoPlist.strings */; };
 		7FAEB0C5AF81F16DDF0FEC53 /* UnfurlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2727A28BE0D218D5ED70BD /* UnfurlTests.swift */; };
@@ -288,10 +285,13 @@
 		E9752642B8B3A41B0DCAC1EF /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFA6F5B10F5569D29192E86 /* Model.swift */; };
 		E9BF107E28EB8DD11B389890 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4CA1D0F66EE6F25B2809D7 /* ShareViewController.swift */; };
 		EA7C25ABD99591F750E160C8 /* ReviewPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8C8BC7C677D204C48B1C35 /* ReviewPrompt.swift */; };
+		EACD1941C4A1FA4F5B526DCD /* CopyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */; };
+		EB0022B9466A5634A3B6FAD4 /* CopyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */; };
 		ECB671B7B09F2F2C811149F9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DE8D38812BE8E53CB38E4014 /* InfoPlist.strings */; };
 		ECE8D2F82106875E9609C88E /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4CA1D0F66EE6F25B2809D7 /* ShareViewController.swift */; };
 		ED1610DED19C5C0C064BD826 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BCD5ADC04FD53110AFF20000 /* PrivacyInfo.xcprivacy */; };
 		ED385524D1E1E30689361571 /* Drawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC19747221FAECCFEE3559E /* Drawer.swift */; };
+		ED82F45B26BD76D6B80FF693 /* CopyGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */; };
 		EDDB62F70856BE9CFE664AE1 /* Unfurler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */; };
 		EDEA375466A567E4772DFD3B /* Intake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF7324B5EBF1F088F7F36B0 /* Intake.swift */; };
 		EE779A1E62A122BEAEDCB769 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995BDC3986BCF6B25F34BEF3 /* Platform.swift */; };
@@ -370,7 +370,6 @@
 		0BF281F4BE559A2247003492 /* AttentionCardAction.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = AttentionCardAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F6C7D3CD8B1168A395CD85D /* LongPressTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressTip.swift; sourceTree = "<group>"; };
 		0F90FC6A6FFDC3679BCD8246 /* QueryPlanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPlanTests.swift; sourceTree = "<group>"; };
-		18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetGuide.swift; sourceTree = "<group>"; };
 		1AF7324B5EBF1F088F7F36B0 /* Intake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intake.swift; sourceTree = "<group>"; };
 		1E7465AC0D67046C8C505116 /* CardPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPalette.swift; sourceTree = "<group>"; };
 		1F45F1638D4DDEFDD7EC9D3F /* MinimalTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTemplate.swift; sourceTree = "<group>"; };
@@ -442,6 +441,7 @@
 		A01DED85AF2295463CF54F28 /* DemoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoLibrary.swift; sourceTree = "<group>"; };
 		A179081DF91D0979057FC8A9 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1E6571FA7129F841B033E4A /* MenuPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPanel.swift; sourceTree = "<group>"; };
+		A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyGuide.swift; sourceTree = "<group>"; };
 		A5AAF1C1113490DF53B80233 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A7D7FE771184F783EEC3D10D /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A9637BC5D5902AC60C6C10EB /* ACKNOWLEDGEMENTS */ = {isa = PBXFileReference; path = ACKNOWLEDGEMENTS; sourceTree = "<group>"; };
@@ -562,6 +562,7 @@
 		56D6D7073D18A5D4E13079AA /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				A45007E2DFAAAC228757B6B1 /* CopyGuide.swift */,
 				EFA25D6EE15580CAF8E3954D /* EmptyState.swift */,
 				46736B2D6210E236010432C4 /* ItemProviders.swift */,
 				F8F2A11C5E4F644AC96B880D /* Localizable.xcstrings */,
@@ -569,7 +570,6 @@
 				995BDC3986BCF6B25F34BEF3 /* Platform.swift */,
 				C1CB68E970E6B587DFFBF994 /* QRScanner.swift */,
 				7D8C8BC7C677D204C48B1C35 /* ReviewPrompt.swift */,
-				18E35A062B49A47DD4850F6F /* ShareSheetGuide.swift */,
 				22A54ED73BE55F2399F8E6A2 /* ShareSuggestions.swift */,
 				9792D39565DE3A1F9C1B3188 /* Sharing.swift */,
 				777D89B40F2DC9BE6B80DA5C /* Unfurler.swift */,
@@ -1107,6 +1107,7 @@
 				392DD5C643E9A1BD17E41EDD /* ClipPrompt.swift in Sources */,
 				C39087D78043072CEBACD4B2 /* ClipSearch.swift in Sources */,
 				6C2FADFCCC7B878AE16560A8 /* ClipSettingsRow.swift in Sources */,
+				ED82F45B26BD76D6B80FF693 /* CopyGuide.swift in Sources */,
 				C1F97A05439B595D1A2412F4 /* DemoLibrary.swift in Sources */,
 				5AA72B08A1A97323A21F1B4B /* Drawer.swift in Sources */,
 				6A712FF14242B1D6894B6882 /* EmptyState.swift in Sources */,
@@ -1139,7 +1140,6 @@
 				BC65784A9BD83FABDBEFC5F5 /* SavedTextEditor.swift in Sources */,
 				E676AD7527BBA78FAF54FD2E /* SearchRequest.swift in Sources */,
 				236F388304B7E21DA9B176F3 /* SettingsView.swift in Sources */,
-				3E8F34DDB46148322CD5D873 /* ShareSheetGuide.swift in Sources */,
 				E33650851A5B0A158F18E690 /* ShareSuggestions.swift in Sources */,
 				45537D91A08134B8F80C8836 /* ShareViewController.swift in Sources */,
 				27C3B75F9FFDD74ED0E53258 /* Sharing.swift in Sources */,
@@ -1169,6 +1169,7 @@
 				DA00B1DC2421E67F837FF211 /* ClipPrompt.swift in Sources */,
 				F2A098DA36F9F3B95166568D /* ClipSearch.swift in Sources */,
 				789A259EF4FE839C446D4916 /* ClipSettingsRow.swift in Sources */,
+				7C91744495E104780F8868C6 /* CopyGuide.swift in Sources */,
 				88C47DF88A43C2987672EA93 /* DemoLibrary.swift in Sources */,
 				48B405D85D1CC5CCA2407344 /* Drawer.swift in Sources */,
 				E1A7C12C637E8B4F8B69AF6C /* EmptyState.swift in Sources */,
@@ -1202,7 +1203,6 @@
 				6336FADF3616CCE555DF3920 /* SearchDemoCorpus.swift in Sources */,
 				C71284B25F78CBBE6973D362 /* SearchRequest.swift in Sources */,
 				919B78A56308C6B78A6D0C86 /* SettingsView.swift in Sources */,
-				0B21CCA9325B5CD74D0670E8 /* ShareSheetGuide.swift in Sources */,
 				FA1CCA192835C0D9CDE91283 /* ShareSuggestions.swift in Sources */,
 				9F907253B9B6A1D219A6D4AC /* Sharing.swift in Sources */,
 				4CB62BC8E7B5D4EA9EBF92D0 /* Sidebar.swift in Sources */,
@@ -1223,6 +1223,7 @@
 				C27D6022DCF7F60622EA3702 /* CardControls.swift in Sources */,
 				B85D02B2BE317AB5EF3DE03D /* CardPalette.swift in Sources */,
 				1FE2BA74494548C936FBE027 /* CardView.swift in Sources */,
+				EB0022B9466A5634A3B6FAD4 /* CopyGuide.swift in Sources */,
 				06CCC98633DC0D98ADD89B8A /* DemoLibrary.swift in Sources */,
 				ED385524D1E1E30689361571 /* Drawer.swift in Sources */,
 				D88AEED9B7EC0814585D4C28 /* EmptyState.swift in Sources */,
@@ -1252,7 +1253,6 @@
 				3157155B76C7AFCEA08D71C8 /* ReviewPrompt.swift in Sources */,
 				0478AD3547EE74760F29D103 /* SavedTextEditor.swift in Sources */,
 				B91FC6560BC945551F57DE79 /* SettingsView.swift in Sources */,
-				027200EC7E80BC55E51E5F82 /* ShareSheetGuide.swift in Sources */,
 				99EB6DC707C74D02B7303972 /* ShareSuggestions.swift in Sources */,
 				ECE8D2F82106875E9609C88E /* ShareViewController.swift in Sources */,
 				C0A56CB704FF2B96B432D8A4 /* Sharing.swift in Sources */,
@@ -1281,6 +1281,7 @@
 				A443AD6689CCF4AC40B3347C /* ClipPrompt.swift in Sources */,
 				06E6C0290B3B20E55722EED7 /* ClipSearch.swift in Sources */,
 				416C3530CFBEA48FC3779840 /* ClipSettingsRow.swift in Sources */,
+				EACD1941C4A1FA4F5B526DCD /* CopyGuide.swift in Sources */,
 				3A3D6B5A502E97EABBFC2E2A /* DemoLibrary.swift in Sources */,
 				73E3E4B2300E8EF47F01E0FA /* Drawer.swift in Sources */,
 				1D7D1E32341FC4B62C223203 /* EmptyState.swift in Sources */,
@@ -1313,7 +1314,6 @@
 				633EEEAA8BA26D5D6BE01922 /* SavedTextEditor.swift in Sources */,
 				06C1A3ABE65CADD90972FF33 /* SearchRequest.swift in Sources */,
 				ACAA0383B8CBE3041B5A0B0C /* SettingsView.swift in Sources */,
-				3322AB4AC0482F090C66F76B /* ShareSheetGuide.swift in Sources */,
 				AF332D996E8A1B9C3DA14F0E /* ShareSuggestions.swift in Sources */,
 				E9BF107E28EB8DD11B389890 /* ShareViewController.swift in Sources */,
 				079232B036DA1E354DE04F3B /* Sharing.swift in Sources */,
