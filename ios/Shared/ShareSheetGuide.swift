@@ -1,14 +1,39 @@
 import SwiftUI
 
-/// Animated walkthrough: first saving a copied link from the clipboard banner, then pinning Attention in the
-/// system share sheet.
+/// Animated walkthrough of one way to get links into Attention: saving a copied link from the clipboard banner,
+/// or pinning Attention in the system share sheet.
 struct ShareSheetGuide: View {
+    let chapter: Chapter
     var onWatched: (() -> Void)? = nil
-    @State private var phase: Phase = .copyHome
+    @State private var phase: Phase
     @State private var target: GuideTarget?
     @State private var pressing = false
     @State private var run = 0
     @Namespace private var ns
+
+    init(_ chapter: Chapter, onWatched: (() -> Void)? = nil) {
+        self.chapter = chapter
+        self.onWatched = onWatched
+        _phase = State(initialValue: chapter.phases[0])
+    }
+
+    enum Chapter {
+        case copy, pin
+
+        var phases: [Phase] {
+            switch self {
+            case .copy: [.copyHome, .copySheet, .banner, .saved]
+            case .pin: [.home, .sheet, .list, .editing, .added, .finished]
+            }
+        }
+
+        var title: String {
+            switch self {
+            case .copy: String(localized: "Copy and Paste")
+            case .pin: String(localized: "Pin to Share Sheet")
+            }
+        }
+    }
 
     enum Phase: Int, CaseIterable {
         case copyHome, copySheet, banner, saved, home, sheet, list, editing, added, finished
@@ -43,11 +68,6 @@ struct ShareSheetGuide: View {
             }
         }
 
-        /// The first scenes copy a link in another app and save it from the banner; the rest pin the share sheet.
-        var title: String {
-            rawValue < Phase.home.rawValue ? String(localized: "Copy and Paste") : String(localized: "Pin to Share Sheet")
-        }
-
         var showsLibrary: Bool { self == .banner || self == .saved }
         var showsSheet: Bool { self == .copySheet || self == .sheet || self == .finished }
         var showsAppList: Bool { self == .list || self == .editing || self == .added }
@@ -62,7 +82,7 @@ struct ShareSheetGuide: View {
             .padding()
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(phase.title)
+        .navigationTitle(chapter.title)
         .navigationBarTitleDisplayMode(.inline)
         .task(id: run) { await play() }
     }
@@ -106,13 +126,13 @@ struct ShareSheetGuide: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Phase.allCases.map(\.caption).joined(separator: ". "))
+        .accessibilityLabel(chapter.phases.map(\.caption).joined(separator: ". "))
     }
 
     private var captions: some View {
         VStack(spacing: 14) {
             HStack(spacing: 6) {
-                ForEach(Phase.allCases, id: \.self) { p in
+                ForEach(chapter.phases, id: \.self) { p in
                     Capsule()
                         .fill(p == phase ? AnyShapeStyle(.tint) : AnyShapeStyle(.fill.secondary))
                         .frame(width: p == phase ? 18 : 6, height: 6)
@@ -130,25 +150,22 @@ struct ShareSheetGuide: View {
     }
 
     private func play() async {
+        let phases = chapter.phases
         while !Task.isCancelled {
-            withAnimation(.smooth) { phase = .copyHome; target = nil }
+            withAnimation(.smooth) { phase = phases[0]; target = nil }
             guard await pause(0.8) else { return }
-            for p in Phase.allCases.dropLast() {
-                // A scene without a target has nothing to tap; it moves on by itself.
-                if let tap = p.target {
-                    withAnimation(.smooth(duration: 0.6)) { target = tap }
-                    guard await pause(0.9) else { return }
-                    withAnimation(.easeIn(duration: 0.12)) { pressing = true }
-                    guard await pause(0.16) else { return }
-                    withAnimation(.easeOut(duration: 0.2)) { pressing = false }
-                }
-                let next = Phase(rawValue: p.rawValue + 1) ?? .finished
+            for (p, next) in zip(phases, phases.dropFirst()) {
+                withAnimation(.smooth(duration: 0.6)) { target = p.target }
+                guard await pause(0.9) else { return }
+                withAnimation(.easeIn(duration: 0.12)) { pressing = true }
+                guard await pause(0.16) else { return }
+                withAnimation(.easeOut(duration: 0.2)) { pressing = false }
                 withAnimation(.snappy(duration: 0.45)) {
                     phase = next
                     if next.target == nil { target = nil }
                 }
-                if next == .finished { onWatched?() }
-                guard await pause(next == .saved ? 2.2 : 1.3) else { return }
+                if next == phases.last { onWatched?() }
+                guard await pause(1.3) else { return }
             }
             guard await pause(2.4) else { return }
         }
@@ -554,5 +571,5 @@ private enum GuideApp {
 }
 
 #Preview {
-    NavigationStack { ShareSheetGuide() }
+    NavigationStack { ShareSheetGuide(.copy) }
 }

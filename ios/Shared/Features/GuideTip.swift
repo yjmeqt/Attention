@@ -1,7 +1,7 @@
 import SwiftUI
 import TipKit
 
-/// Points at More once the first-launch share sheet guide has folded into it.
+/// Points at More once the first-launch guide has folded into it.
 struct GuideTip: Tip {
     @Parameter static var guideFolded: Bool = false
 

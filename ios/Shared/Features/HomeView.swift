@@ -112,7 +112,7 @@ struct HomeView: View {
         .sheet(isPresented: $showsSettings) { SettingsView() }
         .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
-                ShareSheetGuide(onWatched: { guideWatched = true })
+                ShareSheetGuide(.copy, onWatched: { guideWatched = true })
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") { showsGuide = false }
@@ -525,7 +525,13 @@ struct HomeView: View {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     }
                     NavigationLink {
-                        ShareSheetGuide()
+                        ShareSheetGuide(.copy)
+                            .onAppear { guideTip.invalidate(reason: .actionPerformed) }
+                    } label: {
+                        Label("Copy and Paste", systemImage: "doc.on.clipboard")
+                    }
+                    NavigationLink {
+                        ShareSheetGuide(.pin)
                             .onAppear { guideTip.invalidate(reason: .actionPerformed) }
                     } label: {
                         Label("Pin \(Brand.name) to the front of the share sheet", systemImage: "pin")

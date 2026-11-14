@@ -68,7 +68,7 @@ struct EmptyState: View {
 
     private var pinGuideLink: some View {
         NavigationLink {
-            ShareSheetGuide()
+            ShareSheetGuide(.pin)
                 .onDisappear { seenShareGuide = true }
         } label: {
             HStack(spacing: 12) {
