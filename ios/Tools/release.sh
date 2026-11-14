@@ -41,7 +41,8 @@ PLATFORM=IOS
 die() { print -u2 "error: $*"; exit 1 }
 step() { print -P "%F{cyan}==>%f $*" }
 
-setting() { sed -nE "s/^ *$1: \"?([^\"]*)\"?$/\1/p" project.yml | head -1 }
+PROJECT_FILE=Attention.xcodeproj/project.xcproj
+setting() { sed -nE "s/^ *\"$1\": \"([^\"]*)\",?$/\1/p" $PROJECT_FILE | head -1 }
 
 require_auth() {
   command -v asc >/dev/null || die "asc not found; install with: brew install asc"
@@ -69,9 +70,8 @@ beta() {
     [[ $remote == <-> ]] || die "could not read next build number from App Store Connect"
     build=$(( remote > build + 1 ? remote : build + 1 ))
     step "Build $version ($build)"
-    sed -i '' -E "s/^( *CURRENT_PROJECT_VERSION: ).*/\1\"$build\"/" project.yml
+    sed -i '' -E "s/^( *\"CURRENT_PROJECT_VERSION\": )\"[^\"]*\"/\1\"$build\"/" $PROJECT_FILE
   fi
-  xcodegen generate --quiet
 
   local scheme=$SCHEME destination=generic/platform=iOS kind=ipa
   [[ $PLATFORM == MAC_OS ]] && scheme=AttentionMac destination=generic/platform=macOS kind=pkg

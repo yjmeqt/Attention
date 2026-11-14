@@ -3,23 +3,6 @@
 # `cmd` runs via `sh <tmpfile>`; `set -e` is NOT auto-injected. Add `set -o pipefail` where a
 # pipe's exit code matters, and avoid `set -e` in tasks that rely on a non-zero check (e.g. stop).
 
-# ── Generate (XcodeGen) ───────────────────────────────────────────────────────
-# ios/project.yml is the source of truth; Attention.xcodeproj is committed and regenerates
-# byte-for-byte, so regenerating when it's already current is harmless.
-[tasks.generate]
-args = ["mode=auto"]
-desc = "XcodeGen the project: only when project.yml is newer (the default), or always with `xc-dev generate force`."
-cmd  = """
-cd {{project_root}}/ios
-STAMP=Attention.xcodeproj/project.pbxproj
-if [ "{{mode}}" != "force" ] && [ -f "$STAMP" ] && [ ! project.yml -nt "$STAMP" ]; then
-    echo "Project up to date — skipping generate"
-    exit 0
-fi
-command -v xcodegen >/dev/null || { echo "xcodegen not found — brew install xcodegen" >&2; exit 1; }
-xcodegen generate --quiet && echo "Generated Attention.xcodeproj"
-"""
-
 # ── Build ─────────────────────────────────────────────────────────────────────
 # Builds for the generic simulator so one build installs on any of this worktree's sims.
 # No -derivedDataPath: builds land in Xcode's own DerivedData folder for this worktree's project
@@ -28,7 +11,6 @@ xcodegen generate --quiet && echo "Generated Attention.xcodeproj"
 # .xc-dev/app-path for the run tasks.
 [tasks.build]
 args    = ["config=Debug"]
-depends = ["generate"]
 desc    = "Build Attention for the simulator into Xcode's DerivedData for this worktree."
 cmd     = """
 set -o pipefail
@@ -92,7 +74,6 @@ echo "No simulator UI found under $XCODE_APP" >&2
 
 # ── Mac ───────────────────────────────────────────────────────────────────────
 [tasks.build-mac-store-shots]
-depends = ["generate"]
 desc = "Build the Debug-only Mac screenshot capture entry point with the store display name."
 cmd = """
 set -o pipefail
@@ -104,7 +85,6 @@ xcodebuild -project {{project_root}}/{{path}} -scheme AttentionMac \
 # The menu bar app (AttentionMac). Same DerivedData folder as the iOS build, under Products/<config>.
 [tasks.build-mac]
 args    = ["config=Debug"]
-depends = ["generate"]
 desc    = "Build the Mac menu bar app."
 cmd     = """
 set -o pipefail
@@ -169,7 +149,6 @@ PY
 
 [tasks.run-device]
 args    = ["deviceId", "config=Debug"]
-depends = ["generate"]
 desc    = "Build, install and launch on a physical iPhone. Pass deviceId (see `xc-dev devices-iphone`)."
 cmd     = """
 set -o pipefail
@@ -288,7 +267,6 @@ done
 """
 
 [tasks.build-store-shots]
-depends = ["generate"]
 desc = "Build the iOS screenshot app with its App Store display name."
 cmd = """
 set -o pipefail
