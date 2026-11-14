@@ -9,8 +9,8 @@ Everything needed to create the App Store listing lives in the repo. Pricing and
 | App bundle ID | `com.yjmeqt.attn` (Release; Debug builds use `com.yjmeqt.attn.dev`) |
 | Share extension | `com.yjmeqt.attn.share` |
 | App Group | `group.com.yjmeqt.attn.shared` |
-| Team | `M3V5P234X3` (set in `ios/project.yml`) |
-| Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/project.yml` |
+| Team | `M3V5P234X3` (project build setting `DEVELOPMENT_TEAM`) |
+| Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/Attention.xcodeproj/project.xcproj` |
 
 Bundle IDs are permanent once the app is created in App Store Connect.
 
@@ -60,7 +60,7 @@ One-time setup:
 2. Edit the default workflow: start condition **Branch Changes** on `main` (or **Manual** only), action **Archive** with platform iOS, scheme `Attention`, deployment preparation **TestFlight and App Store** (Internal Testing Only builds can't go to the public link), and a post-action **TestFlight Internal Testing** to the internal group, plus **TestFlight External Testing** if builds should reach the public link.
 3. In App Store Connect, **Xcode Cloud → Settings → Build Number**, set the next build number above the latest upload (3 or higher after 1.0 (2)).
 
-After that, merging to `main` produces a TestFlight build. To start one from the terminal: `asc xcode-cloud run --app 6827156660 --workflow "<workflow name>" --branch main --wait`. `MARKETING_VERSION` still comes from `project.yml`; `Tools/release.sh metadata` is unchanged.
+After that, merging to `main` produces a TestFlight build. To start one from the terminal: `asc xcode-cloud run --app 6827156660 --workflow "<workflow name>" --branch main --wait`. `MARKETING_VERSION` still comes from the project file; `Tools/release.sh metadata` is unchanged.
 
 ## TestFlight
 

@@ -1,0 +1,551 @@
+{
+  "default-configuration": "Debug",
+  "configurations": [
+    "Debug",
+    "Release",
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "Base",
+      "ar",
+      "de",
+      "es",
+      "fr",
+      "ja",
+      "ko",
+      "ru",
+      "vi",
+      "zh-Hans",
+      "zh-Hant",
+    ],
+  },
+  "files": [
+    {
+      "kind": "group",
+      "path": "ActionExtension",
+      "children": [
+        {
+          "kind": "folder",
+          "path": "Card",
+          "target-membership": [
+            "AttentionCardAction",
+          ],
+          "membership-exceptions": [
+            {
+              "target": "AttentionCardAction",
+              "exclusions": [
+                "Info.plist",
+              ],
+            },
+          ],
+        }, {
+          "kind": "folder",
+          "path": "Save",
+          "target-membership": [
+            "AttentionSaveAction",
+          ],
+          "membership-exceptions": [
+            {
+              "target": "AttentionSaveAction",
+              "exclusions": [
+                "Info.plist",
+              ],
+            },
+          ],
+        },
+      ],
+    }, {
+      "kind": "folder",
+      "path": "App",
+      "target-membership": [
+        "Attention",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "Attention",
+          "exclusions": [
+            "Info.plist",
+          ],
+        }, {
+          "target": "AttentionMac",
+          "inclusions": [
+            "Attention.icon",
+            "AttentionDev.icon",
+            "PrivacyInfo.xcprivacy",
+          ],
+        },
+      ],
+    }, {
+      "kind": "folder",
+      "path": "Mac",
+      "target-membership": [
+        "AttentionMac",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "AttentionMac",
+          "exclusions": [
+            "Info.plist",
+          ],
+        },
+      ],
+    }, {
+      "kind": "group",
+      "path": "Shared",
+      "children": [
+        {
+          "path": "EmptyState.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "ItemProviders.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionMac/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "Localizable.xcstrings",
+          "target-membership": [
+            "Attention/resources",
+            "AttentionCardAction/resources",
+            "AttentionExtension/resources",
+            "AttentionMac/resources",
+            "AttentionSaveAction/resources",
+          ],
+        }, {
+          "path": "Model.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionMac/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "Platform.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionMac/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "QRScanner.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "ReviewPrompt.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "CopyGuide.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "ShareSuggestions.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "Sharing.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        }, {
+          "path": "Unfurler.swift",
+          "target-membership": [
+            "Attention/compile-sources",
+            "AttentionCardAction/compile-sources",
+            "AttentionExtension/compile-sources",
+            "AttentionMac/compile-sources",
+            "AttentionSaveAction/compile-sources",
+          ],
+        },
+        { "kind": "folder", "path": "Card", "target-membership": [ "Attention", "AttentionCardAction", "AttentionExtension", "AttentionMac", "AttentionSaveAction" ] },
+        {
+          "kind": "folder",
+          "path": "Features",
+          "target-membership": [
+            "Attention",
+            "AttentionCardAction",
+            "AttentionExtension",
+            "AttentionSaveAction",
+          ],
+          "membership-exceptions": [
+            {
+              "target": "AttentionMac",
+              "inclusions": [
+                "CardControls.swift",
+                "Feed.swift",
+                "FeedFilter.swift",
+                "Opening.swift",
+                "SavedTextEditor.swift",
+                "TagEditor.swift",
+              ],
+            },
+          ],
+        },
+        { "kind": "folder", "path": "Intake", "target-membership": [ "Attention", "AttentionCardAction", "AttentionExtension", "AttentionMac", "AttentionSaveAction" ] },
+        {
+          "kind": "folder",
+          "path": "Library",
+          "target-membership": [
+            "Attention",
+            "AttentionCardAction",
+            "AttentionExtension",
+            "AttentionSaveAction",
+          ],
+          "membership-exceptions": [
+            {
+              "target": "AttentionMac",
+              "inclusions": [
+                "ImageData.swift",
+                "Library.swift",
+                "LibraryItem.swift",
+              ],
+            },
+          ],
+        }, {
+          "kind": "folder",
+          "path": "Search",
+          "target-membership": [
+            "Attention",
+            "AttentionCardAction",
+            "AttentionSaveAction",
+          ],
+          "membership-exceptions": [
+            {
+              "target": "Attention",
+              "exclusions": [
+                "ACKNOWLEDGEMENTS",
+              ],
+            }, {
+              "target": "AttentionCardAction",
+              "exclusions": [
+                "ACKNOWLEDGEMENTS",
+              ],
+            }, {
+              "target": "AttentionSaveAction",
+              "exclusions": [
+                "ACKNOWLEDGEMENTS",
+              ],
+            },
+          ],
+        },
+      ],
+    }, {
+      "kind": "folder",
+      "path": "ShareExtension",
+      "target-membership": [
+        "AttentionExtension",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "AttentionCardAction",
+          "inclusions": [
+            "PrivacyInfo.xcprivacy",
+            "ShareViewController.swift",
+          ],
+        }, {
+          "target": "AttentionExtension",
+          "exclusions": [
+            "Info.plist",
+          ],
+        }, {
+          "target": "AttentionSaveAction",
+          "inclusions": [
+            "PrivacyInfo.xcprivacy",
+            "ShareViewController.swift",
+          ],
+        },
+      ],
+    },
+    { "kind": "folder", "path": "Tests", "target-membership": [ "AttentionTests" ] },
+    {
+      "kind": "group",
+      "name": "Products",
+      "children": [
+        { "path": "<PRODUCTS>/Attention.app", "id": "8B933632420542F788112CC5", "index": false },
+        { "path": "<PRODUCTS>/AttentionCardAction.appex", "id": "0BF281F4BE559A2247003492", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
+        { "path": "<PRODUCTS>/AttentionExtension.appex", "id": "CEC5ACF91CD65913FA082F63", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
+        { "path": "<PRODUCTS>/AttentionMac.app", "id": "BEEF89F6804EFFBE1F7CE589", "type": "wrapper.application", "index": false },
+        { "path": "<PRODUCTS>/AttentionSaveAction.appex", "id": "E6DBB2F77075A75A7FA83294", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
+        { "path": "<PRODUCTS>/AttentionTests.xctest", "id": "C390BEFA89359AC048D8A9FC", "index": false },
+      ],
+    },
+  ],
+  "targets": [
+    {
+      "name": "Attention",
+      "id": "AA58317B997D9CB0D1326005",
+      "product": "Products/Attention.app",
+      "product-type": "application",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "dependencies": [
+        "AttentionExtension",
+        "AttentionSaveAction",
+        "AttentionCardAction",
+      ],
+      "build-phases": [
+        "compile-sources",
+        "resources",
+        {
+          "kind": "copy",
+          "name": "Embed Foundation Extensions",
+          "bundle-base-path": "plugins-directory",
+        },
+      ],
+      "build-settings": {
+        "ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug]": "AttentionDev",
+        "ASSETCATALOG_COMPILER_APPICON_NAME[config=Release]": "Attention",
+        "CODE_SIGN_ENTITLEMENTS": "App/Attention.entitlements",
+        "CODE_SIGN_IDENTITY": "iPhone Developer",
+        "EXCLUDED_SOURCE_FILE_NAMES[config=Release]": "SearchDemoCorpus.json",
+        "INFOPLIST_FILE": "App/Info.plist",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID)",
+        "SDKROOT": "iphoneos",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+      },
+    }, {
+      "name": "AttentionCardAction",
+      "id": "33E3FC65C570420FA9DA9B28",
+      "product": "Products/AttentionCardAction.appex",
+      "product-type": "app-extension",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "build-phases": [
+        "compile-sources",
+        "resources",
+      ],
+      "build-settings": {
+        "CODE_SIGN_ENTITLEMENTS": "ShareExtension/AttentionExtension.entitlements",
+        "INFOPLIST_FILE": "ActionExtension/Card/Info.plist",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@executable_path/../../Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID).card-action",
+        "SDKROOT": "iphoneos",
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "$(inherited) SHARE_EXTENSION",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+      },
+    }, {
+      "name": "AttentionExtension",
+      "id": "53E2C3F8D4066EF7262A5875",
+      "product": "Products/AttentionExtension.appex",
+      "product-type": "app-extension",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "build-phases": [
+        "compile-sources",
+        "resources",
+      ],
+      "build-settings": {
+        "CODE_SIGN_ENTITLEMENTS": "ShareExtension/AttentionExtension.entitlements",
+        "INFOPLIST_FILE": "ShareExtension/Info.plist",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@executable_path/../../Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID).share",
+        "SDKROOT": "iphoneos",
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "$(inherited) SHARE_EXTENSION",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+      },
+    }, {
+      "name": "AttentionMac",
+      "id": "C531A18793BA7C1D2842A8B5",
+      "product": "Products/AttentionMac.app",
+      "product-type": "application",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "build-phases": [
+        "compile-sources",
+        "resources",
+      ],
+      "build-settings": {
+        "ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug]": "AttentionDev",
+        "ASSETCATALOG_COMPILER_APPICON_NAME[config=Release]": "Attention",
+        "CODE_SIGN_ENTITLEMENTS": "Mac/AttentionMac.entitlements",
+        "COMBINE_HIDPI_IMAGES": "YES",
+        "ENABLE_HARDENED_RUNTIME": "YES",
+        "INFOPLIST_FILE": "Mac/Info.plist",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/../Frameworks",
+        ],
+        "MACOSX_DEPLOYMENT_TARGET": "26.0",
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID)",
+        "PRODUCT_NAME": "Attention",
+        "SDKROOT": "macosx",
+      },
+    }, {
+      "name": "AttentionSaveAction",
+      "id": "F6C980FA64AC26C245088B07",
+      "product": "Products/AttentionSaveAction.appex",
+      "product-type": "app-extension",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "build-phases": [
+        "compile-sources",
+        "resources",
+      ],
+      "build-settings": {
+        "CODE_SIGN_ENTITLEMENTS": "ShareExtension/AttentionExtension.entitlements",
+        "INFOPLIST_FILE": "ActionExtension/Save/Info.plist",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@executable_path/../../Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID).save-action",
+        "SDKROOT": "iphoneos",
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "$(inherited) SHARE_EXTENSION",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+      },
+    }, {
+      "name": "AttentionTests",
+      "id": "CC660836D0310B3A43A22B6A",
+      "product": "Products/AttentionTests.xctest",
+      "product-type": "bundle.unit-test",
+      "legacy-provisioning-style": "automatic",
+      "legacy-team-id": "M3V5P234X3",
+      "dependencies": [
+        "Attention",
+      ],
+      "build-phases": [
+        "compile-sources",
+      ],
+      "build-settings": {
+        "BUNDLE_LOADER": "$(TEST_HOST)",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@loader_path/Frameworks",
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID).tests",
+        "SDKROOT": "iphoneos",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/Attention.app/Attention",
+      },
+    },
+  ],
+  "build-settings": {
+    "ALWAYS_SEARCH_USER_PATHS": "NO",
+    "APP_BUNDLE_ID[config=Debug]": "com.yjmeqt.attn.dev",
+    "APP_BUNDLE_ID[config=Release]": "com.yjmeqt.attn",
+    "APP_DISPLAY_NAME[config=Debug]": "Attention Dev",
+    "APP_DISPLAY_NAME[config=Release]": "Attention",
+    "APP_GROUP_ID": "group.$(APP_BUNDLE_ID).shared",
+    "CLANG_ANALYZER_NONNULL": "YES",
+    "CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION": "YES_AGGRESSIVE",
+    "CLANG_CXX_LANGUAGE_STANDARD": "gnu++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "CLANG_ENABLE_MODULES": "YES",
+    "CLANG_ENABLE_OBJC_ARC": "YES",
+    "CLANG_ENABLE_OBJC_WEAK": "YES",
+    "CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING": "YES",
+    "CLANG_WARN_BOOL_CONVERSION": "YES",
+    "CLANG_WARN_COMMA": "YES",
+    "CLANG_WARN_CONSTANT_CONVERSION": "YES",
+    "CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS": "YES",
+    "CLANG_WARN_DIRECT_OBJC_ISA_USAGE": "YES_ERROR",
+    "CLANG_WARN_DOCUMENTATION_COMMENTS": "YES",
+    "CLANG_WARN_EMPTY_BODY": "YES",
+    "CLANG_WARN_ENUM_CONVERSION": "YES",
+    "CLANG_WARN_INFINITE_RECURSION": "YES",
+    "CLANG_WARN_INT_CONVERSION": "YES",
+    "CLANG_WARN_NON_LITERAL_NULL_CONVERSION": "YES",
+    "CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF": "YES",
+    "CLANG_WARN_OBJC_LITERAL_CONVERSION": "YES",
+    "CLANG_WARN_OBJC_ROOT_CLASS": "YES_ERROR",
+    "CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER": "YES",
+    "CLANG_WARN_RANGE_LOOP_ANALYSIS": "YES",
+    "CLANG_WARN_STRICT_PROTOTYPES": "YES",
+    "CLANG_WARN_SUSPICIOUS_MOVE": "YES",
+    "CLANG_WARN_UNGUARDED_AVAILABILITY": "YES_AGGRESSIVE",
+    "CLANG_WARN_UNREACHABLE_CODE": "YES",
+    "CLANG_WARN__DUPLICATE_METHOD_MATCH": "YES",
+    "CLOUDKIT_CONTAINER_ID": "iCloud.$(APP_BUNDLE_ID)",
+    "CODE_SIGN_STYLE": "Automatic",
+    "COPY_PHASE_STRIP": "NO",
+    "CURRENT_PROJECT_VERSION": "11",
+    "DEBUG_INFORMATION_FORMAT[config=Debug]": "dwarf",
+    "DEBUG_INFORMATION_FORMAT[config=Release]": "dwarf-with-dsym",
+    "DEVELOPMENT_TEAM": "M3V5P234X3",
+    "ENABLE_NS_ASSERTIONS[config=Release]": "NO",
+    "ENABLE_STRICT_OBJC_MSGSEND": "YES",
+    "ENABLE_TESTABILITY[config=Debug]": "YES",
+    "GCC_C_LANGUAGE_STANDARD": "gnu11",
+    "GCC_DYNAMIC_NO_PIC[config=Debug]": "NO",
+    "GCC_NO_COMMON_BLOCKS": "YES",
+    "GCC_OPTIMIZATION_LEVEL[config=Debug]": "0",
+    "GCC_PREPROCESSOR_DEFINITIONS[config=Debug]": [
+      "$(inherited)",
+      "DEBUG=1",
+    ],
+    "GCC_WARN_64_TO_32_BIT_CONVERSION": "YES",
+    "GCC_WARN_ABOUT_RETURN_TYPE": "YES_ERROR",
+    "GCC_WARN_UNDECLARED_SELECTOR": "YES",
+    "GCC_WARN_UNINITIALIZED_AUTOS": "YES_AGGRESSIVE",
+    "GCC_WARN_UNUSED_FUNCTION": "YES",
+    "GCC_WARN_UNUSED_VARIABLE": "YES",
+    "IPHONEOS_DEPLOYMENT_TARGET": "26.0",
+    "LM_SKIP_METADATA_EXTRACTION": "YES",
+    "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
+    "MARKETING_VERSION": "1.0.2",
+    "MTL_ENABLE_DEBUG_INFO[config=Debug]": "INCLUDE_SOURCE",
+    "MTL_ENABLE_DEBUG_INFO[config=Release]": "NO",
+    "MTL_FAST_MATH": "YES",
+    "ONLY_ACTIVE_ARCH[config=Debug]": "YES",
+    "PRODUCT_NAME": "$(TARGET_NAME)",
+    "SUPPORTS_MACCATALYST": "NO",
+    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
+    "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "NO",
+    "SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug]": "DEBUG",
+    "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+    "SWIFT_COMPILATION_MODE[config=Release]": "wholemodule",
+    "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+    "SWIFT_EMIT_LOC_STRINGS": "YES",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Release]": "-O",
+    "SWIFT_VERSION": "6.0",
+    "TARGETED_DEVICE_FAMILY": "1,2",
+  },
+  "last-upgrade": "14.3",
+}
