@@ -5,9 +5,7 @@ final class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let items = extensionContext?.inputItems as? [NSExtensionItem] ?? []
-        let actionMode = Bundle.main.object(forInfoDictionaryKey: "AttentionActionMode") as? String
-        let suggestion = actionMode.flatMap(ShareSuggestion.init(rawValue:))
-            ?? ShareSuggestion(intent: extensionContext?.intent)
+        let suggestion = ShareSuggestion(intent: extensionContext?.intent)
         let root = ShareRoot(items: items, suggestion: suggestion) { [weak self] in
             self?.extensionContext?.completeRequest(returningItems: nil)
         }

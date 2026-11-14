@@ -7,28 +7,25 @@ import LinkPresentation
 @MainActor
 @Suite("Sharing")
 struct SharingTests {
-    @Test func actionExtensionsAppearInSystemActions() throws {
+    @Test func actionExtensionAppearsInSystemActions() throws {
         let plugins = try #require(Bundle.main.builtInPlugInsURL)
-        for (name, mode, symbol) in [
-            ("AttentionSaveAction", "save", "tray.and.arrow.down"),
-            ("AttentionCardAction", "share", "square.and.arrow.up"),
-        ] {
-            let url = plugins.appending(path: "\(name).appex/Info.plist")
-            let data = try Data(contentsOf: url)
-            let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
-            let ext = try #require(plist["NSExtension"] as? [String: Any])
-            let attributes = try #require(ext["NSExtensionAttributes"] as? [String: Any])
-            #expect(ext["NSExtensionPointIdentifier"] as? String == "com.apple.ui-services")
-            #expect(plist["AttentionActionMode"] as? String == mode)
-            #expect((plist["CFBundleDisplayName"] as? String)?.isEmpty == false)
-            let icons = try #require(plist["CFBundleIcons"] as? [String: Any])
-            let primaryIcon = try #require(icons["CFBundlePrimaryIcon"] as? [String: Any])
-            #expect(primaryIcon["CFBundleSymbolName"] as? String == symbol)
-            let rule = try #require(attributes["NSExtensionActivationRule"] as? String)
-            let predicate = NSPredicate(format: rule)
-            let input: [String: Any] = ["extensionItems": [["attachments": [["registeredTypeIdentifiers": ["public.url"]]]]]]
-            #expect(predicate.evaluate(with: input))
-        }
+        #expect(!FileManager.default.fileExists(atPath: plugins.appending(path: "AttentionSaveAction.appex").path))
+        #expect(!FileManager.default.fileExists(atPath: plugins.appending(path: "AttentionCardAction.appex").path))
+        let url = plugins.appending(path: "AttentionAction.appex/Info.plist")
+        let data = try Data(contentsOf: url)
+        let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
+        let ext = try #require(plist["NSExtension"] as? [String: Any])
+        #expect(ext["NSExtensionPointIdentifier"] as? String == "com.apple.ui-services")
+        #expect(plist["CFBundleDisplayName"] as? String == Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
+        // No mode: it behaves like the Attention icon in the app row.
+        #expect(plist["AttentionActionMode"] == nil)
+        let icons = try #require(plist["CFBundleIcons"] as? [String: Any])
+        let primaryIcon = try #require(icons["CFBundlePrimaryIcon"] as? [String: Any])
+        #expect(primaryIcon["CFBundleSymbolName"] as? String == "tray.and.arrow.down")
+        let input: [String: Any] = ["extensionItems": [["attachments": [["registeredTypeIdentifiers": ["public.url"]]]]]]
+        let attributes = try #require(ext["NSExtensionAttributes"] as? [String: Any])
+        let rule = try #require(attributes["NSExtensionActivationRule"] as? String)
+        #expect(NSPredicate(format: rule).evaluate(with: input))
     }
 
     private func accepts(_ attachments: [[String]]) throws -> Bool {

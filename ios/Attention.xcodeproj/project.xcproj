@@ -22,36 +22,16 @@
   },
   "files": [
     {
-      "kind": "group",
+      "kind": "folder",
       "path": "ActionExtension",
-      "children": [
+      "target-membership": [
+        "AttentionAction",
+      ],
+      "membership-exceptions": [
         {
-          "kind": "folder",
-          "path": "Card",
-          "target-membership": [
-            "AttentionCardAction",
-          ],
-          "membership-exceptions": [
-            {
-              "target": "AttentionCardAction",
-              "exclusions": [
-                "Info.plist",
-              ],
-            },
-          ],
-        }, {
-          "kind": "folder",
-          "path": "Save",
-          "target-membership": [
-            "AttentionSaveAction",
-          ],
-          "membership-exceptions": [
-            {
-              "target": "AttentionSaveAction",
-              "exclusions": [
-                "Info.plist",
-              ],
-            },
+          "target": "AttentionAction",
+          "exclusions": [
+            "Info.plist",
           ],
         },
       ],
@@ -98,105 +78,93 @@
           "path": "EmptyState.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "ItemProviders.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
             "AttentionMac/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "Localizable.xcstrings",
           "target-membership": [
             "Attention/resources",
-            "AttentionCardAction/resources",
             "AttentionExtension/resources",
             "AttentionMac/resources",
-            "AttentionSaveAction/resources",
+            "AttentionAction/resources",
           ],
         }, {
           "path": "Model.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
             "AttentionMac/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "Platform.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
             "AttentionMac/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "QRScanner.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "ReviewPrompt.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "ShareSheetGuide.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "ShareSuggestions.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "Sharing.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         }, {
           "path": "Unfurler.swift",
           "target-membership": [
             "Attention/compile-sources",
-            "AttentionCardAction/compile-sources",
             "AttentionExtension/compile-sources",
             "AttentionMac/compile-sources",
-            "AttentionSaveAction/compile-sources",
+            "AttentionAction/compile-sources",
           ],
         },
-        { "kind": "folder", "path": "Card", "target-membership": [ "Attention", "AttentionCardAction", "AttentionExtension", "AttentionMac", "AttentionSaveAction" ] },
+        { "kind": "folder", "path": "Card", "target-membership": [ "Attention", "AttentionExtension", "AttentionMac", "AttentionAction" ] },
         {
           "kind": "folder",
           "path": "Features",
           "target-membership": [
             "Attention",
-            "AttentionCardAction",
             "AttentionExtension",
-            "AttentionSaveAction",
+            "AttentionAction",
           ],
           "membership-exceptions": [
             {
@@ -212,15 +180,14 @@
             },
           ],
         },
-        { "kind": "folder", "path": "Intake", "target-membership": [ "Attention", "AttentionCardAction", "AttentionExtension", "AttentionMac", "AttentionSaveAction" ] },
+        { "kind": "folder", "path": "Intake", "target-membership": [ "Attention", "AttentionExtension", "AttentionMac", "AttentionAction" ] },
         {
           "kind": "folder",
           "path": "Library",
           "target-membership": [
             "Attention",
-            "AttentionCardAction",
             "AttentionExtension",
-            "AttentionSaveAction",
+            "AttentionAction",
           ],
           "membership-exceptions": [
             {
@@ -237,8 +204,7 @@
           "path": "Search",
           "target-membership": [
             "Attention",
-            "AttentionCardAction",
-            "AttentionSaveAction",
+            "AttentionAction",
           ],
           "membership-exceptions": [
             {
@@ -247,12 +213,7 @@
                 "ACKNOWLEDGEMENTS",
               ],
             }, {
-              "target": "AttentionCardAction",
-              "exclusions": [
-                "ACKNOWLEDGEMENTS",
-              ],
-            }, {
-              "target": "AttentionSaveAction",
+              "target": "AttentionAction",
               "exclusions": [
                 "ACKNOWLEDGEMENTS",
               ],
@@ -268,18 +229,12 @@
       ],
       "membership-exceptions": [
         {
-          "target": "AttentionCardAction",
-          "inclusions": [
-            "PrivacyInfo.xcprivacy",
-            "ShareViewController.swift",
-          ],
-        }, {
           "target": "AttentionExtension",
           "exclusions": [
             "Info.plist",
           ],
         }, {
-          "target": "AttentionSaveAction",
+          "target": "AttentionAction",
           "inclusions": [
             "PrivacyInfo.xcprivacy",
             "ShareViewController.swift",
@@ -293,10 +248,9 @@
       "name": "Products",
       "children": [
         { "path": "<PRODUCTS>/Attention.app", "id": "8B933632420542F788112CC5", "index": false },
-        { "path": "<PRODUCTS>/AttentionCardAction.appex", "id": "0BF281F4BE559A2247003492", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
         { "path": "<PRODUCTS>/AttentionExtension.appex", "id": "CEC5ACF91CD65913FA082F63", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
         { "path": "<PRODUCTS>/AttentionMac.app", "id": "BEEF89F6804EFFBE1F7CE589", "type": "wrapper.application", "index": false },
-        { "path": "<PRODUCTS>/AttentionSaveAction.appex", "id": "E6DBB2F77075A75A7FA83294", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
+        { "path": "<PRODUCTS>/AttentionAction.appex", "id": "E6DBB2F77075A75A7FA83294", "index": false, "target-membership": [ { "build-phase": "Attention/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
         { "path": "<PRODUCTS>/AttentionTests.xctest", "id": "C390BEFA89359AC048D8A9FC", "index": false },
       ],
     },
@@ -311,8 +265,7 @@
       "legacy-team-id": "M3V5P234X3",
       "dependencies": [
         "AttentionExtension",
-        "AttentionSaveAction",
-        "AttentionCardAction",
+        "AttentionAction",
       ],
       "build-phases": [
         "compile-sources",
@@ -336,30 +289,6 @@
         ],
         "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID)",
         "SDKROOT": "iphoneos",
-        "TARGETED_DEVICE_FAMILY": "1,2",
-      },
-    }, {
-      "name": "AttentionCardAction",
-      "id": "33E3FC65C570420FA9DA9B28",
-      "product": "Products/AttentionCardAction.appex",
-      "product-type": "app-extension",
-      "legacy-provisioning-style": "automatic",
-      "legacy-team-id": "M3V5P234X3",
-      "build-phases": [
-        "compile-sources",
-        "resources",
-      ],
-      "build-settings": {
-        "CODE_SIGN_ENTITLEMENTS": "ShareExtension/AttentionExtension.entitlements",
-        "INFOPLIST_FILE": "ActionExtension/Card/Info.plist",
-        "LD_RUNPATH_SEARCH_PATHS": [
-          "$(inherited)",
-          "@executable_path/Frameworks",
-          "@executable_path/../../Frameworks",
-        ],
-        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_ID).card-action",
-        "SDKROOT": "iphoneos",
-        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "$(inherited) SHARE_EXTENSION",
         "TARGETED_DEVICE_FAMILY": "1,2",
       },
     }, {
@@ -414,9 +343,9 @@
         "SDKROOT": "macosx",
       },
     }, {
-      "name": "AttentionSaveAction",
+      "name": "AttentionAction",
       "id": "F6C980FA64AC26C245088B07",
-      "product": "Products/AttentionSaveAction.appex",
+      "product": "Products/AttentionAction.appex",
       "product-type": "app-extension",
       "legacy-provisioning-style": "automatic",
       "legacy-team-id": "M3V5P234X3",
@@ -426,7 +355,7 @@
       ],
       "build-settings": {
         "CODE_SIGN_ENTITLEMENTS": "ShareExtension/AttentionExtension.entitlements",
-        "INFOPLIST_FILE": "ActionExtension/Save/Info.plist",
+        "INFOPLIST_FILE": "ActionExtension/Info.plist",
         "LD_RUNPATH_SEARCH_PATHS": [
           "$(inherited)",
           "@executable_path/Frameworks",
