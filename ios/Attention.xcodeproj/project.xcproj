@@ -155,7 +155,7 @@
             "AttentionSaveAction/compile-sources",
           ],
         }, {
-          "path": "ShareSheetGuide.swift",
+          "path": "CopyGuide.swift",
           "target-membership": [
             "Attention/compile-sources",
             "AttentionCardAction/compile-sources",

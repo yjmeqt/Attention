@@ -1,38 +1,35 @@
 import SwiftUI
 
-/// Animated walkthrough of pinning Attention in the system share sheet.
-struct ShareSheetGuide: View {
+/// Animated walkthrough of saving a link copied in another app: open Attention and tap Paste on the banner.
+struct CopyGuide: View {
     var onWatched: (() -> Void)? = nil
-    @State private var phase: Phase = .home
+    @State private var phase: Phase = .page
     @State private var target: GuideTarget?
     @State private var pressing = false
     @State private var run = 0
-    @Namespace private var ns
 
     enum Phase: Int, CaseIterable {
-        case home, sheet, list, editing, added, finished
+        case page, sheet, banner, saved
 
         var target: GuideTarget? {
             switch self {
-            case .home: .share
-            case .sheet: .more
-            case .list: .edit
-            case .editing: .add
-            case .added: .done
-            case .finished: nil
+            case .page: .share
+            case .sheet: .copy
+            case .banner: .paste
+            case .saved: nil
             }
         }
 
         var caption: String {
             switch self {
-            case .home: String(localized: "Tap the Share button")
-            case .sheet: String(localized: "Swipe the app row to the end and tap More")
-            case .list: String(localized: "Tap Edit")
-            case .editing: String(localized: "Find \(Brand.name) and tap ⊕ on the left")
-            case .added: String(localized: "Tap ✓ to finish")
-            case .finished: String(localized: "\(Brand.name) now shows up front in the share sheet")
+            case .page: String(localized: "Tap the Share button")
+            case .sheet: String(localized: "Tap Copy")
+            case .banner: String(localized: "Open \(Brand.name) and tap Paste")
+            case .saved: String(localized: "Your link is saved as a card")
             }
         }
+
+        var showsLibrary: Bool { self == .banner || self == .saved }
     }
 
     var body: some View {
@@ -44,7 +41,7 @@ struct ShareSheetGuide: View {
             .padding()
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(String(localized: "Pin to Share Sheet"))
+        .navigationTitle(String(localized: "Copy and Paste"))
         .navigationBarTitleDisplayMode(.inline)
         .task(id: run) { await play() }
     }
@@ -52,16 +49,17 @@ struct ShareSheetGuide: View {
     private var stage: some View {
         ZStack(alignment: .bottom) {
             GuideSourcePage()
-            if phase != .home {
-                Color.black.opacity(0.25).transition(.opacity)
+            // Switching apps: the library slides over the page the link was copied from.
+            if phase.showsLibrary {
+                GuideLibrary(saved: phase == .saved)
+                    .transition(.move(edge: .trailing))
+                    .zIndex(1)
             }
-            if phase == .sheet || phase == .finished {
-                GuideShareSheet(pinned: phase == .finished)
+            if phase == .sheet {
+                Color.black.opacity(0.25).transition(.opacity).zIndex(2)
+                GuideShareSheet()
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            if phase == .list || phase == .editing || phase == .added {
-                GuideAppList(editing: phase != .list, added: phase == .added, ns: ns)
-                    .transition(.move(edge: .bottom))
+                    .zIndex(3)
             }
         }
         .frame(width: 290, height: 560)
@@ -105,7 +103,7 @@ struct ShareSheetGuide: View {
 
     private func play() async {
         while !Task.isCancelled {
-            withAnimation(.smooth) { phase = .home; target = nil }
+            withAnimation(.smooth) { phase = .page; target = nil }
             guard await pause(0.8) else { return }
             for p in Phase.allCases.dropLast() {
                 withAnimation(.smooth(duration: 0.6)) { target = p.target }
@@ -113,12 +111,12 @@ struct ShareSheetGuide: View {
                 withAnimation(.easeIn(duration: 0.12)) { pressing = true }
                 guard await pause(0.16) else { return }
                 withAnimation(.easeOut(duration: 0.2)) { pressing = false }
-                let next = Phase(rawValue: p.rawValue + 1) ?? .finished
+                let next = Phase(rawValue: p.rawValue + 1) ?? .saved
                 withAnimation(.snappy(duration: 0.45)) {
                     phase = next
-                    if next == .finished { target = nil }
+                    if next == .saved { target = nil }
                 }
-                if next == .finished { onWatched?() }
+                if next == .saved { onWatched?() }
                 guard await pause(1.3) else { return }
             }
             guard await pause(2.4) else { return }
@@ -132,7 +130,7 @@ struct ShareSheetGuide: View {
 
 
 nonisolated enum GuideTarget: Hashable, Sendable {
-    case share, more, edit, add, done
+    case share, copy, paste
 }
 
 nonisolated struct GuideTargetKey: PreferenceKey {
@@ -205,9 +203,79 @@ private struct GuideSourcePage: View {
     }
 }
 
-private struct GuideShareSheet: View {
-    let pinned: Bool
+/// Attention's library with the banner that offers the copied link, then the card it was saved as.
+private struct GuideLibrary: View {
+    let saved: Bool
 
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                AttentionGlyph(size: 26)
+                Text(Brand.name).font(.title3.bold())
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 56)
+            .padding(.horizontal, 18)
+
+            HStack(alignment: .top, spacing: 10) {
+                ForEach([[120.0, 150, 90], [150.0, 100, 110]], id: \.self) { heights in
+                    VStack(spacing: 10) {
+                        ForEach(heights, id: \.self) { height in
+                            RoundedRectangle(cornerRadius: 12).fill(.fill.tertiary).frame(height: height)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .opacity(saved ? 0.35 : 1)
+            .overlay {
+                if saved {
+                    SampleCard(scale: 0.55)
+                        .transition(.scale(scale: 0.5).combined(with: .opacity))
+                }
+            }
+
+            if !saved {
+                banner.transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .padding(.bottom, 26)
+        .background(Color(.systemBackground))
+    }
+
+    private var banner: some View {
+        HStack(spacing: 8) {
+            Label("You copied a link", systemImage: "link")
+                .font(.footnote.weight(.medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            Label(String(localized: "Paste"), systemImage: "doc.on.clipboard")
+                .font(.footnote.weight(.semibold))
+                .lineLimit(1)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(.tint, in: .capsule)
+                .fixedSize()
+                .guideTarget(.paste)
+            Image(systemName: "xmark")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, 12)
+        .padding(.vertical, 7)
+        .background(.regularMaterial, in: .capsule)
+        .overlay(Capsule().strokeBorder(.secondary.opacity(0.2)))
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+        .padding(.horizontal, 12)
+    }
+}
+
+private struct GuideShareSheet: View {
     var body: some View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
@@ -229,22 +297,18 @@ private struct GuideShareSheet: View {
             }
             Divider()
             HStack(alignment: .top, spacing: 8) {
-                if pinned {
-                    GuideAppCell(app: .attention)
-                        .padding(4)
-                        .background(.tint.opacity(0.18), in: .rect(cornerRadius: 16))
-                        .padding(-4)
-                        .transition(.scale.combined(with: .opacity))
-                }
                 GuideAppCell(app: .messages)
                 GuideAppCell(app: .mail)
-                if !pinned { GuideAppCell(app: .wechat) }
+                GuideAppCell(app: .wechat)
                 GuideAppCell(app: .more)
-                    .guideTarget(.more)
             }
             Divider()
             HStack(spacing: 12) {
-                ForEach(["doc.on.doc", "person.crop.circle.badge.plus", "eyeglasses", "chevron.down"], id: \.self) { symbol in
+                Image(systemName: "doc.on.doc")
+                    .frame(width: 50, height: 50)
+                    .background(.fill.tertiary, in: .circle)
+                    .guideTarget(.copy)
+                ForEach(["person.crop.circle.badge.plus", "eyeglasses", "chevron.down"], id: \.self) { symbol in
                     Image(systemName: symbol)
                         .frame(width: 50, height: 50)
                         .background(.fill.tertiary, in: .circle)
@@ -256,137 +320,6 @@ private struct GuideShareSheet: View {
         .padding(.bottom, 10)
         .background(.regularMaterial, in: .rect(cornerRadius: 34, style: .continuous))
         .padding(8)
-    }
-}
-
-private struct GuideAppList: View {
-    let editing: Bool
-    let added: Bool
-    let ns: Namespace.ID
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ZStack {
-                Text("App").font(.headline)
-                HStack {
-                    if !editing { checkButton }
-                    Spacer()
-                    if editing {
-                        checkButton.guideTarget(.done)
-                    } else {
-                        Text(String(localized: "Edit"))
-                            .font(.subheadline.weight(.medium))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(.fill.tertiary, in: .capsule)
-                            .guideTarget(.edit)
-                    }
-                }
-            }
-            .padding(.bottom, 8)
-
-            header(String(localized: "Favorites"))
-            group {
-                row(.airdrop, section: .favorite)
-                row(.messages, section: .favorite)
-                row(.mail, section: .favorite, last: !added)
-                if added { attentionRow(section: .favorite) }
-            }
-
-            header(String(localized: "Suggestions"))
-            group {
-                row(.notes, section: .suggestion)
-                row(.reminders, section: .suggestion)
-                if !added { attentionRow(section: .suggestion) }
-                row(.wechat, section: .suggestion, last: true)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 14)
-        .padding(.top, 16)
-        .frame(height: 520)
-        .background(Color(.systemGroupedBackground), in: .rect(topLeadingRadius: 34, topTrailingRadius: 34, style: .continuous))
-    }
-
-    private var checkButton: some View {
-        Image(systemName: "checkmark")
-            .font(.body.weight(.semibold))
-            .foregroundStyle(.white)
-            .frame(width: 36, height: 36)
-            .background(.blue, in: .circle)
-    }
-
-    private func header(_ text: String) -> some View {
-        Text(text)
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .padding(.leading, 16)
-            .padding(.top, 14)
-            .padding(.bottom, 6)
-    }
-
-    private func group<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        VStack(spacing: 0, content: content)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 22, style: .continuous))
-    }
-
-    private func attentionRow(section: GuideRow.Section) -> some View {
-        GuideRow(app: .attention, section: section, editing: editing, last: true, highlighted: section == .suggestion && editing)
-            .matchedGeometryEffect(id: "attention", in: ns)
-    }
-
-    private func row(_ app: GuideApp, section: GuideRow.Section, last: Bool = false) -> some View {
-        GuideRow(app: app, section: section, editing: editing, last: last, highlighted: false)
-    }
-}
-
-private struct GuideRow: View {
-    enum Section { case favorite, suggestion }
-
-    let app: GuideApp
-    let section: Section
-    let editing: Bool
-    let last: Bool
-    let highlighted: Bool
-
-    var body: some View {
-        HStack(spacing: 10) {
-            if editing {
-                if section == .favorite {
-                    Image(systemName: "minus.circle.fill").foregroundStyle(.white, .red)
-                } else if app == .attention {
-                    Image(systemName: "plus.circle.fill").foregroundStyle(.white, .green)
-                        .guideTarget(.add)
-                } else {
-                    Image(systemName: "plus.circle.fill").foregroundStyle(.white, .green)
-                }
-            }
-            app.icon(size: 28)
-            Text(app.name).font(.subheadline).lineLimit(1)
-            Spacer(minLength: 0)
-            if editing {
-                if section == .favorite {
-                    Image(systemName: "line.3.horizontal").foregroundStyle(.tertiary)
-                } else {
-                    Capsule().fill(.green)
-                        .frame(width: 40, height: 24)
-                        .overlay(alignment: .trailing) { Circle().fill(.white).padding(2) }
-                }
-            }
-        }
-        .font(.title3)
-        .padding(.horizontal, 12)
-        .frame(height: 44)
-        .background {
-            if highlighted {
-                RoundedRectangle(cornerRadius: 12).fill(.tint.opacity(0.15))
-                    .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.tint, lineWidth: 2))
-                    .padding(2)
-            }
-        }
-        .overlay(alignment: .bottom) {
-            if !last { Divider().padding(.leading, editing ? 82 : 50) }
-        }
     }
 }
 
@@ -406,30 +339,22 @@ private struct GuideAppCell: View {
 }
 
 private enum GuideApp {
-    case attention, messages, mail, wechat, more, airdrop, notes, reminders
+    case messages, mail, wechat, more
 
     var name: String {
         switch self {
-        case .attention: Brand.name
         case .messages: String(localized: "Messages")
         case .mail: String(localized: "Mail")
         case .wechat: String(localized: "WeChat")
         case .more: String(localized: "More")
-        case .airdrop: String(localized: "AirDrop")
-        case .notes: String(localized: "Notes")
-        case .reminders: String(localized: "Reminders")
         }
     }
 
     @ViewBuilder func icon(size: CGFloat) -> some View {
         switch self {
-        case .attention: AttentionGlyph(size: size)
         case .messages: tile("message.fill", .green, size)
         case .mail: tile("envelope.fill", .blue, size)
         case .wechat: tile("bubble.left.and.bubble.right.fill", Color(red: 0.03, green: 0.76, blue: 0.38), size)
-        case .airdrop: tile("dot.radiowaves.up.forward", .blue, size)
-        case .notes: tile("note.text", .yellow, size)
-        case .reminders: tile("list.bullet", .orange, size)
         case .more:
             Image(systemName: "ellipsis")
                 .font(.system(size: size * 0.4, weight: .bold))
@@ -449,5 +374,5 @@ private enum GuideApp {
 }
 
 #Preview {
-    NavigationStack { ShareSheetGuide() }
+    NavigationStack { CopyGuide() }
 }

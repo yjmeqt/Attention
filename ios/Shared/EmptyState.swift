@@ -7,12 +7,8 @@ struct EmptyState: View {
     let paste: ([NSItemProvider]) -> Void
     var onSample: ((URL) -> Void)?
 
-    @AppStorage("seenShareGuide") private var seenShareGuide = false
-
     var body: some View {
         VStack(spacing: 24) {
-            if !seenShareGuide { pinGuideLink }
-
             if showsSample { SampleCard() }
 
             // Simplified Chinese pitches sending these links to WeChat, which shows them bare; other languages pitch one library.
@@ -40,8 +36,6 @@ struct EmptyState: View {
             .padding()
             .background(.fill.quinary, in: .rect(cornerRadius: 16))
 
-            if seenShareGuide { pinGuideLink }
-
             if showsSampleLink, let onSample { sampleLink(onSample) }
         }
     }
@@ -64,30 +58,6 @@ struct EmptyState: View {
         }
         .padding(12)
         .background(.fill.quinary, in: .rect(cornerRadius: 16))
-    }
-
-    private var pinGuideLink: some View {
-        NavigationLink {
-            ShareSheetGuide()
-                .onDisappear { seenShareGuide = true }
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: seenShareGuide ? "lightbulb" : "pin.fill")
-                    .foregroundStyle(.tint)
-                Text("Pin \(Brand.name) to the front of the share sheet")
-                    .multilineTextAlignment(.leading)
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .font(seenShareGuide ? .footnote : .subheadline.weight(.medium))
-            .padding(12)
-            .background(seenShareGuide ? AnyShapeStyle(.fill.quinary) : AnyShapeStyle(.tint.opacity(0.12)),
-                        in: .rect(cornerRadius: 12))
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
 }
