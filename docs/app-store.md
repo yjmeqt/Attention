@@ -141,14 +141,14 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 
 ## Privacy
 
-- **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking, no collected data; UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
-- **App Privacy questionnaire**: answer **Data Not Collected**. Links are fetched from the device and never sent to the developer.
+- **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking. The app declares one collected type, Other User Content (not linked, not tracking, App Functionality), for shared lists; the extensions collect nothing. UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
+- **App Privacy questionnaire**: with shared lists, answer **Data Collected → User Content → Other User Content**: not linked to the user's identity, not used for tracking, purpose App Functionality. It's only what the user chooses to share as a list. Links in the library are fetched from the device and never sent to the developer. Cloudflare sees IP addresses only to serve requests and rate-limit uploads, which Apple doesn't count as collection.
 - **Privacy policy and support page**: `web/public/privacy.html` and `web/public/support.html` (English, Simplified and Traditional Chinese), served by the Worker at `https://attentioncard.com/privacy` and `https://attentioncard.com/support`. The old GitHub Pages URLs (`docs/privacy-policy.html`, `docs/support.html`) redirect there, keeping any `#zh` or `#zh-hant` anchor; `docs/_config.yml` keeps the other docs off that site.
 - **Permission prompts**: camera (QR scanning) and adding to Photos, in all listed languages (`InfoPlist.strings`).
 
 ## Age rating and export compliance
 
-- **Age rating**: all content questions "None". The app is not a web browser: it shows page titles and preview images of links the user chooses, so "Unrestricted Web Access" is **No**. Expect 4+.
+- **Age rating**: all content questions "None". Shared lists are user-generated content that other users can open in the app: answer **Yes** to user-generated content; reporting (a Report link on every page) and take-down (by the sharer, or by the developer after a report) are in place. The app is not a web browser: it shows page titles and preview images of links the user chooses, so "Unrestricted Web Access" is **No**. Expect 4+.
 - **Encryption**: the app uses only HTTPS through system APIs, which is exempt. `ITSAppUsesNonExemptEncryption` is already `NO` in the Info.plist, so App Store Connect won't ask on every build.
 
 ## Before the first submission
@@ -160,4 +160,5 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 - [ ] Review the regenerated screenshots (see Screenshots) and upload them (`Tools/release.sh metadata --apply`)
 - [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
+- [ ] Shared lists, before the first build with them: deploy the CloudKit schema (`SharedListRecord`) to Production, update App Privacy and the age rating as above, and turn on R2 usage notifications in the Cloudflare dashboard
 - [ ] Pricing and availability (not decided yet)
