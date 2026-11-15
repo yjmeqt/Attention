@@ -9,8 +9,8 @@ Everything needed to create the App Store listing lives in the repo. Pricing and
 | App bundle ID | `com.yjmeqt.attn` (Release; Debug builds use `com.yjmeqt.attn.dev`) |
 | Share extension | `com.yjmeqt.attn.share` |
 | App Group | `group.com.yjmeqt.attn.shared` |
-| Team | `M3V5P234X3` (set in `ios/project.yml`) |
-| Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/project.yml` |
+| Team | `M3V5P234X3` (project build setting `DEVELOPMENT_TEAM`) |
+| Version | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `ios/Attention.xcodeproj/project.xcproj` |
 
 Bundle IDs are permanent once the app is created in App Store Connect.
 
@@ -60,7 +60,7 @@ One-time setup:
 2. Edit the default workflow: start condition **Branch Changes** on `main` (or **Manual** only), action **Archive** with platform iOS, scheme `Attention`, deployment preparation **TestFlight and App Store** (Internal Testing Only builds can't go to the public link), and a post-action **TestFlight Internal Testing** to the internal group, plus **TestFlight External Testing** if builds should reach the public link.
 3. In App Store Connect, **Xcode Cloud → Settings → Build Number**, set the next build number above the latest upload (3 or higher after 1.0 (2)).
 
-After that, merging to `main` produces a TestFlight build. To start one from the terminal: `asc xcode-cloud run --app 6827156660 --workflow "<workflow name>" --branch main --wait`. `MARKETING_VERSION` still comes from `project.yml`; `Tools/release.sh metadata` is unchanged.
+After that, merging to `main` produces a TestFlight build. To start one from the terminal: `asc xcode-cloud run --app 6827156660 --workflow "<workflow name>" --branch main --wait`. `MARKETING_VERSION` still comes from the project file; `Tools/release.sh metadata` is unchanged.
 
 ## TestFlight
 
@@ -84,7 +84,7 @@ Beta App Description (English is the primary language; add Simplified Chinese as
 
 What to Test (per build):
 
-> Save links by sharing from other apps and by pasting. Open an item: Open is the main button, and Share offers Share Link, Copy Link and Share as Image. Try the Card, Text and QR templates. On a fresh install the share-sheet guide plays through once before it can be closed. Report links that show no preview.
+> Save links by sharing from other apps and by pasting. Open an item: Open is the main button, and Share offers Share Link, Copy Link and Share as Image. Try the Card, Text and QR templates. On a fresh install the copy-and-paste guide plays through once before it can be closed. Report links that show no preview.
 
 > 通过其他 App 的分享菜单和粘贴保存链接。打开一条：主按钮是“打开”，“分享”里有分享链接、复制链接和分享为图片。试试卡片、文字和二维码三种模板。首次安装时，分享菜单引导要看完一遍才能关掉。没有预览的链接请反馈给我们。
 

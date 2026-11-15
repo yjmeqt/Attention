@@ -34,12 +34,10 @@ Everything runs on the device. There is no backend and no account: the library s
 
 ## iOS
 
-Requirements: Xcode 27.1, [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+Requirements: Xcode 27 or later. `Attention.xcodeproj` is in Xcode 27's JSON project format (`project.xcproj`), and its source folders are synchronized, so new files join their targets without a project edit.
 
 ```sh
-cd ios
-xcodegen generate          # regenerate Attention.xcodeproj after changing project.yml or adding files
-open Attention.xcodeproj
+open ios/Attention.xcodeproj
 ```
 
 Command-line builds put their output in the repo-level `build/` folder, which is git-ignored:
@@ -57,11 +55,11 @@ xcodebuild -project Attention.xcodeproj -scheme Attention \
 | `AttentionMac` | The Mac app (`Mac/`, plus the library, unfurler, card templates and feed tiles from `Shared/`) |
 
 - Code shared by the app and the extension lives in `Shared/`. They exchange history through the App Group `group.<bundle ID>.shared`.
-- The Mac app compiles only the parts of `Shared/` it needs (see its `sources` in `project.yml`); `Shared/Platform.swift` gives `NSImage` the few `UIImage` members they use, so shared code says `PlatformImage` and `Image(platformImage:)`. Its library window has sites and tags in the sidebar, the feed as a grid, and the selected card in an inspector; ⌘V or a drop saves a link or image. The menu bar panel makes a card from a copied link, and ⌃⌥⌘A anywhere turns the link on the clipboard into a card image on the clipboard, ready to paste into WeChat. It shows in the Dock only while the library window is open. `xc-dev run-mac` builds and opens it.
+- The Mac app compiles only the parts of `Shared/` it needs (all of `Shared/Card` and `Shared/Intake`, plus the files listed for `AttentionMac` in `Attention.xcodeproj/project.xcproj`); `Shared/Platform.swift` gives `NSImage` the few `UIImage` members they use, so shared code says `PlatformImage` and `Image(platformImage:)`. Its library window has sites and tags in the sidebar, the feed as a grid, and the selected card in an inspector; ⌘V or a drop saves a link or image. The menu bar panel makes a card from a copied link, and ⌃⌥⌘A anywhere turns the link on the clipboard into a card image on the clipboard, ready to paste into WeChat. It shows in the Dock only while the library window is open. `xc-dev run-mac` builds and opens it.
 - **iCloud**: the library (`LibraryItem`, with its images as external-storage attributes) syncs through the container `iCloud.<bundle ID>`. CloudKit rules out unique attributes, so `Library.mergeDuplicates()` folds together copies of the same link saved on two devices before they synced. The share extension writes to the store without syncing; the app uploads its changes. Feed thumbnails are a local cache each device rebuilds. Before the first release that syncs, deploy the schema from Development to Production in the [CloudKit Console](https://icloud.developer.apple.com/) (run a Debug build that has saved an item first, so every field exists).
 - The Mac app ships through the same App Store record as iOS (same bundle ID, one purchase): `Tools/release.sh beta --mac` uploads a build, `Tools/release.sh metadata --mac` pushes the listing and `mac-*.png` screenshots to the macOS version.
 - Debug and Release install side by side: Debug is `com.yjmeqt.attn.dev` ("Attention Dev"), Release is `com.yjmeqt.attn` ("Attention"). The extension and tests append `.share` and `.tests`.
-- Signing uses automatic provisioning with team `M3V5P234X3`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and `APP_BUNDLE_ID` in `project.yml`.
+- Signing uses automatic provisioning with team `M3V5P234X3`. To build under a different Apple ID, change `DEVELOPMENT_TEAM` and `APP_BUNDLE_ID` in the project's build settings.
 - UI strings are in `Shared/Localizable.xcstrings` (English source; Simplified Chinese, Korean, Japanese, Russian, Vietnamese, Arabic, French, German and Spanish). The app icon is an Icon Composer document (`App/Attention.icon`), so iOS derives the dark, tinted and clear appearances itself.
 
 Tests: the `UnfurlTests` suite fetches about 30 real Chinese and US sites, so it needs network access and is slow. Run everything else with:

@@ -11,7 +11,7 @@
 iOS build, run, simulator and clean work goes through [`xc-dev`](https://github.com/yjmeqt/xc-dev) (`cargo install --git https://github.com/yjmeqt/xc-dev xc-dev`). Its config is committed in `.xc-dev/`, so every worktree, including the ones Claude creates under `.claude/worktrees/`, has the same tasks with nothing to set up. Run `xc-dev` from anywhere in the repo to list them.
 
 ```sh
-xc-dev build                # xcodegen if project.yml changed, then build for the simulator
+xc-dev build                # build for the simulator
 xc-dev run                  # build, boot this worktree's iPhone sim, install, launch
 xc-dev run-ipad             # same on this worktree's iPad sim
 xc-dev run-duo              # same on this worktree's iPhone Duo sim
@@ -27,6 +27,15 @@ xc-dev :get sim_id          # any resolved variable: sim_name, bundle_id, git_wo
 - Each worktree gets its own simulators, named `Attention-<worktree slug>` (plus `-ipad` and `-duo`), so parallel worktrees never share one. Don't use the `Attention-Shots-*` simulators: `ios/Tools/store-shots/capture.zsh` drives them.
 - Builds go to Xcode's own DerivedData folder for the worktree's project path (`~/Library/Developer/Xcode/DerivedData/Attention-<hash>`), the same one Xcode uses when it opens that project. `xc-dev clean` deletes it.
 - Add a task to `.xc-dev/tasks.toml` rather than hand-writing an `xcodebuild` call that a task could cover.
+
+### Project file
+
+`ios/Attention.xcodeproj/project.xcproj` is Xcode 27's JSON project format and the only project definition; there's no generator. Opening it needs Xcode 27 or later.
+
+- `App/`, `Mac/`, `ShareExtension/`, `ActionExtension/Save`, `ActionExtension/Card`, `Tests/` and each subfolder of `Shared/` are synchronized folders: a file added there joins that folder's targets with no project edit. Exceptions are listed per folder under `membership-exceptions`, and they name files, not subfolders (Xcode ignores a folder name there).
+- The files directly in `Shared/` are plain file references, so a new one needs an entry with its `target-membership`.
+- The Mac target gets all of `Shared/Card` and `Shared/Intake` but only the listed files of `Shared/Features` and `Shared/Library`; a new file there that the Mac needs goes in that folder's `AttentionMac` inclusions.
+- After editing the file by hand, run `xcrun xcprojformatter --update ios/Attention.xcodeproj` to put it back in canonical form.
 
 ### Tests
 

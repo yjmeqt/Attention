@@ -133,7 +133,7 @@ struct HomeView: View {
         #endif
         .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
-                ShareSheetGuide(onWatched: { guideWatched = true })
+                CopyGuide(onWatched: { guideWatched = true })
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") { showsGuide = false }
@@ -593,10 +593,10 @@ struct HomeView: View {
                         Button("Share List…", systemImage: "square.and.arrow.up") { shareTag(sharableTag) }
                     }
                     NavigationLink {
-                        ShareSheetGuide()
+                        CopyGuide()
                             .onAppear { guideTip.invalidate(reason: .actionPerformed) }
                     } label: {
-                        Label("Pin \(Brand.name) to the front of the share sheet", systemImage: "pin")
+                        Label("Copy and Paste", systemImage: "doc.on.clipboard")
                     }
                 } label: {
                     Label("More", systemImage: "ellipsis")
@@ -617,7 +617,7 @@ struct HomeView: View {
         }
     }
 
-    private static let guideSource = "shareSheetGuide"
+    private static let guideSource = "copyGuide"
 
     /// Once the guide has shrunk into More, More bounces, then a tip says the guide lives there.
     private func guideDismissed() {

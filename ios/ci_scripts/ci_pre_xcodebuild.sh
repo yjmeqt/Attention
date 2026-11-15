@@ -6,6 +6,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ ${CI_XCODEBUILD_ACTION:-} == archive && -n ${CI_BUILD_NUMBER:-} ]]; then
-  sed -i '' -E "s/(CURRENT_PROJECT_VERSION = )[^;]*;/\1$CI_BUILD_NUMBER;/" Attention.xcodeproj/project.pbxproj
+  sed -i '' -E "s/(\"CURRENT_PROJECT_VERSION\": )\"[^\"]*\"/\1\"$CI_BUILD_NUMBER\"/" Attention.xcodeproj/project.xcproj
   echo "Build number set to $CI_BUILD_NUMBER"
 fi
