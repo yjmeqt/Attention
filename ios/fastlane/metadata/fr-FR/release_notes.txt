@@ -1,1 +1,1 @@
-Une nouvelle icône, un écran d’accueil plus clair et quelques corrections.
+Partagez une liste : sélectionnez quelques éléments, ou touchez longuement un tag, et envoyez un seul lien. Il s’ouvre comme un fil dans Attention et dans n’importe quel navigateur, et vous pouvez le retirer à tout moment depuis Listes partagées dans la barre latérale. Votre bibliothèque se synchronise désormais via iCloud entre votre iPhone, votre iPad et votre Mac.

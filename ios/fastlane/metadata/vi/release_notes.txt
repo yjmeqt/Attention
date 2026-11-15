@@ -1,1 +1,1 @@
-Biểu tượng ứng dụng mới, màn hình chào mừng rõ ràng hơn và một số bản sửa lỗi.
+Chia sẻ danh sách: chọn vài mục, hoặc nhấn giữ một thẻ, rồi gửi một liên kết duy nhất. Liên kết mở dạng bảng tin trong Attention và mọi trình duyệt, và bạn có thể gỡ xuống bất cứ lúc nào trong Danh sách đã chia sẻ ở thanh bên. Thư viện giờ đồng bộ qua iCloud giữa iPhone, iPad và Mac.

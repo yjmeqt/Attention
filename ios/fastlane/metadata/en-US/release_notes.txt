@@ -1,1 +1,1 @@
-A new app icon, a clearer welcome screen, and small fixes.
+Share a list: select a few items, or touch and hold a tag, and send one link. It opens as a feed in Attention and in any browser, and you can take it down anytime from Shared Lists in the sidebar. Your library now syncs over iCloud between your iPhone, iPad and Mac.

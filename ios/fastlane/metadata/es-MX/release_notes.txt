@@ -1,1 +1,1 @@
-Un nuevo ícono de la app, una pantalla de bienvenida más clara y algunas correcciones.
+Comparte una lista: selecciona algunos elementos, o mantén presionada una etiqueta, y envía un solo enlace. Se abre como un feed en Attention y en cualquier navegador, y puedes retirarlo cuando quieras desde Listas compartidas en la barra lateral. Tu biblioteca ahora se sincroniza por iCloud entre tu iPhone, iPad y Mac.
