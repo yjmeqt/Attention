@@ -10,4 +10,11 @@ To test:
 
 The app reads public page metadata (title, preview image, icon) for the links the user saves. It uses public endpoints from YouTube (oEmbed), Bilibili and FxTwitter for richer previews of those sites, and Google's favicon service for site icons. Text in shared images is recognized on the device.
 
-Optional visual search: Settings > "Download MobileCLIP" fetches a model file (about 100 MB) from the developer's GitHub Releases, with public mirrors as fallback. This is a one-time download that the user starts; the model then runs on the device. The library syncs through the user's own iCloud private database (CloudKit). No user data is sent to the developer.
+Optional visual search: Settings > "Download MobileCLIP" fetches a model file (about 100 MB) from the developer's GitHub Releases, with public mirrors as fallback. This is a one-time download that the user starts; the model then runs on the device. The library syncs through the user's own iCloud private database (CloudKit). Apart from lists the user chooses to share (below), no user data is sent to the developer.
+
+Shared lists (user-generated content, guideline 1.2):
+- To share: tap More > Select, pick a few items and tap the share button at the bottom left, then Share. The app uploads that snapshot (titles, links or text, small thumbnails) to attentioncard.com and shares its link, for example https://attentioncard.com/l/<id>. Private items and images are never uploaded.
+- Anyone with the link sees it as a web page, and Attention users can open it in the app (universal link) and save it.
+- The person who shared it can take it down at any time from Shared Lists in the sidebar; the link then stops working.
+- Every shared page has a Report link that emails report@attentioncard.com. The developer reviews reports and removes offending lists, which then show "removed after a report".
+- Lists are not public: they aren't listed anywhere or indexed by search engines.
