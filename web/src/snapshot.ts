@@ -59,11 +59,20 @@ function text(value: unknown, field: string, max: number, required = true): stri
   // Line breaks are kept for text items; everything else is one line.
   const trimmed = value.trim();
   if (required && trimmed === "") fail(`${field} is required`);
-  if ([...trimmed].length > max) fail(`${field} is longer than ${max} characters`);
-  return trimmed || undefined;
+  return clip(trimmed, max) || undefined;
+}
+
+/**
+ Shortens text to `max` code points, ending in "…". The app clips too, but Swift counts an emoji with a skin
+ tone or a joiner as one character where it's several code points here, so long titles can still arrive over.
+*/
+export function clip(value: string, max: number): string {
+  const points = [...value];
+  return points.length <= max ? value : points.slice(0, max - 1).join("").trimEnd() + "…";
 }
 
 function webURL(value: unknown, field: string): string {
+  if (typeof value === "string" && [...value.trim()].length > limits.url) fail(`${field} is longer than ${limits.url} characters`);
   const raw = text(value, field, limits.url)!;
   let url: URL;
   try {

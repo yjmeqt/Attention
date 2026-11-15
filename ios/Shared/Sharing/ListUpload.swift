@@ -136,8 +136,19 @@ struct ListUpload {
         return nil
     }
 
+    /// At most `limit` Unicode scalars, ending in "…": the server counts code points, and an emoji with a
+    /// skin tone or a joiner is one Swift character but several of those. Never splits a character.
     nonisolated static func clipped(_ string: String, _ limit: Int) -> String {
-        string.count <= limit ? string : String(string.prefix(limit - 1)) + "…"
+        guard string.unicodeScalars.count > limit else { return string }
+        var result = ""
+        var count = 0
+        for character in string {
+            let size = character.unicodeScalars.count
+            if count + size > limit - 1 { break }
+            result.append(character)
+            count += size
+        }
+        return result + "…"
     }
 
     /// The multipart body, with `preview` as the link preview image when there is one.

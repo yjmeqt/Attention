@@ -30,7 +30,7 @@ describe("parseSnapshot", () => {
     ["relative links", { ...link, url: "/path" }],
     ["unknown kinds", { kind: "image" }],
     ["empty text", { kind: "text", text: "   " }],
-    ["text over 5,000 characters", { kind: "text", text: "字".repeat(5001) }],
+    ["links over 2,048 characters", { ...link, url: "https://example.com/" + "a".repeat(2048) }],
     ["bad part names", { ...link, thumb: "../x" }],
   ])("rejects %s", (_, item) => {
     expect(() => parseSnapshot({ v: 1, title: "t", items: [item] }, now)).toThrow(InvalidSnapshot);
@@ -42,6 +42,19 @@ describe("parseSnapshot", () => {
     expect(() => parseSnapshot({ v: 1, title: "t", items: [] }, now)).toThrow(InvalidSnapshot);
     expect(() => parseSnapshot({ v: 1, title: "t", items: Array(101).fill(link) }, now)).toThrow(InvalidSnapshot);
     expect(() => parseSnapshot([], now)).toThrow(InvalidSnapshot);
+  });
+
+  it("clips long text to its limit in code points instead of refusing it", () => {
+    // What Swift counts as 300 characters: each family emoji is one grapheme but five code points.
+    const title = "Thread 👨‍👩‍👧 ".repeat(30);
+    const snapshot = parseSnapshot(
+      { v: 1, title: "t", items: [{ ...link, title }, { kind: "text", text: "字".repeat(5001) }] },
+      now,
+    );
+    const clipped = snapshot.items[0] as { title: string };
+    expect([...clipped.title].length).toBeLessThanOrEqual(300);
+    expect(clipped.title.endsWith("…")).toBe(true);
+    expect([...(snapshot.items[1] as { text: string }).text].length).toBe(5000);
   });
 
   it("counts characters, not UTF-16 units", () => {
