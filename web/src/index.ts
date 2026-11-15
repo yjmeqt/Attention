@@ -89,7 +89,12 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   if (path === "/api/lists") {
     if (request.method !== "POST") return methodNotAllowed("POST");
-    return createList(request, env, url);
+    const response = await createList(request, env, url);
+    // Refusals carry their reason only in the body; log it so a failed share can be traced.
+    if (response.status >= 400) {
+      console.log(JSON.stringify({ upload: "refused", status: response.status, ...(await response.clone().json<object>()) }));
+    }
+    return response;
   }
   if (path === "/api/attest/challenge") {
     if (request.method !== "GET") return methodNotAllowed("GET");

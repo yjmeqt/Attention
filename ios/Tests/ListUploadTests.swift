@@ -123,6 +123,17 @@ struct ListUploadTests {
         }
     }
 
+    @Test("Clips text the way the server counts it, in Unicode scalars")
+    func clipsByScalars() {
+        // 240 Swift characters but 360 scalars: each family emoji is one character and five scalars.
+        let title = String(repeating: "Thread 👨‍👩‍👧 ", count: 30)
+        let clipped = ListUpload.clipped(title, 300)
+        #expect(clipped.unicodeScalars.count <= 300)
+        #expect(clipped.hasSuffix("…"))
+        #expect(clipped.dropLast().allSatisfy { title.contains($0) })
+        #expect(ListUpload.clipped("short", 300) == "short")
+    }
+
     @Test("Signs what the server checks: the challenge and the list's JSON")
     func attestClientData() {
         // web/src/attest.ts `uploadClientDataHash` hashes the same string: "<challenge>.<hex SHA-256 of the JSON>".
