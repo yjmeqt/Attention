@@ -27,8 +27,9 @@ async function attestedKey() {
 }
 
 /** An assertion like the app's: the test credential key signs SHA-256(authData || clientDataHash), DER-encoded. */
-async function signAssertion(counter: number, clientDataHash: Uint8Array): Promise<string> {
-  const authData = new Uint8Array(37);
+async function signAssertion(counter: number, clientDataHash: Uint8Array, extra = 0): Promise<string> {
+  const authData = new Uint8Array(37 + extra);
+  authData.fill(0xff, 37);
   authData.set(await sha256(text(fixture.appID)));
   authData[32] = 0x40;
   new DataView(authData.buffer).setUint32(33, counter);
@@ -72,6 +73,14 @@ describe("App Attest", () => {
     for (const [overrides, message] of cases) {
       await expect(attest(overrides)).rejects.toThrow(message);
     }
+  });
+
+  it("reads only the RP ID hash and counter from an assertion's authenticator data", async () => {
+    const key = await attestedKey();
+    const hash = await sha256(text("upload"));
+    // Anything after the counter isn't attested credential data in an assertion, whatever its flags say.
+    const assertion = fromBase64(await signAssertion(7, hash, 30));
+    expect(await verifyAssertion({ assertion, key, clientDataHash: hash })).toBe(7);
   });
 
   it("accepts assertions whose counter goes up, and only over what was signed", async () => {
