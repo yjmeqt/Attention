@@ -119,7 +119,7 @@ final class SharedListRecord {
 }
 ```
 
-新模型要在第一个带这个功能的版本发布前，把 CloudKit schema 从 Development 部署到 Production（和 README 里 `LibraryItem` 的步骤一样）。
+CloudKit schema 已经部署到 Production（步骤见 README 的 iCloud 一节）。
 
 ## Universal Link：在 App 里看完整列表
 
@@ -149,7 +149,7 @@ final class SharedListRecord {
 
 1. **`web/` 和 Worker**（已完成并部署，见 [`web/README.md`](../web/README.md)）：上传、读取、删除接口，`/l/:id` 页面。
 2. **iOS 上传**（已完成）：`SharedListRecord` 模型（`ios/Shared/Library/SharedListRecord.swift`）、快照打包和压缩、上传客户端（`ios/Shared/Sharing/ListUpload.swift`），单元测试在 `ios/Tests/ListUploadTests.swift`，不碰网络。
-3. **iOS 界面**（已完成）：侧边栏标签的上下文菜单和标签页“更多”菜单里的“分享列表…”、确认页（`ShareListSheet.swift`）、链接预览图（`ListCard.swift`）、侧边栏的"已分享的列表"和详情页（`SharedListsView.swift`）。发布前要把 CloudKit schema 部署到 Production。
+3. **iOS 界面**（已完成）：侧边栏标签的上下文菜单和标签页“更多”菜单里的“分享列表…”、确认页（`ShareListSheet.swift`）、链接预览图（`ListCard.swift`）、侧边栏的"已分享的列表"和详情页（`SharedListsView.swift`）。CloudKit schema 已部署到 Production。
 4. **合规**：隐私政策、App Privacy、审核备注（已完成）；App Attest（已完成，`require` 模式，真机验证过）。
 5. **Mac 入口**。之后再做 Android。
 
