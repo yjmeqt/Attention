@@ -74,7 +74,10 @@
   - 只有前 20 条带缩略图，单次上传最多写 21 个对象。
   - 总闸：把 `UPLOADS_ENABLED` 改成 `"false"` 再部署，就停掉所有新上传，已分享的列表照常能看。
 
-  正式公开前再加 App Attest：iOS 上传时附带断言，Worker 验证，确保请求来自正版 app。Android 以后用 Play Integrity。另外在 Cloudflare 后台打开按用量计费的提醒。
+  - App Attest（`web/src/attest.ts`、`ios/Shared/Sharing/AppAttest.swift`）：App 在安全隔区里生成一个密钥，第一次分享前请 Apple 证明它（`GET /api/attest/challenge` 拿挑战，`POST /api/attest` 交证明）。Worker 按 Apple 的步骤验证证书链（根证书在 `web/src/appAttestRoot.ts`）、nonce、密钥 ID、App ID 和环境，然后把公钥和计数器存进 R2 的 `attest/<key id>`。之后每次上传带一个断言，签的是新挑战加列表 JSON 的哈希，Worker 验证签名并要求计数器递增。服务器不认识这个密钥时返回 `unknown_attest_key`，App 换一个新密钥重试一次。
+  - `ATTEST_MODE` 决定没有或验证不过的上传怎么处理：`log` 只记日志（现在的设置：模拟器不支持 App Attest，旧版本也不会带），`require` 拒绝上传，`off` 不检查。真机验证过、带这个功能的版本上线后再改成 `require`。
+  - 测试用 `node web/scripts/attest-fixture.mjs` 生成的证书链（和 Apple 的结构一样，但用测试根证书签），见 `web/test/attest.test.ts`。
+  - Android 以后用 Play Integrity。另外在 Cloudflare 后台打开按用量计费的提醒。
 - **撤回后**：`/l/:id` 返回 410，页面提示"分享者已撤回这个列表"。
 
 ## 网页 `/l/:id`
@@ -147,7 +150,7 @@ final class SharedListRecord {
 1. **`web/` 和 Worker**（已完成并部署，见 [`web/README.md`](../web/README.md)）：上传、读取、删除接口，`/l/:id` 页面。
 2. **iOS 上传**（已完成）：`SharedListRecord` 模型（`ios/Shared/Library/SharedListRecord.swift`）、快照打包和压缩、上传客户端（`ios/Shared/Sharing/ListUpload.swift`），单元测试在 `ios/Tests/ListUploadTests.swift`，不碰网络。
 3. **iOS 界面**（已完成）：侧边栏标签的上下文菜单和标签页“更多”菜单里的“分享列表…”、确认页（`ShareListSheet.swift`）、链接预览图（`ListCard.swift`）、侧边栏的"已分享的列表"和详情页（`SharedListsView.swift`）。发布前要把 CloudKit schema 部署到 Production。
-4. **合规**：隐私政策、App Privacy、审核备注、App Attest。
+4. **合规**：隐私政策、App Privacy、审核备注（已完成）；App Attest（已完成，`log` 模式，真机验证后改 `require`）。
 5. **Mac 入口**。之后再做 Android。
 
 ## 第一版不做

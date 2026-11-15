@@ -4,6 +4,8 @@ import { receiveMail } from "./mail";
 import { checkTarget, unfurl, UnfurlError } from "./unfurl";
 import { homeLang, homePage, homePaths, type HomeLang } from "./home";
 import { checkPreview, jpegSize } from "./listPreview";
+import { appAttestRootPEM } from "./appAttestRoot";
+import { AttestError, checkChallenge, fromBase64, newChallenge, uploadClientDataHash, verifyAssertion, verifyAttestation, type AttestedKey } from "./attest";
 export { UploadQuota } from "./quota";
 import { InvalidSnapshot, isJPEG, limits, parseSnapshot, type Snapshot } from "./snapshot";
 
@@ -12,6 +14,7 @@ import { InvalidSnapshot, isJPEG, limits, parseSnapshot, type Snapshot } from ".
    lists/<id>/list.json   the snapshot; custom metadata `tokenHash` is the SHA-256 of the delete token
    lists/<id>/<n>.jpg     thumbnail of item n
    lists/<id>/og.jpg      link preview image the app rendered, when it sent one (src/listPreview.ts)
+   attest/<key id>        an App Attest key's public key and counter (src/attest.ts), base64url key ID
    revoked/<id>           left behind by a delete, so the page can say "revoked" instead of "not found".
                           JSON `{ reason, at }`: reason "owner" for the sharer's delete, "takedown" for
                           the developer's removal (scripts/takedown.sh).
@@ -47,7 +50,7 @@ export default {
 
 /**
  Universal links: shared lists open in the app when it's installed. Both hosts serve this file;
- the app's Associated Domains entitlement names them (ios/project.yml).
+ the app's Associated Domains entitlement names them (ios/App/Attention.entitlements).
  Thumbnails and preview images under /l/<id>/ stay on the web.
 */
 const appSiteAssociation = {
@@ -87,6 +90,14 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path === "/api/lists") {
     if (request.method !== "POST") return methodNotAllowed("POST");
     return createList(request, env, url);
+  }
+  if (path === "/api/attest/challenge") {
+    if (request.method !== "GET") return methodNotAllowed("GET");
+    return Response.json({ challenge: await newChallenge(env.IMAGE_KEY) }, { headers: { "Cache-Control": "no-store" } });
+  }
+  if (path === "/api/attest") {
+    if (request.method !== "POST") return methodNotAllowed("POST");
+    return attestKey(request, env);
   }
   let match = path.match(/^\/api\/lists\/([^/]+)$/);
   if (match) {
@@ -135,8 +146,8 @@ async function createList(request: Request, env: Env, url: URL): Promise<Respons
   if (listPart === null) return error(400, "invalid_list", "The `list` part is missing.");
 
   let snapshot: Snapshot;
+  const json = typeof listPart === "string" ? listPart : await listPart.text();
   try {
-    const json = typeof listPart === "string" ? listPart : await listPart.text();
     snapshot = parseSnapshot(JSON.parse(json), new Date());
   } catch (e) {
     if (e instanceof InvalidSnapshot) return error(400, "invalid_list", e.message);
@@ -174,6 +185,9 @@ async function createList(request: Request, env: Env, url: URL): Promise<Respons
     if (problem) return error(problem.status, "invalid_preview", problem.message);
     snapshot.og = jpegSize(preview)!;
   }
+
+  const attested = await checkUploadAttestation(request, env, new TextEncoder().encode(json));
+  if (attested) return attested;
 
   // Counted only once the upload is valid, right before anything is written.
   const quota = env.UPLOAD_QUOTA.get(env.UPLOAD_QUOTA.idFromName("global"));
@@ -357,4 +371,83 @@ function methodNotAllowed(allow: string): Response {
     status: 405,
     headers: { Allow: allow, "Content-Type": "application/json" },
   });
+}
+
+// MARK: - App Attest
+
+const attestKeyPath = (keyID: string) => `attest/${keyID.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "")}`;
+
+/** POST /api/attest { keyId, attestation, challenge } (base64): checks a new key's attestation and keeps it. */
+async function attestKey(request: Request, env: Env): Promise<Response> {
+  const ip = request.headers.get("CF-Connecting-IP") ?? "local";
+  if (env.UPLOAD_LIMITER && !(await env.UPLOAD_LIMITER.limit({ key: `attest:${ip}` })).success) {
+    return error(429, "rate_limited");
+  }
+  let input: { keyId?: unknown; attestation?: unknown; challenge?: unknown };
+  try {
+    input = await request.json();
+  } catch {
+    return error(400, "invalid_attestation", "Send JSON.");
+  }
+  const { keyId, attestation, challenge } = input;
+  if (typeof keyId !== "string" || typeof attestation !== "string" || typeof challenge !== "string" || attestation.length > 16_384) {
+    return error(400, "invalid_attestation", "keyId, attestation and challenge are required.");
+  }
+  if (!(await checkChallenge(env.IMAGE_KEY, challenge))) return error(400, "invalid_challenge");
+  try {
+    const key = await verifyAttestation({
+      attestation: fromBase64(attestation),
+      keyID: fromBase64(keyId),
+      clientDataHash: new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(challenge))),
+      rootPEM: appAttestRootPEM,
+      now: new Date(),
+    });
+    await env.LISTS.put(attestKeyPath(key.keyID), JSON.stringify(key), { httpMetadata: { contentType: "application/json" } });
+    return new Response(null, { status: 204 });
+  } catch (e) {
+    if (e instanceof AttestError) {
+      console.log(JSON.stringify({ attest: "attestation rejected", reason: e.message }));
+      return error(400, "invalid_attestation", e.message);
+    }
+    throw e;
+  }
+}
+
+/**
+ Checks an upload's assertion. Returns a response to send back when ATTEST_MODE is "require" and it's missing
+ or bad; otherwise null, after logging the outcome so "log" mode shows how many uploads would pass.
+*/
+async function checkUploadAttestation(request: Request, env: Env, listJSON: Uint8Array): Promise<Response | null> {
+  const mode = env.ATTEST_MODE as string;
+  if (mode === "off") return null;
+  const keyID = request.headers.get("X-Attest-Key");
+  const challenge = request.headers.get("X-Attest-Challenge");
+  const assertion = request.headers.get("X-Attest-Assertion");
+  let problem: string | undefined;
+  if (!keyID || !challenge || !assertion) {
+    problem = "missing";
+  } else if (!(await checkChallenge(env.IMAGE_KEY, challenge))) {
+    problem = "bad challenge";
+  } else {
+    const stored = await env.LISTS.get(attestKeyPath(keyID));
+    if (!stored) {
+      problem = "unknown key";
+    } else {
+      const key = await stored.json<AttestedKey>();
+      try {
+        key.counter = await verifyAssertion({
+          assertion: fromBase64(assertion),
+          key,
+          clientDataHash: await uploadClientDataHash(challenge, listJSON),
+        });
+        await env.LISTS.put(attestKeyPath(keyID), JSON.stringify(key), { httpMetadata: { contentType: "application/json" } });
+      } catch (e) {
+        if (!(e instanceof AttestError)) throw e;
+        problem = e.message;
+      }
+    }
+  }
+  console.log(JSON.stringify({ attest: "upload", mode, result: problem ?? "valid" }));
+  if (!problem || mode !== "require") return null;
+  return problem === "unknown key" ? error(401, "unknown_attest_key") : error(401, "attestation_required", problem);
 }

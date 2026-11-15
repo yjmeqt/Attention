@@ -61,13 +61,15 @@ struct ListUpload {
     var items: [[String: Any]]
     /// Part name → JPEG.
     var thumbs: [String: Data]
+    /// Fixed when the upload is made, so `json` is the same bytes each time: the upload's assertion signs them.
+    var createdAt = ISO8601DateFormatter().string(from: .now)
 
     var json: Data {
         let list: [String: Any] = [
             "v": 1,
             "title": title,
             "lang": lang,
-            "createdAt": ISO8601DateFormatter().string(from: .now),
+            "createdAt": createdAt,
             "items": items,
         ]
         return (try? JSONSerialization.data(withJSONObject: list, options: [.sortedKeys])) ?? Data()
@@ -167,6 +169,10 @@ enum ListSharingError: Error, Equatable {
     case uploadsPaused
     case rejected
     case unavailable
+    /// The server doesn't know this device's App Attest key; attesting a new one fixes it.
+    case unknownAttestKey
+    /// The server requires App Attest and this upload didn't pass.
+    case notVerified
 }
 
 /// Uploads a list and takes it down again (web/src/index.ts `createList`, `deleteList`).
@@ -188,18 +194,32 @@ enum ListSharingClient {
         case 429:
             let code = (try? JSONDecoder().decode([String: String].self, from: data))?["error"]
             throw code == "daily_limit" ? .dailyLimit : .rateLimited
+        case 401:
+            let code = (try? JSONDecoder().decode([String: String].self, from: data))?["error"]
+            throw code == "unknown_attest_key" ? .unknownAttestKey : .notVerified
         case 503: throw .uploadsPaused
         case 400, 413: throw .rejected
         default: throw .unavailable
         }
     }
 
+    /// Uploads with App Attest headers when the device can make them; once more with a new key if the server lost the old one.
     static func upload(_ upload: ListUpload, preview: Data?, session: URLSession = .shared) async throws(ListSharingError) -> Created {
+        do {
+            return try await send(upload, preview: preview, attest: await AppAttest.headers(for: upload.json, session: session), session: session)
+        } catch .unknownAttestKey {
+            AppAttest.forget()
+            return try await send(upload, preview: preview, attest: await AppAttest.headers(for: upload.json, session: session), session: session)
+        }
+    }
+
+    private static func send(_ upload: ListUpload, preview: Data?, attest: [String: String], session: URLSession) async throws(ListSharingError) -> Created {
         let boundary = "attention-\(UUID().uuidString)"
         var request = URLRequest(url: endpoint, timeoutInterval: 60)
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        for (name, value) in attest { request.setValue(value, forHTTPHeaderField: name) }
         let body = upload.multipart(preview: preview, boundary: boundary)
         guard let (data, response) = try? await session.upload(for: request, from: body),
               let http = response as? HTTPURLResponse else { throw .unavailable }

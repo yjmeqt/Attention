@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import Testing
 import UIKit
@@ -61,6 +62,8 @@ struct ListUploadTests {
         library.addTag("Weekend", to: [link, text])
         let upload = await ListUpload.make(title: "  Weekend reads ", draft: ListDraft(tag: "Weekend", library: library), library: library, lang: "zh-Hans-CN")
 
+        // The assertion signs these bytes before the upload sends them, so they mustn't change in between.
+        #expect(upload.json == upload.json)
         let json = try #require(try JSONSerialization.jsonObject(with: upload.json) as? [String: Any])
         #expect(json["v"] as? Int == 1)
         #expect(json["title"] as? String == "Weekend reads")
@@ -111,11 +114,21 @@ struct ListUploadTests {
         #expect(created.id == "Ab3xK9mQ2p")
         #expect(throws: ListSharingError.dailyLimit) { try ListSharingClient.created(from: Data(#"{"error":"daily_limit"}"#.utf8), status: 429) }
         #expect(throws: ListSharingError.rateLimited) { try ListSharingClient.created(from: Data(#"{"error":"rate_limited"}"#.utf8), status: 429) }
+        #expect(throws: ListSharingError.unknownAttestKey) { try ListSharingClient.created(from: Data(#"{"error":"unknown_attest_key"}"#.utf8), status: 401) }
+        #expect(throws: ListSharingError.notVerified) { try ListSharingClient.created(from: Data(#"{"error":"attestation_required"}"#.utf8), status: 401) }
         #expect(throws: ListSharingError.uploadsPaused) { try ListSharingClient.created(from: Data(), status: 503) }
         #expect(throws: ListSharingError.rejected) { try ListSharingClient.created(from: Data(), status: 413) }
         #expect(throws: ListSharingError.unavailable) {
             try ListSharingClient.created(from: Data(#"{"id":"x","url":"https://evil.example/l/x","deleteToken":"t"}"#.utf8), status: 201)
         }
+    }
+
+    @Test("Signs what the server checks: the challenge and the list's JSON")
+    func attestClientData() {
+        // web/src/attest.ts `uploadClientDataHash` hashes the same string: "<challenge>.<hex SHA-256 of the JSON>".
+        let hash = AppAttest.uploadClientDataHash(challenge: "abc", listJSON: Data("{}".utf8))
+        let expected = "abc.44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        #expect(hash == Data(SHA256.hash(data: Data(expected.utf8))))
     }
 
     @Test("Keeps shared lists to take them down later")
