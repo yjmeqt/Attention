@@ -98,16 +98,31 @@ final class SharePresenter {
     private static let excluded: [UIActivity.ActivityType] = [.assignToContact, .print, .openInIBooks, .markupAsPDF]
 
     func present(_ items: [Any]) {
-        guard let anchor, var host = anchor.nearestViewController else { return }
-        while let presented = host.presentedViewController { host = presented }
+        // SwiftUI can rebuild the anchor (a page swapping its loading view for its content), leaving this
+        // weak reference empty or pointing off-screen; then present from the top of the anchor-less window.
+        let anchor = anchor?.window == nil ? nil : anchor
+        guard var host = anchor?.nearestViewController ?? Self.windowRoot else { return }
+        while let presented = host.presentedViewController, !presented.isBeingDismissed { host = presented }
         let sheet = UIActivityViewController(activityItems: items, applicationActivities: nil)
         sheet.excludedActivityTypes = Self.excluded
         sheet.completionWithItemsHandler = { [weak self] activity, completed, _, _ in
             self?.finished(activity, completed: completed)
         }
-        sheet.popoverPresentationController?.sourceView = anchor
-        sheet.popoverPresentationController?.sourceRect = anchor.bounds
+        let source = anchor ?? host.view
+        sheet.popoverPresentationController?.sourceView = source
+        sheet.popoverPresentationController?.sourceRect = anchor?.bounds ?? CGRect(x: source?.bounds.midX ?? 0, y: source?.bounds.midY ?? 0, width: 0, height: 0)
         host.present(sheet, animated: true)
+    }
+
+    /// The key window's root view controller, for when there's no anchor to start from.
+    private static var windowRoot: UIViewController? {
+        #if SHARE_EXTENSION
+        return nil
+        #else
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let window = scenes.first { $0.activationState == .foregroundActive }?.keyWindow ?? scenes.first?.keyWindow
+        return window?.rootViewController
+        #endif
     }
 
     func finished(_ activity: UIActivity.ActivityType?, completed: Bool) {

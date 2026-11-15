@@ -8,6 +8,8 @@ struct ShareListSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var draft: ListDraft
     @State private var title: String
+    /// Used when the title is left empty, and shown as the field's placeholder.
+    private let defaultTitle: String
     @State private var phase: Phase = .composing
     @State private var presenter = SharePresenter()
 
@@ -22,6 +24,7 @@ struct ShareListSheet: View {
         self.library = library
         _draft = State(initialValue: ListDraft(items: request.items))
         _title = State(initialValue: request.title)
+        defaultTitle = request.title
     }
 
     var body: some View {
@@ -40,7 +43,11 @@ struct ShareListSheet: View {
         return false
     }
 
-    private var trimmedTitle: String { title.trimmingCharacters(in: .whitespacesAndNewlines) }
+    /// What the list is called: the typed title, or the default one when the field is empty.
+    private var listTitle: String {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? defaultTitle : trimmed
+    }
 
     @ViewBuilder
     private var content: some View {
@@ -65,7 +72,7 @@ struct ShareListSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    TextField("List Title", text: $title)
+                    TextField(text: $title, prompt: Text(verbatim: defaultTitle)) { Text("List Title") }
                         .font(.title2.bold())
                         .submitLabel(.done)
                         .padding(.horizontal, 14)
@@ -193,7 +200,7 @@ struct ShareListSheet: View {
             if !draft.items.isEmpty {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Share") { Task { await share() } }
-                        .disabled(trimmedTitle.isEmpty || isUploading)
+                        .disabled(isUploading)
                 }
             }
         }
@@ -201,7 +208,7 @@ struct ShareListSheet: View {
 
     private func share() async {
         phase = .uploading
-        let upload = await ListUpload.make(title: trimmedTitle, draft: draft, library: library)
+        let upload = await ListUpload.make(title: listTitle, draft: draft, library: library)
         let preview = ListCardRenderer.previewJPEG(ListCardContent(title: upload.title, items: draft.items, library: library))
         do {
             let created = try await ListSharingClient.upload(upload, preview: preview)
@@ -218,7 +225,7 @@ struct ShareListSheet: View {
     /// Copies the link and opens the share sheet with it; the sheet's header shows the list's preview.
     private func send(url: URL, preview: PlatformImage?) {
         Clipboard.copy(url)
-        presenter.present([ShareItem(url: url, title: trimmedTitle, icon: nil, image: preview)])
+        presenter.present([ShareItem(url: url, title: listTitle, icon: nil, image: preview)])
     }
 
     static func message(for error: ListSharingError) -> String {
