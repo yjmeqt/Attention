@@ -161,5 +161,5 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 - [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
 - [x] Shared lists: CloudKit schema (`LibraryItem` and `SharedListRecord`) deployed to Production, App Privacy published (Other User Content), R2 usage notifications on (storage 8 GB, Class A 800k, Class B 8M a month). The Worker requires App Attest on uploads (`ATTEST_MODE` `"require"`, web/README.md)
-- [ ] With the next app version: answer Yes to user-generated content in the age rating (it can't be edited while no version is being prepared) and change the privacy policy URL to `https://attentioncard.com/privacy`
+- [x] 1.0.3: user-generated content answered Yes in the age rating, privacy policy URL changed to `https://attentioncard.com/privacy`, build 12 attached
 - [ ] Pricing and availability (not decided yet)

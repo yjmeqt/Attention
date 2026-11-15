@@ -1,1 +1,1 @@
-Ein neues App-Symbol, ein klarerer Startbildschirm und kleine Fehlerbehebungen.
+Listen teilen: Wähle ein paar Einträge aus oder halte ein Tag gedrückt und verschicke einen einzigen Link. Er öffnet sich als Feed in Attention und in jedem Browser, und du kannst ihn jederzeit unter „Geteilte Listen“ in der Seitenleiste zurückziehen. Deine Mediathek wird jetzt über iCloud zwischen iPhone, iPad und Mac synchronisiert.
