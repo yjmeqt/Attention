@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><title>Attention Promo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>
+/* A 16-second ad. ?format=story (9:16, 1080×1920, the master layout) | square (1080×1080) | xhs (3:4, 1080×1440).
+   Chat, phone and feature beats live in #stage, laid out for 1080×1920 and scaled into the space under the captions;
+   captions, brand tag and end card are laid out per format. Every element's state is a pure function of time:
+   renderAt(t) draws one frame, and promo-export.js steps it at 30 fps into an MP4.
+   Story: hook (nobody opens your bare link) → the link is struck out → demo (Share → Attention → card) →
+   payoff (the card lands in the chat, friends react) → features → end card with the call to action. */
+:root { --paper: #ece2cd; --ink: #111; --red: #d4261b; --white: #fbf7ee; --me: #a9ea7a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #000; }
+#art { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); color: var(--ink);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif; }
+#bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+.abs { position: absolute; }
+
+/* Captions: a black tag line and a big red headline on a paper plate, so they read over anything. */
+.cap { position: absolute; left: 64px; top: 150px; width: 960px; transform-origin: left top; }
+.cap .l1 { display: inline-block; background: var(--ink); color: var(--white); font-weight: 700; font-size: 54px;
+  line-height: 1; padding: 18px 26px 20px; transform: rotate(-3deg); transform-origin: left bottom; }
+.cap .l2 { display: block; width: max-content; margin-top: 18px; background: var(--paper); color: var(--red); font-weight: 900; font-size: 150px;
+  line-height: 1.02; letter-spacing: .01em; padding: 4px 22px 14px 10px; transform: rotate(-3deg); transform-origin: left top;
+  box-shadow: 14px 14px 0 var(--ink); }
+
+/* Brand tag, top right, from the first frame. */
+#brand { position: absolute; right: 54px; top: 58px; display: flex; align-items: center; gap: 16px; font-weight: 900; font-size: 40px; }
+.icon { position: relative; width: 64px; height: 64px; border-radius: 22.5%; background: #f6f3ed; overflow: hidden;
+  box-shadow: 0 6px 16px -6px #0007, inset 0 0 0 1px #0001; }
+.icon::before { content: ""; position: absolute; left: 50%; top: 50%; right: 0; bottom: 0; background: #e8402a; }
+.icon::after { content: ""; position: absolute; left: 14%; top: 73.4%; width: 22%; height: 3.2%; background: #15151a; }
+
+/* Chat window: a generic group chat. */
+#chat { position: absolute; left: 70px; top: 640px; width: 940px; height: 1210px; border-radius: 46px; overflow: hidden;
+  background: #ededed; box-shadow: 0 50px 90px -40px #000a, 0 0 0 10px var(--ink); }
+#chat header { height: 118px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+  background: #f7f7f7; border-bottom: 1px solid #d9d9d9; font-size: 40px; font-weight: 500; color: #111; }
+#chat header .back { font-size: 64px; font-weight: 400; margin-top: -8px; }
+#chat .body { position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow: hidden; }
+#msgs { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; flex-direction: column; }
+.row { overflow: visible; }
+.msg { display: flex; gap: 22px; padding: 14px 34px; align-items: flex-start; transform-origin: left center; }
+.msg.me { flex-direction: row-reverse; transform-origin: right center; }
+.av { flex: none; width: 92px; height: 92px; border-radius: 16px; color: #fff; font-size: 44px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; }
+.col { display: flex; flex-direction: column; max-width: 640px; }
+.me .col { max-width: 740px; }
+.me .col { align-items: flex-end; }
+.name { font-size: 28px; color: #888; margin: 0 0 8px 6px; }
+.bub { position: relative; background: #fff; border-radius: 16px; padding: 24px 30px; font-size: 46px; line-height: 1.35; color: #111; }
+.me .bub { background: var(--me); }
+.bub.link { color: #2a5db0; white-space: nowrap; font-size: 42px; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.bub.card { padding: 0; background: none; }
+.bub.card img { display: block; width: 520px; border-radius: 22px; box-shadow: 0 18px 40px -18px #0009; }
+.read { font-size: 26px; color: #999; margin: 8px 8px 0 0; }
+.stamp { position: absolute; right: -40px; top: -70px; width: 170px; height: 170px; border-radius: 50%; background: var(--red);
+  color: #fff; font: 900 110px/170px "Noto Sans SC", sans-serif; text-align: center; box-shadow: 0 14px 30px -10px #000a; }
+
+/* Phone with the real app screens (raw captures from capture.zsh). */
+#phone { position: absolute; left: 250px; top: 610px; width: 580px; height: 1260px; border-radius: 86px; background: var(--ink);
+  padding: 14px; box-shadow: 0 60px 100px -40px #000c; }
+#phone .screen { position: relative; width: 100%; height: 100%; border-radius: 72px; overflow: hidden; background: #000; }
+#phone .screen img { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hit { position: absolute; border-radius: 24%; box-shadow: 0 0 0 8px var(--red); }
+#sweep { position: absolute; border-radius: 12px; overflow: hidden; }
+#sweep::before { content: ""; position: absolute; top: -50%; bottom: -50%; width: 38%; left: var(--x, -40%);
+  background: linear-gradient(100deg, transparent, #fff9 45%, #fffc 50%, #fff9 55%, transparent); transform: rotate(18deg); }
+#finger { position: absolute; width: 104px; height: 104px; margin: -52px 0 0 -52px; border-radius: 50%;
+  background: radial-gradient(circle, #ffffffd0 0 26%, #ffffff60 27% 58%, #fff0 59%); box-shadow: 0 10px 30px -6px #0008; }
+#ripple { position: absolute; width: 104px; height: 104px; margin: -52px 0 0 -52px; border-radius: 50%; border: 6px solid #fff; }
+
+/* Feature beat: three templates and three chips. */
+.thumb { position: absolute; top: 680px; width: 340px; height: 290px; border-radius: 24px; background-repeat: no-repeat;
+  box-shadow: 0 30px 50px -24px #000b, 0 0 0 6px var(--ink); }
+.chip { position: absolute; left: 50%; font-weight: 900; font-size: 60px; padding: 18px 36px 22px; white-space: nowrap; }
+.chip.k { background: var(--ink); color: var(--white); }
+.chip.r { background: var(--red); color: var(--white); }
+.chip.p { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 6px var(--ink); }
+
+/* End card. */
+#end { position: absolute; inset: 0; }
+#end .bigicon { position: absolute; left: 90px; top: 250px; width: 300px; height: 300px; }
+#end .bigicon .icon { width: 300px; height: 300px; box-shadow: 0 40px 70px -30px #000c; }
+#end .word { position: absolute; left: 90px; top: 600px; font-weight: 900; font-size: 170px; line-height: 1; color: var(--ink); letter-spacing: -.02em; }
+#end .slogan { position: absolute; left: 90px; top: 810px; font-weight: 900; font-size: 92px; line-height: 1.2; color: var(--white); }
+#end .cta { position: absolute; left: 90px; top: 1080px; background: var(--ink); color: var(--white); font-weight: 900; font-size: 64px;
+  padding: 30px 56px 36px; border-radius: 999px; display: flex; align-items: center; gap: 22px; box-shadow: 0 24px 50px -20px #000c; }
+#end .cta svg { width: 58px; height: 58px; }
+#end .fine { position: absolute; left: 96px; top: 1255px; font-size: 40px; font-weight: 500; color: var(--white); }
+#end .peek { position: absolute; left: 470px; top: 1400px; width: 600px; border-radius: 30px; box-shadow: 0 40px 80px -30px #000d; }
+#fly { position: absolute; left: 0; top: 0; width: 620px; border-radius: 34px; box-shadow: 0 50px 100px -30px #000e, 0 0 0 8px var(--ink); }
+#flash { position: absolute; inset: 0; background: #fff; pointer-events: none; }
+
+/* Square. */
+.square .cap { left: 48px; top: 44px; }
+.square .cap .l1 { font-size: 40px; padding: 14px 20px 16px; }
+.square .cap .l2 { font-size: 100px; margin-top: 12px; box-shadow: 10px 10px 0 var(--ink); }
+.square #brand { right: 40px; top: 40px; font-size: 32px; gap: 12px; }
+.square #brand .icon { width: 50px; height: 50px; }
+.square #end .bigicon { left: 70px; top: 80px; } .square #end .bigicon .icon { width: 190px; height: 190px; }
+.square #end .word { left: 70px; top: 300px; font-size: 124px; }
+.square #end .slogan { left: 70px; top: 450px; font-size: 64px; }
+.square #end .cta { left: 70px; top: 640px; font-size: 48px; padding: 24px 42px 28px; } .square #end .cta svg { width: 44px; height: 44px; }
+.square #end .fine { left: 76px; top: 776px; font-size: 32px; }
+.square #end .peek { left: 670px; top: 800px; width: 370px; }
+
+/* 3:4, for Xiaohongshu. */
+.xhs .cap { left: 56px; top: 90px; }
+.xhs .cap .l1 { font-size: 46px; padding: 16px 22px 18px; }
+.xhs .cap .l2 { font-size: 124px; margin-top: 14px; box-shadow: 12px 12px 0 var(--ink); }
+.xhs #brand { right: 48px; top: 40px; font-size: 34px; gap: 12px; }
+.xhs #brand .icon { width: 54px; height: 54px; }
+.xhs #end .bigicon { left: 80px; top: 110px; } .xhs #end .bigicon .icon { width: 230px; height: 230px; }
+.xhs #end .word { left: 80px; top: 380px; font-size: 150px; }
+.xhs #end .slogan { left: 80px; top: 570px; font-size: 80px; }
+.xhs #end .cta { left: 80px; top: 820px; font-size: 56px; padding: 26px 48px 30px; } .xhs #end .cta svg { width: 50px; height: 50px; }
+.xhs #end .fine { left: 86px; top: 975px; font-size: 36px; }
+.xhs #end .peek { left: 580px; top: 1075px; width: 480px; }
+</style></head>
+<body><main id="art">
+<canvas id="bg"></canvas>
+<div id="stage">
+
+<section id="chat">
+  <header><span class="back">‹</span><span>周末学习群（6）</span><span>···</span></header>
+  <div class="body"><div id="msgs"></div></div>
+</section>
+
+<div id="phone"><div class="screen">
+  <img id="sShare" src="../../fastlane/raw/zh-Hans/iphone-share.png" alt="">
+  <img id="sTpl" src="../../fastlane/raw/zh-Hans/iphone-template.png" alt="">
+  <div id="hit"></div><div id="sweep"></div><div id="ripple"></div><div id="finger"></div>
+</div></div>
+
+<img id="fly" src="../../fastlane/raw/zh-Hans/card.png" alt="">
+<div id="thumbs"></div>
+<div id="chips"></div>
+</div>
+
+<div id="end">
+  <img class="peek" src="../../fastlane/raw/zh-Hans/card.png" alt="">
+  <div class="bigicon"><div class="icon"></div></div>
+  <div class="word">Attention</div>
+  <div class="slogan">链接秒变卡片<br>发微信一眼看懂</div>
+  <div class="cta"><svg viewBox="0 0 24 24" fill="none" stroke="#fbf7ee" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6.5 9.5 12 15l5.5-5.5M4 20h16"/></svg>App Store 免费下载</div>
+  <div class="fine">在 App Store 搜索「Attention」</div>
+</div>
+
+<div id="caps"></div>
+<div id="brand"><div class="icon"></div>Attention</div>
+<div id="flash"></div>
+</main>
+<script src="promo-shader.js"></script>
+<script>
+const DURATION = 16, FPS = 30;
+const q = new URLSearchParams(location.search), FORMAT = q.get("format") || "story";
+const SIZE = { story: [1080, 1920], square: [1080, 1080], xhs: [1080, 1440] }[FORMAT];
+// #stage scale and offset: the master content band (y 600–1900 at 1080 wide) fitted under the captions.
+const STAGE = { story: [1, 0, 0], square: [.62, 205, 250 - 600 * .62], xhs: [.86, 76, 330 - 600 * .86] }[FORMAT];
+// Times when every caption, chip and end-card line has settled; promo-export.js checks the layout at these.
+const HOLDS = [0, 2.2, 3.2, 4.0, 6.5, 9.0, 10.6, 12.85, 15.5];
+const $ = s => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const E = {
+  out: x => 1 - Math.pow(1 - x, 3),
+  inOut: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  in: x => x * x * x,
+  back: x => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); },
+  spring: x => x >= 1 ? 1 : 1 - Math.exp(-6.5 * x) * Math.cos(11 * x),
+};
+
+// ---- Captions: [in, out, tag line, headline] ----
+const CAPS = [
+  [-1, 2.55, "为什么你发的链接", "没人点？"],
+  [2.6, 3.55, "因为它只是", "一串网址！"],
+  [3.6, 5.2, "在 YouTube、X 点分享", "选 Attention"],
+  [5.2, 7.45, "一秒生成", "一张卡片"],
+  [7.6, 10.9, "标题、封面、二维码", "一眼看懂！"],
+  [11.0, 13.15, "卡片、文字、二维码", "随你挑！"],
+];
+for (const [, , a, b] of CAPS) {
+  const d = document.createElement("div"); d.className = "cap";
+  d.innerHTML = `<span class="l1">${a}</span><span class="l2">${b}</span>`;
+  $("#caps").append(d);
+}
+const capEls = [...document.querySelectorAll(".cap")];
+
+// ---- Chat: two takes of the same conversation ----
+const PEOPLE = { 林: ["小林", "#e89b4f"], 杰: ["阿杰", "#5aa36b"], 雯: ["小雯", "#6f93d0"], 我: ["", "#333"] };
+const MSGS = [
+  // [id, take, who, kind, content, at]
+  ["h-", "AB", "雯", "text", "下周的读书会改到周日了哈", -1],
+  ["h0", "AB", "雯", "text", "这周末大家都干嘛？", -1],
+  ["h1", "AB", "杰", "text", "在家躺平 + 看视频", -1],
+  ["a0", "AB", "林", "text", "有什么好看的？推荐一下", -1],
+  ["a1", "A", "我", "link", "https://youtu.be/aircAruvnKk", .25],
+  ["a2", "A", "杰", "text", "这是啥？", .95],
+  ["a3", "A", "林", "text", "看不出是什么，不点了", 1.6],
+  ["b1", "B", "我", "card", "../../fastlane/raw/zh-Hans/card.png", 7.95],
+  ["b2", "B", "杰", "text", "哇，这个一眼就懂！", 8.85],
+  ["b3", "B", "林", "text", "扫码看完了，讲得真好", 9.5],
+  ["b4", "B", "雯", "text", "收藏了，还有吗？", 10.15],
+];
+for (const [id, , who, kind, content] of MSGS) {
+  const me = who === "我", [name, color] = PEOPLE[who];
+  const row = document.createElement("div"); row.className = "row"; row.id = id;
+  const body = kind === "card" ? `<div class="bub card"><img src="${content}" alt=""></div>`
+    : `<div class="bub ${kind}">${content}${kind === "link" ? '<div class="stamp">✕</div>' : ""}</div>`;
+  row.innerHTML = `<div class="msg ${me ? "me" : ""}"><div class="av" style="background:${color}">${me ? "我" : who}</div>
+    <div class="col">${me ? "" : `<div class="name">${name}</div>`}${body}${me && kind === "card" ? '<div class="read">3 人已读</div>' : ""}</div></div>`;
+  $("#msgs").append(row);
+}
+
+// ---- Feature beat: template thumbnails cut out of the template screen (1320×2868 capture) ----
+const THUMBS = [[49, 2369, -9, 90], [553, 2369, 0, 370], [805, 2369, 9, 650]]; // crop x, crop y, rotation, left
+const CROP = [215, 208];
+for (const [x, y, r, left] of THUMBS) {
+  const d = document.createElement("div"); d.className = "thumb";
+  const s = 340 / CROP[0];
+  Object.assign(d.style, { left: left + "px", height: Math.round(CROP[1] * s) + "px",
+    backgroundImage: "url(../../fastlane/raw/zh-Hans/iphone-template.png)",
+    backgroundSize: `${1320 * s}px ${2868 * s}px`, backgroundPosition: `${-x * s}px ${-y * s}px` });
+  $("#thumbs").append(d);
+}
+const CHIPS = [["长按识别二维码", "k", 1150, 11.85], ["存过的，随时找回", "r", 1310, 12.15], ["无需注册 · 本机生成", "p", 1470, 12.45]];
+for (const [text, cls] of CHIPS) { const d = document.createElement("div"); d.className = `chip ${cls}`; d.textContent = text; $("#chips").append(d); }
+
+// Shockwaves in the background: [time, x, y] in uv with a top-left origin.
+const BURSTS = [[2.6, .62, .5], [4.85, .8, .78], [6.0, .5, .6], [7.95, .55, .75], [13.0, .25, .25]];
+
+let bg, heights = {};
+function setup() {
+  const art = $("#art"), c = $("#bg");
+  art.classList.add(FORMAT); art.style.width = SIZE[0] + "px"; art.style.height = SIZE[1] + "px";
+  c.width = SIZE[0]; c.height = SIZE[1];
+  $("#stage").style.transform = `translate(${STAGE[1]}px, ${STAGE[2]}px) scale(${STAGE[0]})`;
+  bg = PromoShader(c);
+  // Natural row heights, so new messages can push the conversation up smoothly.
+  for (const r of document.querySelectorAll(".row")) { r.style.height = "auto"; r.style.display = "block"; heights[r.id] = r.offsetHeight; }
+}
+
+function style(el, o) { for (const k in o) el.style[k] = o[k]; }
+
+function renderAt(t) {
+  // Background.
+  let burst = null;
+  for (const [bt, x, y] of BURSTS) if (t >= bt && t < bt + 1.1) burst = [x, y, (t - bt) / 1.1];
+  const flood = lerp(0, 1.15, E.inOut(seg(t, 12.9, 13.3))) + .25 * Math.exp(-Math.pow((t - 2.65) / .12, 2));
+  bg.draw({ time: t, flood, burst, dots: 92 * Math.min(...SIZE) / 1080 });
+
+  // Camera shake when the link is struck out.
+  const sh = seg(t, 2.6, 2.95), amp = (1 - sh) * 22 * (sh > 0 && sh < 1);
+  $("#art").style.transform = `translate(${Math.sin(t * 97) * amp}px, ${Math.cos(t * 71) * amp}px)`;
+
+  // Captions.
+  CAPS.forEach(([a, b], i) => {
+    const el = capEls[i], pin = a < 0 ? 1 : seg(t, a, a + .3), pout = seg(t, b - .14, b);
+    const on = t >= a && t < b;
+    el.style.opacity = on ? clamp(pin * 3) * (1 - pout) : 0;
+    el.querySelector(".l1").style.transform = `translateX(${lerp(-80, 0, E.out(pin))}px) rotate(-3deg)`;
+    el.querySelector(".l2").style.transform = `translateY(${-40 * E.in(pout)}px) scale(${lerp(1.4, 1, E.back(clamp(pin * 1.15)))}) rotate(-3deg)`;
+  });
+  $("#brand").style.opacity = 1 - seg(t, 12.9, 13.1);
+
+  // Chat window: take A until the demo, take B after it.
+  const take = t < 5.5 ? "A" : "B";
+  const chatOut = E.in(seg(t, 3.3, 3.65)), chatIn = E.out(seg(t, 7.45, 7.85)), chatDown = E.in(seg(t, 10.85, 11.2));
+  const chatX = take === "A" ? -1150 * chatOut : 1150 * (1 - chatIn);
+  style($("#chat"), { transform: `translate(${chatX}px, ${1400 * chatDown}px) rotate(${(take === "A" ? -6 * chatOut : 6 * (1 - chatIn))}deg)`,
+    opacity: (take === "A" ? t < 3.7 : t > 7.4 && t < 11.25) ? 1 : 0 });
+  for (const [id, takes, who, kind, , at] of MSGS) {
+    const row = document.getElementById(id), shown = takes.includes(take) && t >= at;
+    if (!shown) { row.style.display = "none"; continue; }
+    const p = at < 0 ? 1 : seg(t, at, at + .38);
+    style(row, { display: "block", height: heights[id] * E.out(clamp(p * 1.6)) + "px" });
+    const m = row.querySelector(".msg");
+    // The card message is delivered by the flying card, so it appears in place once that lands.
+    m.style.transform = kind === "card" ? "none" : `scale(${lerp(.55, 1, E.back(p))})`;
+    m.style.opacity = kind === "card" ? (t >= 8.25 ? 1 : 0) : clamp(p * 4);
+    if (kind === "link") {
+      const s = seg(t, 2.6, 2.82), st = row.querySelector(".stamp");
+      style(st, { opacity: s > 0 ? 1 : 0, transform: `scale(${lerp(3.2, 1, E.out(s))}) rotate(${lerp(-40, 8, E.out(s))}deg)` });
+      row.querySelector(".bub").style.filter = `grayscale(${s}) opacity(${1 - .35 * s})`;
+    }
+  }
+
+  // Phone: share sheet, tap Attention, flash, the generated card.
+  const pin = E.spring(seg(t, 3.45, 4.05)), pout = E.in(seg(t, 7.3, 7.62));
+  const onShare = t < 5.2;
+  const W = 552, H = 1232; // screen size inside the frame
+  // Attention's icon in the share capture, and the card in the template capture (fractions of the screen).
+  const ICON = [.825, .773], CARD = [.037, .138, .926, .469];
+  let scale, ox, oy;
+  if (onShare) { scale = lerp(1, 1.55, E.inOut(seg(t, 4.05, 4.6))); [ox, oy] = [14 + ICON[0] * W, 14 + ICON[1] * H]; }
+  else { scale = lerp(1.06, 1.2, E.out(seg(t, 5.2, 6.1))); [ox, oy] = [14 + (CARD[0] + CARD[2] / 2) * W, 14 + (CARD[1] + CARD[3] / 2) * H]; }
+  style($("#phone"), { display: t > 3.4 && t < 7.65 ? "block" : "none", transformOrigin: `${ox}px ${oy}px`,
+    transform: `translate(${-1300 * pout}px, ${1500 * (1 - pin) + 120 * E.out(seg(t, 6.0, 6.5))}px) rotate(${-8 * pout}deg) scale(${scale})`,
+    filter: `brightness(${1 - .45 * E.out(seg(t, 6.0, 6.5))})` });
+  // The card lifts out of the phone, then flies into the chat where it lands as a message.
+  const lift = seg(t, 6.0, 6.75), fly = E.inOut(seg(t, 7.3, 8.2));
+  // Lands exactly where the card message sits once its row has grown (right-aligned, bottom of the chat).
+  const fx = lerp(540, 602, fly), fy = lerp(lerp(1180, 1150, E.out(lift)), 1460, fly);
+  const fs = lerp(lerp(.45, 1, E.spring(lift)), 520 / 620, fly), fr = lerp(lerp(-14, 3, E.out(lift)), 0, fly);
+  style($("#fly"), { opacity: t >= 6.0 && t < 8.25 ? 1 : 0, transform: `translate(${fx - 310}px, ${fy - 364}px) rotate(${fr}deg) scale(${fs})` });
+  $("#sShare").style.opacity = onShare ? 1 : 0;
+  $("#sTpl").style.opacity = onShare ? 0 : 1;
+  const tap = 4.85, fIn = E.out(seg(t, 4.4, 4.75)), press = Math.exp(-Math.pow((t - tap) / .08, 2));
+  style($("#finger"), { left: ICON[0] * W + 44 + 120 * (1 - fIn) + "px", top: ICON[1] * H + 58 + 160 * (1 - fIn) + "px",
+    opacity: onShare && t > 4.4 ? fIn * (1 - seg(t, 5.05, 5.2)) : 0, transform: `scale(${1 - .22 * press})` });
+  const rp = seg(t, tap, tap + .45);
+  style($("#ripple"), { left: ICON[0] * W + "px", top: ICON[1] * H + "px", opacity: onShare && rp > 0 && rp < 1 ? 1 - rp : 0, transform: `scale(${1 + 2.4 * E.out(rp)})` });
+  const hs = 150 / W; // icon is about 150 px wide on this screen
+  style($("#hit"), { left: (ICON[0] - hs / 2) * W + "px", top: ICON[1] * H - hs * W / 2 + "px", width: hs * W + "px", height: hs * W + "px",
+    opacity: onShare && t > tap ? 1 : 0, transform: `scale(${lerp(1.5, 1, E.out(seg(t, tap, tap + .2)))})` });
+  style($("#sweep"), { left: CARD[0] * W + "px", top: CARD[1] * H + "px", width: CARD[2] * W + "px", height: CARD[3] * H + "px",
+    opacity: !onShare ? 1 : 0 });
+  $("#sweep").style.setProperty("--x", lerp(-45, 120, E.inOut(seg(t, 5.3, 5.9))) + "%");
+  $("#flash").style.opacity = .9 * Math.exp(-Math.pow((t - 5.2) / .07, 2));
+
+  // Features: thumbnails slam in, then chips slide in from alternating sides.
+  const fOut = E.in(seg(t, 12.95, 13.2));
+  [...document.querySelectorAll(".thumb")].forEach((d, i) => {
+    const p = seg(t, 11.15 + i * .2, 11.15 + i * .2 + .32), r = THUMBS[i][2];
+    style(d, { opacity: t > 11.15 + i * .2 && t < 13.2 ? 1 : 0,
+      transform: `translateY(${-900 * fOut}px) scale(${lerp(1.9, 1, E.out(p))}) rotate(${r + lerp(r * 2, 0, E.out(p))}deg)` });
+  });
+  [...document.querySelectorAll(".chip")].forEach((d, i) => {
+    const [, , top, at] = CHIPS[i], p = E.out(seg(t, at, at + .3)), dir = i % 2 ? 1 : -1;
+    style(d, { top: top + "px", opacity: t > at && t < 13.2 ? 1 : 0,
+      transform: `translateX(calc(-50% + ${dir * 1200 * (1 - p)}px)) translateY(${-900 * fOut}px) rotate(${dir * -2}deg)` });
+  });
+
+  // End card.
+  const e = k => seg(t, k, k + .4);
+  const end = $("#end"); end.style.opacity = t > 13.0 ? 1 : 0;
+  end.querySelector(".bigicon").style.transform = `scale(${E.back(e(13.05))}) rotate(${lerp(-25, 0, E.out(e(13.05)))}deg)`;
+  style(end.querySelector(".word"), { opacity: clamp(e(13.2) * 3), transform: `translateX(${lerp(-120, 0, E.out(e(13.2)))}px)` });
+  style(end.querySelector(".slogan"), { opacity: clamp(e(13.4) * 3), transform: `translateY(${lerp(60, 0, E.out(e(13.4)))}px)` });
+  const pulse = t > 14.2 ? 1 + .045 * Math.max(0, Math.sin((t - 14.2) * Math.PI * 1.6)) : 1;
+  style(end.querySelector(".cta"), { opacity: clamp(e(13.6) * 3), transform: `scale(${E.back(e(13.6)) * pulse})` });
+  end.querySelector(".fine").style.opacity = clamp(e(13.85) * 2);
+  end.querySelector(".peek").style.transform = `translate(${lerp(500, 0, E.out(e(13.1)))}px, ${lerp(400, 0, E.out(e(13.1)))}px) rotate(${lerp(30, -8, E.out(e(13.1)))}deg)`;
+}
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+  setup();
+  // Xiaohongshu readers are mostly in mainland China, where the app isn't sold: say so on the call to action.
+  if (FORMAT === "xhs") $("#end .fine").textContent = "海外 App Store 搜索「Attention」· 中国区暂不可下载";
+  if (q.has("t")) renderAt(+q.get("t"));
+  else if (!navigator.webdriver) { // live preview in a browser
+    const t0 = performance.now();
+    const loop = () => { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    loop();
+  }
+  return { duration: DURATION, fps: FPS, holds: HOLDS, size: SIZE };
+})();
+</script></body></html>

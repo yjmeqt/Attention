@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><title>Attention Poster</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>
+/* Still ads in the promo video's style. ?concept=compare|steps|cover|log &format=story (1080×1920) | feed (1080×1350) | square (1080×1080)
+   | xhs (1080×1440, Xiaohongshu). cover is compare with a hook for Chinese speakers abroad, as the first image of a note.
+   log is a stats board for the build-in-public series: &day=11 &title=Line one<br>Line two &tag=… &note=…
+   &stats=label:value|label:!value (a leading ! sets the value in red), all URL-encoded.
+   bars is a per-day bar chart with the same header: &bars=MM-DD:total:highlighted,… &legend=… plus optional &stats.
+   rules is a numbered list with the same header: &items=one|two|three.
+   shot is a framed screenshot with the same header: &img=<path relative to this page> &note=…
+   CSS px = output px. The layout is a column: headline, visual, footer; the visual turns from stacked (story) to side by side. */
+:root { --paper: #ece2cd; --ink: #111; --red: #d4261b; --white: #fbf7ee; --me: #a9ea7a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+#art { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: var(--paper); color: var(--ink);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif; display: flex; flex-direction: column; padding: var(--pad); }
+#bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#art > *:not(#bg) { position: relative; }
+.story { --pad: 80px; --head: 150px; --tag: 52px; }
+.feed { --pad: 64px; --head: 132px; --tag: 46px; }
+.square { --pad: 56px; --head: 112px; --tag: 40px; }
+.xhs { --pad: 64px; --head: 126px; --tag: 46px; --icon: 104px; --bub: 38px; --card: 640px; --arrow: 80px; --pic: 296px; --pich: 460px; }
+.xhs .visual { gap: 24px; }
+.xhs .bub:not(.reply) { white-space: normal; width: 8.6em; word-break: break-all; }
+
+.head .l1 { display: inline-block; background: var(--ink); color: var(--white); font-weight: 700; font-size: var(--tag); line-height: 1;
+  padding: .32em .46em .36em; transform: rotate(-3deg); transform-origin: left bottom; }
+.head .l2 { display: block; width: max-content; margin-top: .14em; background: var(--paper); color: var(--red); font-weight: 900; font-size: var(--head);
+  line-height: 1.04; padding: .02em .14em .08em .06em; transform: rotate(-3deg); transform-origin: left top; box-shadow: .09em .09em 0 var(--ink); }
+.visual { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 36px; }
+.story .visual { gap: 26px; }
+.story .visual { flex-direction: column; }
+
+/* Footer: icon, name, call to action. */
+.foot { display: flex; align-items: center; gap: 22px; background: var(--paper); padding: 16px 16px 16px 16px; border-radius: 32px; box-shadow: 0 0 0 5px var(--ink), 10px 10px 0 5px var(--ink); margin: 0 10px 10px 0; }
+.icon { position: relative; flex: none; width: var(--icon); height: var(--icon); border-radius: 22.5%; background: #f6f3ed; overflow: hidden;
+  box-shadow: 0 10px 24px -10px #0009, inset 0 0 0 1px #0001; }
+.icon::before { content: ""; position: absolute; left: 50%; top: 50%; right: 0; bottom: 0; background: #e8402a; }
+.icon::after { content: ""; position: absolute; left: 14%; top: 73.4%; width: 22%; height: 3.2%; background: #15151a; }
+.story { --icon: 120px; } .feed { --icon: 100px; } .square { --icon: 88px; }
+.foot .name { font-weight: 900; font-size: calc(var(--icon) * .46); line-height: 1.1; }
+.foot .name small { display: block; font-weight: 500; font-size: .5em; color: #333; margin-top: 4px; }
+.foot .cta { margin-left: auto; background: var(--ink); color: var(--white); font-weight: 900; font-size: calc(var(--icon) * .34);
+  padding: .5em 1em .56em; border-radius: 999px; white-space: nowrap; box-shadow: 0 16px 30px -14px #000c; }
+
+/* Compare: the bare link, struck out, then the card. */
+.before { display: flex; flex-direction: column; gap: 18px; }
+.bub { position: relative; background: var(--me); border-radius: 18px; padding: .55em .7em; font-size: var(--bub); color: #2a5db0;
+  text-decoration: underline; text-underline-offset: .15em; white-space: nowrap; box-shadow: 0 18px 30px -18px #0008; }
+.bub:not(.reply) { background: #cdd7c1; color: #6f7f9c; }  /* the bare link, faded: nobody opens it */
+.bub.reply { background: #fff; color: #111; text-decoration: none; align-self: flex-start; }
+.bub.reply b { display: block; font-size: .62em; color: #888; font-weight: 400; margin-bottom: .2em; }
+.bub .x { position: absolute; right: -.7em; top: -.9em; width: 2em; height: 2em; border-radius: 50%; background: var(--red); color: #fff;
+  font-weight: 900; font-size: 1.1em; line-height: 2em; text-align: center; text-decoration: none; transform: rotate(8deg); box-shadow: 0 10px 20px -8px #000a; }
+.story { --bub: 42px; } .feed { --bub: 38px; } .square { --bub: 32px; }
+.feed .bub:not(.reply), .square .bub:not(.reply) { white-space: normal; width: 8.6em; word-break: break-all; }
+.arrow { flex: none; width: var(--arrow); height: calc(var(--arrow) * .3); background: var(--ink);
+  clip-path: polygon(0 35%, 68% 35%, 68% 0, 100% 50%, 68% 100%, 68% 65%, 0 65%); }
+.story .arrow { transform: rotate(90deg); --arrow: 120px; margin: 42px 0; } .feed .arrow, .square .arrow { --arrow: 80px; }
+.feed .visual, .square .visual { gap: 24px; }
+.after { position: relative; }
+.after img { display: block; height: var(--card); border-radius: 4%; box-shadow: 0 40px 70px -30px #000d, 0 0 0 6px var(--ink); transform: rotate(4deg); }
+.story { --card: 600px; } .feed { --card: 520px; } .square { --card: 440px; }
+.after .tag { position: absolute; left: -7%; top: 4%; background: var(--red); color: var(--white); font-weight: 900; font-size: calc(var(--bub) * 1.05);
+  padding: .3em .6em .36em; transform: rotate(-4deg); white-space: nowrap; box-shadow: .12em .12em 0 var(--ink); }
+
+/* Steps: three numbered panels. */
+.step { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.story .step { flex-direction: row; gap: 40px; width: 100%; }
+.step .pic { position: relative; width: var(--pic); height: var(--pich); border-radius: 26px; overflow: hidden; background-repeat: no-repeat;
+  box-shadow: 0 26px 46px -24px #000c, 0 0 0 6px var(--ink); flex: none; }
+.story { --pic: 380px; --pich: 330px; } .feed { --pic: 296px; --pich: 430px; } .square { --pic: 280px; --pich: 330px; }
+.step .txt { font-weight: 900; font-size: calc(var(--bub) * 1.12); line-height: 1.25; text-align: center; }
+.story .step .txt { text-align: left; font-size: 62px; }
+.step .n { display: inline-flex; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--red); color: var(--white); font-size: .8em;
+  align-items: center; justify-content: center; margin-right: .3em; vertical-align: .1em; }
+.ring { position: absolute; border-radius: 24%; box-shadow: 0 0 0 7px var(--red); }
+
+/* Log: a grid of numbers, like a lab notebook page. */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; width: 100%; }
+.stat { background: var(--paper); box-shadow: 0 0 0 5px var(--ink), 10px 10px 0 5px var(--ink); padding: 22px 28px 26px; margin: 0 10px 10px 0; }
+.stat b { display: block; font-weight: 900; font-size: 96px; line-height: 1; letter-spacing: -.02em; }
+.stat b.hot { color: var(--red); }
+.stat span { display: block; margin-top: 12px; font-weight: 700; font-size: 34px; color: #333; }
+.log-note { width: 100%; margin-top: 30px; font-weight: 700; font-size: 34px; line-height: 1.5; color: var(--ink); }
+.log .visual { flex-direction: column; }
+.log .head .l2 { font-size: calc(var(--head) * .84); }
+.bars { display: flex; align-items: flex-end; gap: 8px; width: 100%; height: 520px; padding-bottom: 54px; position: relative;
+  border-bottom: 6px solid var(--ink); }
+.bar { flex: 1; display: flex; flex-direction: column-reverse; position: relative; }
+.bar i { display: block; background: var(--ink); }
+.bar i.hot { background: var(--red); }
+.bar em { position: absolute; bottom: -46px; left: 0; font-style: normal; font-weight: 700; font-size: 26px; white-space: nowrap; color: #333; }
+.bar b { position: absolute; left: 50%; transform: translateX(-50%); font-weight: 900; font-size: 24px; }
+.legend { width: 100%; margin-top: 64px; font-weight: 700; font-size: 32px; display: flex; gap: 34px; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 28px; height: 28px; margin-right: 12px; vertical-align: -4px; background: var(--ink); }
+.legend span.hot::before { background: var(--red); }
+.bars-stats { display: flex; gap: 26px; width: 100%; margin-top: 34px; }
+.bars-stats .stat { flex: 1; } .bars-stats .stat b { font-size: 64px; }
+.shot { display: block; width: 100%; border-radius: 28px; box-shadow: 0 0 0 6px var(--ink), 14px 14px 0 6px var(--ink); transform: rotate(-2deg); }
+.rules { width: 100%; counter-reset: r; display: flex; flex-direction: column; gap: 30px; }
+.rule { counter-increment: r; display: flex; gap: 26px; align-items: flex-start; background: var(--paper); box-shadow: 0 0 0 5px var(--ink), 10px 10px 0 5px var(--ink);
+  padding: 26px 30px; margin: 0 10px 10px 0; font-weight: 700; font-size: 44px; line-height: 1.35; }
+.rule::before { content: counter(r); flex: none; width: 70px; height: 70px; border-radius: 50%; background: var(--red); color: var(--white);
+  font-weight: 900; font-size: 44px; line-height: 70px; text-align: center; }
+.foot .tag2 { margin-left: auto; background: var(--red); color: var(--white); font-weight: 900; font-size: calc(var(--icon) * .3);
+  padding: .5em 1em .56em; border-radius: 999px; white-space: nowrap; }
+</style></head>
+<body><main id="art"><canvas id="bg"></canvas>
+<div class="head"><span class="l1"></span><span class="l2"></span></div>
+<div class="visual"></div>
+<div class="foot"><div class="icon"></div><div class="name">Attention<small>链接转图片卡片</small></div><div class="cta">App Store 免费下载</div></div>
+</main>
+<script src="promo-shader.js"></script>
+<script>
+const q = new URLSearchParams(location.search), concept = q.get("concept") || "compare", format = q.get("format") || "story";
+const $ = s => document.querySelector(s);
+$("#art").classList.add(format);
+const RAW = "../../fastlane/raw/zh-Hans/";
+// A crop of a 1320×2868 capture, centred on (cx, cy) and cw wide, filling a w×h box: [x, y, scale, CSS].
+const crop = (file, [cx, cy, cw], w, h) => {
+  const s = w / cw, ch = h / s, x = Math.max(0, Math.min(1320 - cw, cx - cw / 2)), y = Math.max(0, Math.min(2868 - ch, cy - ch / 2));
+  return [x, y, s, `background-image:url(${RAW + file});background-size:${1320 * s}px ${2868 * s}px;background-position:${-x * s}px ${-y * s}px`];
+};
+
+if (concept === "cover") {
+  $(".l1").textContent = "海外党 · 给家人发 YouTube、X";
+  $(".l2").innerHTML = "发到微信的链接<br>终于有封面了！";
+  $(".foot .cta").remove(); // a note cover reads as a hard ad with a download button; the last image carries it
+  $(".foot .name").innerHTML = "Attention<small>海外 App Store 免费 · 中国区暂不可下载</small>";
+}
+if (concept === "compare" || concept === "cover") {
+  if (concept === "compare") {
+    $(".l1").textContent = "YouTube、X 链接发到微信";
+    $(".l2").innerHTML = "别再发<br>一串网址！";
+  }
+  $(".visual").innerHTML = `
+    <div class="before"><div class="bub">https://youtu.be/aircAruvnKk<span class="x">✕</span></div>
+      <div class="bub reply"><b>好友</b>这是啥？不点了</div></div>
+    <div class="arrow"></div>
+    <div class="after"><img src="${RAW}card.png" alt=""><div class="tag">一眼看懂！</div></div>`;
+} else if (["log", "bars", "rules", "shot"].includes(concept)) {
+  $("#art").classList.add("log");
+  const esc = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  $(".l1").textContent = `${q.get("tag") || "AI 独立开发实验"} · 第 ${q.get("day") || 1} 天`;
+  $(".l2").innerHTML = esc(q.get("title") || "用 Claude 写 App\n能赚到钱吗？").replace(/\n|&lt;br&gt;/g, "<br>");
+  const stats = (q.get("stats") || "").split("|").filter(Boolean).map(p => { const i = p.indexOf(":"); return [p.slice(0, i), p.slice(i + 1)]; });
+  const statHtml = stats.map(([k, v]) => `<div class="stat"><b class="${v.startsWith("!") ? "hot" : ""}">${esc(v.replace(/^!/, ""))}</b><span>${esc(k)}</span></div>`).join("");
+  const note = q.get("note") ? `<div class="log-note">${esc(q.get("note"))}</div>` : "";
+  if (concept === "log") $(".visual").innerHTML = `<div class="stats">${statHtml}</div>${note}`;
+  else if (concept === "shot") $(".visual").innerHTML = `<img class="shot" src="${esc(q.get("img") || "")}" alt="">${note}`;
+  else if (concept === "rules") $(".visual").innerHTML = `<div class="rules">${(q.get("items") || "").split("|").map(t => `<div class="rule">${esc(t)}</div>`).join("")}</div>${note}`;
+  else {
+    const days = (q.get("bars") || "").split(",").filter(Boolean).map(d => d.split(":")), max = Math.max(...days.map(d => +d[1]), 1);
+    const px = n => n / max * 380;
+    const [legA, legB] = (q.get("legend") || "其他提交|署名 Claude").split("|");
+    $(".visual").innerHTML = `<div class="bars">${days.map(([day, total, hot], i) => `<div class="bar">
+        <i class="hot" style="height:${px(+hot)}px"></i><i style="height:${px(total - hot)}px"></i>
+        ${+total ? `<b style="bottom:${px(+total) + 6}px">${total}</b>` : ""}${i % 7 === 0 || i === days.length - 1 ? `<em>${day.replace("-", "/")}</em>` : ""}</div>`).join("")}</div>
+      <div class="legend"><span>${esc(legA)}</span><span class="hot">${esc(legB)}</span></div>
+      ${stats.length ? `<div class="bars-stats">${statHtml}</div>` : ""}${note}`;
+  }
+  $(".foot .name").innerHTML = "Attention<small>实验对象 · 海外 App Store</small>";
+  $(".foot .cta").outerHTML = `<div class="tag2">持续更新中</div>`;
+} else {
+  $(".l1").textContent = "三步把链接变卡片";
+  $(".l2").innerHTML = format === "story" ? "点分享，<br>就搞定！" : "点分享，就搞定！";
+  const cs = getComputedStyle($("#art")), pw = parseFloat(cs.getPropertyValue("--pic")), ph = parseFloat(cs.getPropertyValue("--pich"));
+  // 1: the share sheet's app row; 2: the generated card in the app; 3: the card itself.
+  const ICON = [1089, 2217];
+  const [sx, sy, ss, shareCss] = crop("iphone-share.png", [ICON[0] - 260, ICON[1] - 120, format === "story" ? 1100 : 900], pw, ph);
+  const [, , , tplCss] = crop("iphone-template.png", [660, 1250, 1260], pw, ph);
+  const ringX = (ICON[0] - sx) * ss, ringY = (ICON[1] - sy) * ss, ringS = 210 * ss;
+  $(".visual").innerHTML = `
+    <div class="step"><div class="pic" style="${shareCss}"><div class="ring" style="left:${ringX - ringS / 2}px;top:${ringY - ringS / 2}px;width:${ringS}px;height:${ringS}px"></div></div>
+      <div class="txt"><span class="n">1</span>点分享<br>选 Attention</div></div>
+    <div class="step"><div class="pic" style="${tplCss}"></div>
+      <div class="txt"><span class="n">2</span>自动生成<br>一张卡片</div></div>
+    <div class="step"><div class="pic" style="background:#000 url(${RAW}card.png) center/cover"></div>
+      <div class="txt"><span class="n">3</span>发到微信<br>扫码就能看</div></div>`;
+  if (format !== "story") $(".l2").style.fontSize = "calc(var(--head) * .9)";
+}
+
+// Pairs of laid-out boxes that overlap, or boxes that leave the canvas; promo-export.js fails on any.
+window.overlaps = () => {
+  const W = innerWidth, H = innerHeight, out = [];
+  const els = [".head .l1", ".head .l2", ".foot", ".before", ".after", ".arrow", ".stats", ".log-note", ".bars", ".legend", ".bars-stats", ".rules", ".shot", ...[...document.querySelectorAll(".step")].map((_, i) => `.step:nth-child(${i + 1})`)]
+    .flatMap(s => [...document.querySelectorAll(s)].map(e => [s, e.getBoundingClientRect()]));
+  for (const [s, r] of els) if (r.left < 16 || r.top < 16 || r.right > W - 16 || r.bottom > H - 16) out.push(`${s} off canvas`);
+  for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) {
+    const [a, A] = els[i], [b, B] = els[j];
+    if (a.startsWith(".head") && b.startsWith(".head")) continue;
+    if (A.left < B.right - 2 && B.left < A.right - 2 && A.top < B.bottom - 2 && B.top < A.bottom - 2) out.push(`${a} overlaps ${b}`);
+  }
+  return out;
+};
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+  const c = $("#bg"); c.width = innerWidth; c.height = innerHeight;
+  PromoShader(c).draw({ time: 3.2, dots: 92 * Math.min(innerWidth, innerHeight) / 1080 });
+})();
+</script></body></html>
