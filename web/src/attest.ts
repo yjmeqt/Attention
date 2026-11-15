@@ -73,14 +73,17 @@ async function verifySignature(signer: Certificate | { spki: Uint8Array; curve: 
 }
 
 /** Authenticator data: the RP ID hash, flags, counter and, in an attestation, the attested key. */
-function authenticatorData(bytes: Uint8Array) {
-  if (bytes.length < 37) fail("authenticator data too short");
+function authenticatorData(bytes: Uint8Array, attested: boolean) {
+  const tooShort = () => fail(`authenticator data too short (${bytes.length} bytes, flags ${bytes[32]?.toString(16) ?? "none"})`);
+  if (bytes.length < 37) tooShort();
   const counter = new DataView(bytes.buffer, bytes.byteOffset + 33, 4).getUint32(0);
   const result = { rpIDHash: bytes.subarray(0, 32), counter, aaguid: undefined as Uint8Array | undefined, credentialID: undefined as Uint8Array | undefined };
-  if (bytes.length >= 55) {
+  // An attestation's carries the attested key's AAGUID and credential ID after that; an assertion's doesn't.
+  if (attested) {
+    if (bytes.length < 55) tooShort();
     result.aaguid = bytes.subarray(37, 53);
     const idLength = (bytes[53]! << 8) | bytes[54]!;
-    if (bytes.length < 55 + idLength) fail("authenticator data too short");
+    if (bytes.length < 55 + idLength) tooShort();
     result.credentialID = bytes.subarray(55, 55 + idLength);
   }
   return result;
@@ -132,7 +135,7 @@ export async function verifyAttestation(input: {
     if (!equal(await sha256(leaf!.publicKey), input.keyID)) fail("key ID doesn't match the certificate");
 
     // 6–9. Our app, a fresh counter, an App Attest environment, and the same key ID.
-    const data = authenticatorData(authData);
+    const data = authenticatorData(authData, true);
     const appID = await matchingAppID(data.rpIDHash);
     if (data.counter !== 0) fail("counter isn't zero");
     const environment = data.aaguid && aaguids[new TextDecoder().decode(data.aaguid)];
@@ -158,7 +161,7 @@ export async function verifyAssertion(input: { assertion: Uint8Array; key: Attes
     const signer = { spki: fromBase64(input.key.spki), curve: { name: "P-256" as const, size: 32 } };
     if (!(await verifySignature(signer, "SHA-256", signature, nonce))) fail("bad signature");
 
-    const data = authenticatorData(authData);
+    const data = authenticatorData(authData, false);
     if ((await matchingAppID(data.rpIDHash)) !== input.key.appID) fail("different app");
     if (data.counter <= input.key.counter) fail("counter didn't go up");
     return data.counter;
