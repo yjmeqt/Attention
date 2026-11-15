@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- The app icon (ios/App/Attention.icon): a light square, its bottom-right quarter red, a short line bottom left. -->
+  <style>
+    .paper { fill: #F6F3ED } .line { fill: #15151A }
+    @media (prefers-color-scheme: dark) { .paper { fill: #15151A } .line { fill: #F6F3ED } }
+  </style>
+  <clipPath id="shape"><rect width="1024" height="1024" rx="230"/></clipPath>
+  <g clip-path="url(#shape)">
+    <rect class="paper" width="1024" height="1024"/>
+    <rect x="512" y="512" width="512" height="512" fill="#E8402A"/>
+    <rect class="line" x="143" y="752" width="226" height="32"/>
+  </g>
+</svg>

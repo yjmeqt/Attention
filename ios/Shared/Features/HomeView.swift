@@ -27,6 +27,7 @@ struct HomeView: View {
     #endif
     let library: Library
 
+    @Environment(\.feedIsCovered) private var feedIsCovered
     @State private var filter = FeedFilter()
     @State private var actions: ItemActions
     @State private var detailID: UUID?
@@ -46,6 +47,11 @@ struct HomeView: View {
     @State private var searching = false
     @State private var drawerOpen = false
     @State private var showsSettings = false
+    #if !SHARE_EXTENSION
+    /// Items being shared as a list.
+    @State private var sharingList: ShareListRequest?
+    @State private var showsSharedLists = false
+    #endif
     @State private var visualScores: [UUID: Float] = [:]
     #if os(iOS) && !SHARE_EXTENSION
     @State private var assistant = Assistant()
@@ -110,6 +116,21 @@ struct HomeView: View {
             if !shows { lockPrivate() }
         }
         .sheet(isPresented: $showsSettings) { SettingsView() }
+        #if !SHARE_EXTENSION
+        .sheet(isPresented: Binding(get: { sharingList != nil }, set: { if !$0 { sharingList = nil } })) {
+            if let sharingList { ShareListSheet(sharingList, library: library) }
+        }
+        .sheet(isPresented: $showsSharedLists) {
+            NavigationStack {
+                SharedListsView(library: library)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { showsSharedLists = false }
+                        }
+                    }
+            }
+        }
+        #endif
         .sheet(isPresented: $showsGuide, onDismiss: guideDismissed) {
             NavigationStack {
                 ShareSheetGuide(onWatched: { guideWatched = true })
@@ -318,10 +339,45 @@ struct HomeView: View {
     }
 
     private var sidebar: some View {
-        Sidebar(library: library, filter: filter, select: select) {
+        Sidebar(library: library, filter: filter, select: select, openSettings: {
             setDrawer(open: false)
             showsSettings = true
-        }
+        }, shareTag: canShareLists ? { tag in
+            setDrawer(open: false)
+            shareTag(tag)
+        } : nil, openSharedLists: canShareLists ? {
+            setDrawer(open: false)
+            openSharedLists()
+        } : nil)
+    }
+
+    #if SHARE_EXTENSION
+    private let canShareLists = false
+    #else
+    private let canShareLists = true
+    #endif
+
+    private func shareTag(_ tag: String) {
+        #if !SHARE_EXTENSION
+        sharingList = .tag(tag, in: library)
+        #endif
+    }
+
+    private func openSharedLists() {
+        #if !SHARE_EXTENSION
+        showsSharedLists = true
+        #endif
+    }
+
+    private func shareSelection() {
+        #if !SHARE_EXTENSION
+        sharingList = .selection(selectedItems, tag: sharableTag)
+        #endif
+    }
+
+    private var sharableTag: String? {
+        if canShareLists, case let .tag(tag) = filter.scope { return tag }
+        return nil
     }
 
     private var title: String {
@@ -436,7 +492,7 @@ struct HomeView: View {
             } else {
                 FeedTile(item: item, library: library) { actions.openInApp(item) }
                     .matchedTransitionSource(id: item.id, in: zoom)
-                    .popoverTip(isFirst ? longPressTip : nil, arrowEdge: .top)
+                    .popoverTip(isFirst && !feedIsCovered ? longPressTip : nil, arrowEdge: .top)
                     .contextMenu {
                         ItemMenu(item: item, actions: actions)
                             .onAppear { longPressTip.invalidate(reason: .actionPerformed) }
@@ -481,6 +537,15 @@ struct HomeView: View {
                 }
             }
             ToolbarItemGroup(placement: .bottomBar) {
+                if canShareLists {
+                    Button("Share as List", systemImage: "square.and.arrow.up") {
+                        shareSelection()
+                        selecting = false
+                        selection = []
+                    }
+                    .disabled(selection.isEmpty)
+                    Spacer()
+                }
                 Button("Tag", systemImage: "tag") { actions.editTags(selectedItems) }
                     .disabled(selection.isEmpty)
                 Spacer()
@@ -523,6 +588,9 @@ struct HomeView: View {
                     Button("Enter Link…", systemImage: "character.cursor.ibeam") { showsLinkEntry = true }
                     if !library.items.isEmpty {
                         Button("Select", systemImage: "checkmark.circle") { selecting = true }
+                    }
+                    if let sharableTag {
+                        Button("Share List…", systemImage: "square.and.arrow.up") { shareTag(sharableTag) }
                     }
                     NavigationLink {
                         ShareSheetGuide()

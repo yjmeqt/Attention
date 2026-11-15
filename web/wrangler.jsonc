@@ -1,0 +1,52 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "attention-web",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-29",
+  // Served only on the custom domain, so shared-list links have one origin.
+  "routes": [
+    { "pattern": "attentioncard.com", "custom_domain": true },
+    // A second host for "View in Attention" buttons: iOS only opens the app for a link to another domain.
+    { "pattern": "open.attentioncard.com", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  // Static files are served as is; the home page (by language), the API and shared lists run the Worker.
+  "assets": {
+    "directory": "./public",
+    "run_worker_first": ["/", "/en", "/en/", "/zh", "/zh/", "/zh-hant", "/zh-hant/", "/api/*", "/l/*", "/.well-known/*"]
+  },
+  "r2_buckets": [
+    { "binding": "LISTS", "bucket_name": "attention-lists" },
+    // Private. Mail to support@ and report@, stored by src/mail.ts.
+    { "binding": "MAIL", "bucket_name": "attention-mail" }
+  ],
+  // Per IP. Workers rate limits count over 10 or 60 seconds only.
+  "ratelimits": [
+    { "name": "UPLOAD_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    // The home page's live link preview; cached previews don't count.
+    { "name": "UNFURL_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
+  ],
+  // Counts uploads across the site per day; see src/quota.ts.
+  "durable_objects": {
+    "bindings": [{ "name": "UPLOAD_QUOTA", "class_name": "UploadQuota" }]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["UploadQuota"] }
+  ],
+  "vars": {
+    // Kill switch: set to "false" and deploy to stop new uploads. Shared lists stay readable.
+    "UPLOADS_ENABLED": "true",
+    // Uploads allowed per UTC day across the whole site, whatever the IP.
+    "DAILY_UPLOAD_LIMIT": "500",
+    // Messages kept per UTC day; more are refused with a "try tomorrow" bounce.
+    "DAILY_MAIL_LIMIT": "200",
+    // The universal-link host for "View in Attention" buttons (see routes).
+    "OPEN_HOST": "open.attentioncard.com",
+    // Where the "Report" link on a shared list goes; the list's URL is appended.
+    // report@ is a Cloudflare Email Routing address that forwards to the developer.
+    "REPORT_URL": "mailto:report@attentioncard.com?subject=Report%20shared%20list&body="
+  },
+  // Secret IMAGE_KEY (wrangler secret put IMAGE_KEY) signs /api/image URLs; .dev.vars has a local one.
+  "observability": { "enabled": true }
+}

@@ -30,9 +30,13 @@ settings:
     Debug:
       APP_BUNDLE_ID: com.yjmeqt.attn.dev
       APP_DISPLAY_NAME: Attention Dev
+      # Debug builds fetch apple-app-site-association straight from the site instead of Apple's CDN
+      # (needs Developer Mode on a device; simulators allow it).
+      APPLINKS_MODE: "?mode=developer"
     Release:
       APP_BUNDLE_ID: com.yjmeqt.attn
       APP_DISPLAY_NAME: Attention
+      APPLINKS_MODE: ""
 
 targets:
   Attention:
@@ -63,6 +67,9 @@ targets:
         com.apple.developer.icloud-services: [CloudKit]
         # Silent pushes tell the library there's something new in iCloud.
         aps-environment: development
+        # Shared lists open in the app (web/src/index.ts serves the apple-app-site-association file).
+        # Not on the Mac app until it can show them, or Mac browsers would hand these links to it.
+        com.apple.developer.associated-domains: ["applinks:attentioncard.com$(APPLINKS_MODE)", "applinks:open.attentioncard.com$(APPLINKS_MODE)"]
     info:
       path: App/Info.plist
       properties:
@@ -134,6 +141,7 @@ targets:
       - Shared/Intake
       - Shared/Library/Library.swift
       - Shared/Library/LibraryItem.swift
+      - Shared/Library/SharedListRecord.swift
       - Shared/Library/ImageData.swift
       - Shared/Features/Feed.swift
       - Shared/Features/FeedFilter.swift
@@ -182,7 +190,7 @@ targets:
     sources:
       - ShareExtension
       - path: Shared
-        excludes: [Search]
+        excludes: [Search, Sharing]
     entitlements:
       path: ShareExtension/AttentionExtension.entitlements
       properties:
@@ -244,7 +252,8 @@ targets:
       - ShareExtension/ShareViewController.swift
       - ShareExtension/PrivacyInfo.xcprivacy
       - ActionExtension/Save
-      - Shared
+      - path: Shared
+        excludes: [Sharing]
     entitlements:
       path: ShareExtension/AttentionExtension.entitlements
       properties:
@@ -279,7 +288,8 @@ targets:
       - ShareExtension/ShareViewController.swift
       - ShareExtension/PrivacyInfo.xcprivacy
       - ActionExtension/Card
-      - Shared
+      - path: Shared
+        excludes: [Sharing]
     entitlements:
       path: ShareExtension/AttentionExtension.entitlements
       properties:

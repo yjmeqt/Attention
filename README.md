@@ -18,6 +18,7 @@ Links from YouTube, X and many other sites show up in WeChat as a bare URL, with
 | [`ios/`](ios) | iOS 26+, iPhone, iPad and iPhone Duo (SwiftUI, Swift 6) | Main app, feature complete for 1.0 |
 | [`ios/Mac/`](ios/Mac) | macOS 26+: library window and menu bar item (SwiftUI, AppKit), same Xcode project and App Store record | New |
 | [`android/`](android) | Android 12+ (Kotlin, Jetpack Compose, Material 3) | In progress |
+| [`web/`](web) | Website and shared-list service (Cloudflare Worker, TypeScript) | New, not deployed |
 | [`docs/`](docs) | App Store preparation, privacy policy | |
 
 HarmonyOS is planned as a sibling `harmony/` folder. Each platform is a self-contained native project; behaviour is kept in sync by porting from the iOS implementation, which is the reference.
@@ -85,4 +86,4 @@ Package and application ID: `com.yijiang.attention`. The launcher icon is an ada
 ## Docs
 
 - [App Store submission](docs/app-store.md): identifiers, listing copy, screenshots, privacy answers, checklist
-- [Privacy policy](docs/privacy-policy.md): needs to be published at a public URL before submission
+- [Privacy policy](web/public/privacy.html): published at https://attentioncard.com/privacy
