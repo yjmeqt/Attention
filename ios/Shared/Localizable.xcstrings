@@ -12112,6 +12112,76 @@
           }
         }
       }
+    },
+    "Attention's server couldn't confirm this copy of the app. Update Attention from the App Store and try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention's server couldn't confirm this copy of the app. Update Attention from the App Store and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention 的服务器无法确认这是正版 App。请从 App Store 更新 Attention 后再试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention 的伺服器無法確認這是正版 App。請從 App Store 更新 Attention 後再試一次。"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention のサーバでこのコピーを確認できませんでした。App Store で Attention をアップデートしてから、もう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention 서버가 이 앱을 확인할 수 없습니다. App Store에서 Attention을 업데이트한 다음 다시 시도하세요."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server von Attention konnte diese App nicht bestätigen. Aktualisiere Attention im App Store und versuche es noch einmal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur d’Attention n’a pas pu vérifier cette copie de l’app. Mettez Attention à jour depuis l’App Store et réessayez."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor de Attention no pudo verificar esta copia de la app. Actualiza Attention desde el App Store e inténtalo de nuevo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер Attention не смог подтвердить эту копию приложения. Обновите Attention в App Store и повторите."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máy chủ của Attention không xác nhận được bản app này. Hãy cập nhật Attention từ App Store rồi thử lại."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر على خادم Attention التحقق من هذه النسخة من التطبيق. حدّث Attention من App Store وحاول مرة أخرى."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

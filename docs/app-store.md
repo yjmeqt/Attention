@@ -160,5 +160,5 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 - [ ] Review the regenerated screenshots (see Screenshots) and upload them (`Tools/release.sh metadata --apply`)
 - [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
-- [ ] Shared lists, before the first build with them: deploy the CloudKit schema (`SharedListRecord`) to Production, update App Privacy and the age rating as above, and turn on R2 usage notifications in the Cloudflare dashboard
+- [ ] Shared lists, before the first build with them: deploy the CloudKit schema (`SharedListRecord`) to Production, update App Privacy and the age rating as above, and turn on R2 usage notifications in the Cloudflare dashboard. Once that build is out and real-device uploads log `valid`, set `ATTEST_MODE` to `"require"` (web/README.md)
 - [ ] Pricing and availability (not decided yet)

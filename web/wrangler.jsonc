@@ -37,6 +37,8 @@
   "vars": {
     // Kill switch: set to "false" and deploy to stop new uploads. Shared lists stay readable.
     "UPLOADS_ENABLED": "true",
+    // App Attest on uploads (src/attest.ts): "log" records the result, "require" refuses uploads that fail, "off" skips it.
+    "ATTEST_MODE": "log",
     // Uploads allowed per UTC day across the whole site, whatever the IP.
     "DAILY_UPLOAD_LIMIT": "500",
     // Messages kept per UTC day; more are refused with a "try tomorrow" bounce.

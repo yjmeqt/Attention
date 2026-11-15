@@ -228,6 +228,7 @@ struct ShareListSheet: View {
         case .uploadsPaused: String(localized: "Sharing lists is paused for now. Try again later.")
         case .rejected: String(localized: "Attention's server didn't accept this list.")
         case .unavailable: String(localized: "Couldn't reach Attention's server. Check your connection and try again.")
+        case .unknownAttestKey, .notVerified: String(localized: "Attention's server couldn't confirm this copy of the app. Update Attention from the App Store and try again.")
         }
     }
 }
