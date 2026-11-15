@@ -28,7 +28,7 @@ Traditional Chinese uses the shared `zh-Hant` locale for Taiwan and Hong Kong. O
 | `description.txt` | 4000 characters |
 | `keywords.txt` | 100 characters, comma-separated, no app name |
 | `release_notes.txt` | What's New |
-| `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | Support and privacy point at the GitHub Pages site; marketing is empty |
+| `support_url.txt`, `privacy_url.txt`, `marketing_url.txt` | `https://attentioncard.com/support`, `/privacy` and the home page |
 
 English, Simplified Chinese and Traditional Chinese lead with sending YouTube and X links to WeChat, which shows them as a bare URL, as image cards with title, cover and QR code; the library, tags and search come after. Traditional Chinese frames it as sending to WeChat groups and friends in mainland China, since LINE and WhatsApp already preview links. The other nine locales still lead with all your links from every app and site in one place, with no feed, no algorithm and no tracking. The app's empty screen still uses the library pitch outside Simplified Chinese. Keywords leave out third-party names (YouTube, X, WeChat), per guideline 2.3.7. Plain "Attention" belongs to another developer, so every name adds a localized tail: "Attention – Link Preview Cards" in English, "Attention – 链接转图片卡片" and "Attention – 連結轉圖片卡片" in Chinese, "Attention – All Your Links" and its equivalents elsewhere (1.0 shipped as "Attention – Save & Share Links" everywhere). Subtitles avoid repeating the name's words, since both are indexed.
 
@@ -70,7 +70,7 @@ Internal testing needs nothing beyond an uploaded build. External testing needs 
 |---|---|
 | Beta App Description | below |
 | Feedback Email | the address testers' screenshots and comments go to |
-| Privacy Policy URL | `https://yjmeqt.github.io/Attention/privacy-policy.html` |
+| Privacy Policy URL | `https://attentioncard.com/privacy` |
 | Marketing URL | leave empty |
 | Beta App Review contact | name, phone and email of whoever Apple should call |
 | Sign-in required | No |
@@ -143,7 +143,7 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 
 - **Privacy manifest**: `ios/App/PrivacyInfo.xcprivacy` and `ios/ShareExtension/PrivacyInfo.xcprivacy`. No tracking, no collected data; UserDefaults is declared with reasons `CA92.1` (app-only) and `1C8F.1` (App Group).
 - **App Privacy questionnaire**: answer **Data Not Collected**. Links are fetched from the device and never sent to the developer.
-- **Privacy policy and support page**: `docs/privacy-policy.md` and `docs/support.md` (Chinese and English), published by GitHub Pages from `docs/` on `main` at `https://yjmeqt.github.io/Attention/privacy-policy.html` and `https://yjmeqt.github.io/Attention/support.html`. `docs/_config.yml` keeps the other docs off the site.
+- **Privacy policy and support page**: `web/public/privacy.html` and `web/public/support.html` (English, Simplified and Traditional Chinese), served by the Worker at `https://attentioncard.com/privacy` and `https://attentioncard.com/support`. The old GitHub Pages URLs (`docs/privacy-policy.html`, `docs/support.html`) redirect there, keeping any `#zh` or `#zh-hant` anchor; `docs/_config.yml` keeps the other docs off that site.
 - **Permission prompts**: camera (QR scanning) and adding to Photos, in all listed languages (`InfoPlist.strings`).
 
 ## Age rating and export compliance

@@ -7,6 +7,10 @@ struct Sidebar: View {
     let filter: FeedFilter
     let select: (FeedFilter.Scope) -> Void
     let openSettings: () -> Void
+    /// Shares a tag's items as a list; the tag rows' menu offers it when set.
+    var shareTag: ((String) -> Void)?
+    /// Opens the lists this person shared; the row shows when set.
+    var openSharedLists: (() -> Void)?
 
     @State private var showsSites = true
     @State private var showsTags = true
@@ -55,6 +59,11 @@ struct Sidebar: View {
                                 row(.tag(tag.value), count: tag.count) {
                                     Label(tag.value, systemImage: "number")
                                 }
+                                .contextMenu {
+                                    if let shareTag {
+                                        Button("Share List…", systemImage: "square.and.arrow.up") { shareTag(tag.value) }
+                                    }
+                                }
                             }
                             if tags.count > Self.shortList { moreButton($allTags) }
                         }
@@ -66,6 +75,11 @@ struct Sidebar: View {
             .scrollIndicators(.hidden)
             VStack(alignment: .leading, spacing: 2) {
                 Divider().padding(.horizontal, 12).padding(.bottom, 6)
+                if let openSharedLists {
+                    rowButton(selected: false, action: openSharedLists) {
+                        Label("Shared Lists", systemImage: "square.and.arrow.up.on.square")
+                    }
+                }
                 row(.archived) { Label("Archived", systemImage: "archivebox") }
                 row(.locked) { Label("Private", systemImage: filter.privateUnlocked ? "lock.open" : "lock") }
                 rowButton(selected: false, action: openSettings) {

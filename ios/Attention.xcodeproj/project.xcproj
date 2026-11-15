@@ -196,10 +196,14 @@
                 "ImageData.swift",
                 "Library.swift",
                 "LibraryItem.swift",
+                "SharedListRecord.swift",
               ],
             },
           ],
-        }, {
+        },
+        // Sharing lists and opening shared ones: the app only, not the extensions or the Mac app yet.
+        { "kind": "folder", "path": "Sharing", "target-membership": [ "Attention" ] },
+        {
           "kind": "folder",
           "path": "Search",
           "target-membership": [
@@ -400,6 +404,10 @@
     "APP_BUNDLE_ID[config=Release]": "com.yjmeqt.attn",
     "APP_DISPLAY_NAME[config=Debug]": "Attention Dev",
     "APP_DISPLAY_NAME[config=Release]": "Attention",
+    // Debug builds fetch apple-app-site-association straight from the site instead of Apple's CDN
+    // (needs Developer Mode on a device; simulators allow it). Used by App/Attention.entitlements.
+    "APPLINKS_MODE[config=Debug]": "?mode=developer",
+    "APPLINKS_MODE[config=Release]": "",
     "APP_GROUP_ID": "group.$(APP_BUNDLE_ID).shared",
     "CLANG_ANALYZER_NONNULL": "YES",
     "CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION": "YES_AGGRESSIVE",

@@ -17,3 +17,9 @@ struct LongPressTip: Tip {
         MaxDisplayCount(3)
     }
 }
+
+extension EnvironmentValues {
+    /// True while something presented over the feed from outside it, such as a shared list,
+    /// covers the feed, so the tip doesn't pop up on top of it.
+    @Entry var feedIsCovered = false
+}

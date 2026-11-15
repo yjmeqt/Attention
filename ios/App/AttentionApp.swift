@@ -29,6 +29,7 @@ struct AttentionApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView(library: library)
+                .modifier(SharedListOpener(library: library))
         }
     }
 }

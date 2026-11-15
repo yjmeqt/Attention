@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- The app icon, light only: used inside cards, which are always light. -->
+  <clipPath id="shape"><rect width="1024" height="1024" rx="230"/></clipPath>
+  <g clip-path="url(#shape)">
+    <rect width="1024" height="1024" fill="#F6F3ED"/>
+    <rect x="512" y="512" width="512" height="512" fill="#E8402A"/>
+    <rect x="143" y="752" width="226" height="32" fill="#15151A"/>
+  </g>
+  <rect x="1" y="1" width="1022" height="1022" rx="229" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="8"/>
+</svg>

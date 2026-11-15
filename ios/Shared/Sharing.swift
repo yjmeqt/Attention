@@ -65,9 +65,10 @@ final class ShareItem: NSObject, UIActivityItemSource {
         metadata.imageProvider = NSItemProvider(object: image)
     }
 
-    init(url: URL, title: String, icon: UIImage?) {
+    init(url: URL, title: String, icon: UIImage?, image: UIImage? = nil) {
         item = url
         metadata = Self.metadata(title: title, url: url, icon: icon)
+        metadata.imageProvider = image.map { NSItemProvider(object: $0) }
     }
 
     private static func metadata(title: String, url: URL?, icon: UIImage?) -> LPLinkMetadata {

@@ -25,7 +25,7 @@ enum CloudSync {
 enum Brand {
     static let name = "Attention"
     static let appStoreURL = URL(string: "https://apps.apple.com/app/id6827156660")!
-    static let privacyPolicyURL = URL(string: "https://yjmeqt.github.io/Attention/privacy-policy.html")!
+    static let privacyPolicyURL = URL(string: "https://attentioncard.com/privacy")!
 }
 
 enum LinkKind: String, Codable {

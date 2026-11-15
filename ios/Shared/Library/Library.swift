@@ -43,7 +43,7 @@ final class Library {
             : ModelConfiguration(url: directory.appending(path: "Library.store"), cloudKitDatabase: cloud)
         let container: ModelContainer
         do {
-            container = try ModelContainer(for: LibraryItem.self, configurations: configuration)
+            container = try ModelContainer(for: LibraryItem.self, SharedListRecord.self, configurations: configuration)
         } catch {
             fatalError("Couldn't open the library: \(error)")
         }
@@ -114,6 +114,28 @@ final class Library {
             refreshThumbnail(keeper)
         }
         save()
+    }
+
+    // MARK: - Shared lists
+
+    /// Lists this person shared, newest first.
+    func sharedLists() -> [SharedListRecord] {
+        let descriptor = FetchDescriptor<SharedListRecord>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
+        // Two devices never hold the same list: each upload gets a new ID. A record CloudKit
+        // delivered twice is folded here.
+        var seen: Set<String> = []
+        return ((try? context.fetch(descriptor)) ?? []).filter { seen.insert($0.listID).inserted }
+    }
+
+    func recordSharedList(_ record: SharedListRecord) {
+        context.insert(record)
+        try? context.save()
+    }
+
+    func removeSharedList(id: String) {
+        let doomed = (try? context.fetch(FetchDescriptor<SharedListRecord>(predicate: #Predicate { $0.listID == id }))) ?? []
+        doomed.forEach(context.delete)
+        try? context.save()
     }
 
     func reload() {

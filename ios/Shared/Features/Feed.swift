@@ -54,16 +54,13 @@ struct FeedTile: View {
     @ViewBuilder
     private var content: some View {
         let _ = library.revision
-        Group {
-            if let photo = library.thumbnail(item) {
-                card(photo)
-            } else {
-                lockup
-            }
-        }
-        .clipShape(.rect(cornerRadius: 16, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(.separator.opacity(0.4), lineWidth: 0.5)
+        let photo = library.thumbnail(item)
+        // An image without a title shows just its eyebrow under the photo.
+        FeedTileFace(photo: photo, aspect: item.thumbnailAspect, tint: library.tint(item).map { CardTint(color: $0.color, isDark: $0.isDark) },
+                     title: photo != nil && item.isImage && item.title.isEmpty ? nil : item.displayTitle) {
+            Eyebrow(item: item, library: library)
+        } footer: {
+            footerRow
         }
         .overlay(alignment: .topTrailing) {
             if isSelecting {
@@ -83,49 +80,6 @@ struct FeedTile: View {
         .contentShape(.rect(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-    }
-
-    /// A photo with a band below it in the photo's own color, like App Store Today cards.
-    private func card(_ photo: PlatformImage) -> some View {
-        let tint = library.tint(item)
-        return VStack(alignment: .leading, spacing: 0) {
-            // Full width in a cell of a set height: the photo takes whatever the band leaves.
-            Color.clear
-                .aspectRatio(item.thumbnailAspect, contentMode: .fit)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .overlay { Image(platformImage: photo).resizable().scaledToFill() }
-                .clipped()
-            VStack(alignment: .leading, spacing: 4) {
-                Eyebrow(item: item, library: library)
-                if !item.isImage || !item.title.isEmpty {
-                    Text(item.displayTitle)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(3)
-                        .multilineTextAlignment(.leading)
-                }
-                footerRow
-            }
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
-            .background(tint.map(\.color) ?? .secondaryBackground)
-            .environment(\.colorScheme, tint.map { $0.isDark ? .dark : .light } ?? colorScheme)
-        }
-    }
-
-    /// Links without a photo: the same text as under a photo, on a plain band.
-    private var lockup: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Eyebrow(item: item, library: library)
-            Text(item.displayTitle)
-                .font(.subheadline.weight(.semibold))
-                .lineLimit(6)
-                .multilineTextAlignment(.leading)
-            footerRow
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.secondaryBackground)
     }
 
     /// Time on the left; links get an Open button on the right, like the App Store's Get button.
@@ -152,8 +106,82 @@ struct FeedTile: View {
         .font(.caption2)
         .foregroundStyle(.secondary)
     }
+}
+
+/// How every feed tile looks: the app's feed, a list someone shared, and that list's link preview.
+/// A photo over a band in the photo's own color, like App Store Today cards; without a photo, the
+/// same text on a plain band.
+struct FeedTileFace<Eyebrow: View, Footer: View>: View {
+    let photo: PlatformImage?
+    /// Width ÷ height of the photo's box.
+    let aspect: Double
+    /// The band's color, from the photo's bottom edge.
+    let tint: CardTint?
+    /// Under a photo, nil leaves the band to the eyebrow and footer.
+    let title: String?
+    var titleLines = 3
+    var lockupLines = 6
+    /// In the feed, cells have a set height and the photo takes what the band leaves; elsewhere the photo
+    /// keeps its aspect ratio and the tile is as tall as it needs.
+    var fillsCell = true
+    @ViewBuilder let eyebrow: () -> Eyebrow
+    @ViewBuilder let footer: () -> Footer
 
     @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Group {
+            if let photo {
+                card(photo)
+            } else {
+                lockup
+            }
+        }
+        .clipShape(.rect(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(.separator.opacity(0.4), lineWidth: 0.5)
+        }
+    }
+
+    private func card(_ photo: PlatformImage) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Full width in a cell of a set height: the photo takes whatever the band leaves.
+            Color.clear
+                .aspectRatio(aspect, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: fillsCell ? .infinity : nil)
+                .overlay { Image(platformImage: photo).resizable().scaledToFill() }
+                .clipped()
+            VStack(alignment: .leading, spacing: 4) {
+                eyebrow()
+                if let title {
+                    Text(verbatim: title)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(titleLines)
+                        .multilineTextAlignment(.leading)
+                }
+                footer()
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
+            .background(tint.map(\.color) ?? .secondaryBackground)
+            .environment(\.colorScheme, tint.map { $0.isDark ? .dark : .light } ?? colorScheme)
+        }
+    }
+
+    private var lockup: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            eyebrow()
+            Text(verbatim: title ?? "")
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(lockupLines)
+                .multilineTextAlignment(.leading)
+            footer()
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.secondaryBackground)
+    }
 }
 
 /// The platform line above a title: favicon and site name.
