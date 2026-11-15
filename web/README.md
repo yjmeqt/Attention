@@ -56,7 +56,7 @@ Workers stays on the free plan, where going over the limits fails requests rathe
 
 - `DAILY_UPLOAD_LIMIT` (default 500): uploads per UTC day across the whole site, counted by the `UploadQuota` Durable Object.
 - `UPLOADS_ENABLED`: set to `"false"` and `npm run deploy` to stop new uploads at once. Shared lists stay readable.
-- `ATTEST_MODE`: App Attest on uploads (`src/attest.ts`). `"log"` records whether each upload's assertion checks out (`wrangler tail` shows `{"attest":"upload",...}`), `"require"` refuses uploads without a valid one, `"off"` skips the check. Switch to `"require"` once builds with App Attest are out and real-device uploads log `valid`. `node scripts/attest-fixture.mjs` remakes the test chain in `test/fixtures/attest.json`.
+- `ATTEST_MODE`: App Attest on uploads (`src/attest.ts`). `"log"` records whether each upload's assertion checks out (`wrangler tail` shows `{"attest":"upload",...}`), `"require"` refuses uploads without a valid one, `"off"` skips the check. It's `"require"`, so simulators can't upload to the live site; tests run with `"log"` (vitest.config.ts). `node scripts/attest-fixture.mjs` remakes the test chain in `test/fixtures/attest.json`.
 
 ## Deploying
 

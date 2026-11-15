@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: { configPath: "./wrangler.jsonc" },
-      miniflare: { bindings: { IMAGE_KEY: "test-key" } },
+      // Most tests upload without an assertion; test/attest.test.ts checks "require" itself.
+      miniflare: { bindings: { IMAGE_KEY: "test-key", ATTEST_MODE: "log" } },
     }),
   ],
 });

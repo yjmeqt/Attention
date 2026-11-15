@@ -1,4 +1,5 @@
 import { env, SELF } from "cloudflare:test";
+import worker from "../src/index";
 import { describe, expect, it } from "vitest";
 import { appAttestRootPEM } from "../src/appAttestRoot";
 import {
@@ -140,7 +141,23 @@ describe("App Attest", () => {
     expect(created.status).toBe(201);
     expect((await (await env.LISTS.get(path))!.json<{ counter: number }>()).counter).toBe(5);
 
-    // In "log" mode (wrangler.jsonc), uploads without an assertion still go through.
+    // In "log" mode (the tests' setting), uploads without an assertion still go through.
     expect((await upload({}, "10.9.0.4")).status).toBe(201);
+  });
+
+  it("refuses uploads without a valid assertion in \"require\" mode", async () => {
+    const strict = { ...env, ATTEST_MODE: "require" } as unknown as typeof env;
+    const upload = async (headers: Record<string, string>, ip: string) => {
+      const form = new FormData();
+      form.set("list", JSON.stringify({ v: 1, title: "Strict", lang: "en", items: [{ kind: "text", text: "hello" }] }));
+      return worker.fetch!(new Request(`${origin}/api/lists`, { method: "POST", body: form, headers: { "CF-Connecting-IP": ip, ...headers } }) as never, strict);
+    };
+    const missing = await upload({}, "10.9.1.1");
+    expect(missing.status).toBe(401);
+    expect(await missing.json()).toMatchObject({ error: "attestation_required", message: "missing" });
+    const { challenge } = await (await SELF.fetch(`${origin}/api/attest/challenge`)).json<{ challenge: string }>();
+    const unknown = await upload({ "X-Attest-Key": base64(new Uint8Array(32)), "X-Attest-Challenge": challenge, "X-Attest-Assertion": "AA" }, "10.9.1.2");
+    expect(unknown.status).toBe(401);
+    expect(await unknown.json()).toMatchObject({ error: "unknown_attest_key" });
   });
 });
