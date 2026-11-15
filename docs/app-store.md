@@ -160,5 +160,6 @@ The outputs are opaque 3840 × 2560 PNGs (3:2). Inspect them before uploading to
 - [ ] Review the regenerated screenshots (see Screenshots) and upload them (`Tools/release.sh metadata --apply`)
 - [x] Archive with the Release configuration and upload; 1.0 (2) is the build for the public TestFlight link. `Tools/release.sh beta` does this and bumps `CURRENT_PROJECT_VERSION`
 - [ ] Fill in App Privacy, age rating, category and review notes
-- [ ] Shared lists, before the first build with them: deploy the CloudKit schema (`SharedListRecord`) to Production, update App Privacy and the age rating as above, and turn on R2 usage notifications in the Cloudflare dashboard. The Worker already requires App Attest on uploads (`ATTEST_MODE` `"require"`, web/README.md)
+- [x] Shared lists: CloudKit schema (`LibraryItem` and `SharedListRecord`) deployed to Production, App Privacy published (Other User Content), R2 usage notifications on (storage 8 GB, Class A 800k, Class B 8M a month). The Worker requires App Attest on uploads (`ATTEST_MODE` `"require"`, web/README.md)
+- [ ] With the next app version: answer Yes to user-generated content in the age rating (it can't be edited while no version is being prepared) and change the privacy policy URL to `https://attentioncard.com/privacy`
 - [ ] Pricing and availability (not decided yet)
